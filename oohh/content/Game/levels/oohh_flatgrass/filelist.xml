@@ -1,0 +1,6 @@
+<download name="oohh_flatgrass" type="Map">
+ <index src="filelist.xml" dest="filelist.xml"/>
+ <files>
+  <file src="level.pak" dest="level.pak" size="676775" md5="44dc12b93d0bc3ba27e344969dff564e"/>
+ </files>
+</download>

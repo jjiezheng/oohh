@@ -1,0 +1,4 @@
+<Entity
+ Name="oohh_scripted_entity"
+ Script="Scripts/Entities/oohh_scripted_entity.lua"
+/>
