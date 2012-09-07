@@ -70,7 +70,7 @@ LUAMTA_FUNCTION(physics, StepBack)
 LUAMTA_FUNCTION(physics, AddAngleVelocity)
 {
 	pe_action_impulse params;
-		params.iApplyTime = 2;
+		params.iApplyTime = 0;
 		params.angImpulse = my->ToVec3(2);
 		params.point = my->ToVec3(3, params.point);
 		params.ipart = my->ToNumber(4, params.ipart);
@@ -83,7 +83,7 @@ LUAMTA_FUNCTION(physics, AddVelocity)
 {
 	auto self = my->ToPhysics(1);
 	pe_action_impulse params;
-		params.iApplyTime = 2;
+		params.iApplyTime = 0;
 		params.impulse = my->ToVec3(2);
 		params.point = my->ToVec3(3, params.point);
 		params.ipart = my->ToNumber(4, params.ipart);
@@ -98,9 +98,19 @@ LUAMTA_FUNCTION(physics, SetAngleVelocity)
 		params.v = my->ToVec3(2);
 		params.w = my->ToVec3(3, params.w);
 		params.ipart = my->ToNumber(4, params.ipart);
-#ifdef CE3
 		params.bRotationAroundPivot = 1;
-#endif
+	my->ToPhysics(1)->Action(&params);
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(physics, SetVelocity)
+{
+	pe_action_set_velocity params;
+		params.v = my->ToVec3(2);
+		params.w = my->ToVec3(3, params.w);
+		params.ipart = my->ToNumber(4, params.ipart);
+		params.bRotationAroundPivot = 0;
 	my->ToPhysics(1)->Action(&params);
 
 	return 0;
@@ -115,25 +125,20 @@ LUAMTA_FUNCTION(physics, GetAngleVelocity)
 	return 1;
 }
 
-LUAMTA_FUNCTION(physics, SetVelocity)
-{
-	pe_action_set_velocity params;
-		params.v = my->ToVec3(2);
-		params.w = my->ToVec3(3, params.w);
-		params.ipart = my->ToNumber(4, params.ipart);
-#ifdef CE3
-		params.bRotationAroundPivot = 0;
-#endif
-	my->ToPhysics(1)->Action(&params);
-
-	return 0;
-}
-
 LUAMTA_FUNCTION(physics, GetVelocity)
 {
 	pe_status_dynamics params;
 		my->ToPhysics(1)->GetStatus(&params);
 	my->Push(params.v);
+
+	return 1;
+}
+
+LUAMTA_FUNCTION(physics, Reset)
+{
+	pe_action_reset params;
+		params.bClearContacts = my->ToBoolean(2) ? 0 : 1;
+	my->ToPhysics(1)->Action(&params);
 
 	return 1;
 }

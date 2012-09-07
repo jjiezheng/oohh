@@ -5,6 +5,12 @@ hook.Add("SystemEvent", "noborder", function(event)
 			timer.Simple(0, function()
 				window.SetRect(window.GetWorkingRect())
 				window.SetNoBorder(true)
+				
+				timer.Simple(0, function()
+					if aahh then
+						aahh.World:RequestLayout()
+					end
+				end)
 			end)
 		end	
 	end

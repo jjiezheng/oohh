@@ -13,16 +13,19 @@ LUAMTA_FUNCTION(entity, __tostring)
 	return 1;
 }
 
-// normally the uniqueid is the pointer of the ... pointer. 
-// Since we want the actor to be the same as entity we should 
-// give it the same id as entity so user data stored in its
-// table will be the same
+/* 
+Normally the uniqueid is the pointer of the ... pointer. 
+
+Since we want for example an actor instance of an entity to be the 
+same as the entity we should give it the same id as entity so user 
+data stored in its table will be shared between actor and entity 
+*/
 
 LUAMTA_FUNCTION(entity, __uniqueid)
 {
 	auto self = my->ToEntity(1);
 
-	my->Push(self->GetId());
+	my->Push((long int)self);
 
 	return 1;
 }

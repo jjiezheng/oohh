@@ -12,10 +12,14 @@
 #include "physinterface.h"
 #include "Weapon.h"
 
+#include <Awesomium/WebView.h>
+
 #define VC_EXTRALEAN
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #undef GetUserName
+#undef PlaySound
+#undef small
 
 struct Rect
 {
@@ -67,6 +71,8 @@ public:
 	MMYY_WRAP_CLASS_NO_PUSH(CActor, Actor, actor)
 	MMYY_WRAP_CLASS(IPhysicalEntity, Physics, physics)
 	MMYY_WRAP_CLASS(CCamera, Camera, camera)
+
+	MMYY_WRAP_CLASS(Awesomium::WebView, WebView, webview)
 
 	MMYY_WRAP_CLASS_NO_PUSH(IEntity, Entity, entity)
 

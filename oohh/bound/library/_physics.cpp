@@ -76,3 +76,17 @@ LUALIB_FUNCTION(physics, SetSnapshotTime)
 
 	return 1;
 }
+
+LUALIB_FUNCTION(physics, SetGravity)
+{
+	gEnv->pPhysicalWorld->GetPhysVars()->gravity = my->ToVec3(1);
+
+	return 1;
+}
+
+LUALIB_FUNCTION(physics, GetGravity)
+{
+	my->Push(Vec3(gEnv->pPhysicalWorld->GetPhysVars()->gravity));
+
+	return 1;
+}

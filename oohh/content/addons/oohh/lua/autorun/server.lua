@@ -9,7 +9,7 @@ if SERVER or system.GetCommandLine().server then
 		]]
 		)
 				
-		timer.Create("server_kl", 1, 0, function()
+		timer.Create("server_kl", 0.1, 0, function()
 			local pos = Vec3(0,0,0)
 			local server = entities.GetLocalPlayer()
 			local players = entities.GetAllPlayers()
@@ -24,7 +24,7 @@ if SERVER or system.GetCommandLine().server then
 
 				pos = pos / count
 
-				server:SetPos(pos + Vec3(0,0,50))
+				server:SetPos(pos + Vec3(10,10,50))
 			end
 		end)
 	end)

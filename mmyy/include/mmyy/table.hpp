@@ -69,10 +69,3 @@ inline bool my_rawget(lua_State *L, int idx)
 
 	return false;
 }
-
-inline int my_newtable(lua_State *L)
-{
-	lua_newtable(L);
-
-	return lua_gettop(L);
-}

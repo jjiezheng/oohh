@@ -92,15 +92,10 @@ namespace oohh
 
 				my->CallEntityHook(ent, "OnRemove");
 
-
 				if (my_getuidtable(my->L, ent->GetId()))
 				{
-					oohh::PrintStack();
 					luaL_getmetatable(my->L, "null_meta");
-					oohh::PrintStack();
-					lua_setmetatable(my->L, -2);
-					oohh::PrintStack();
-	
+					lua_setmetatable(my->L, -2);	
 					
 					my->Remove(-1);
 				}

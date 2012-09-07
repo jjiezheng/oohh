@@ -1,7 +1,7 @@
 entities = entities or {}
 
 function entities.GetAllPlayers()
-	return entities.GetAllByClass("Player")
+	return entities.FindByClass("Player", true)
 end
 
 function entities.GetAllPhysics()
@@ -15,13 +15,15 @@ function entities.GetAllPhysics()
 	return new
 end
 
-function entities.FindByClass(name)
+function entities.FindByClass(name, exact)
 	local tbl = {}
 
-	name = name:lower()
+	if not exact then
+		name = name:lower()
+	end
 
 	for _, ent in pairs(entities.GetAll()) do
-		if ent:GetClass():lower():find(name) then
+		if exact and ent:GetClass() == name or not exact and ent:GetClass():lower():find(name) then
 			table.insert(tbl, ent)
 		end
 	end

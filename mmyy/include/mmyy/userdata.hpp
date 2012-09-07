@@ -63,30 +63,33 @@ namespace null_meta
 
 inline void my_pushnull(lua_State *L)
 {
-	lua_pushvalue(L, LUA_REGISTRYINDEX);
-		lua_pushinteger(L, (long int)L);
-	lua_gettable(L, -2);
+	lua_pushvalue(L, LUA_REGISTRYINDEX); // _R
+		lua_pushinteger(L, (long int)L); // _R, num
+	lua_gettable(L, -2); // _R, val
 	
-	lua_remove(L, -2);
+	lua_remove(L, -2); // val
 
 	if (lua_isnil(L, -1))
 	{
-		luaL_newmetatable(L, "null_meta");
+		lua_remove(L, -1); //
+
+		luaL_newmetatable(L, "null_meta"); // meta
 			my_setmember(L, -1, "__index", null_meta::__index, true);
 			my_setmember(L, -1, "__tostring", null_meta::__tostring, true);
-		lua_remove(L, -1);
+		lua_remove(L, -1); //
 
-		lua_pushvalue(L, LUA_REGISTRYINDEX);
-			lua_pushinteger(L, (long int)L);
-			lua_newtable(L);
-		lua_settable(L, -3);
+		lua_pushvalue(L, LUA_REGISTRYINDEX); // _R
+			lua_pushinteger(L, (long int)L); // _R, num
+			lua_newtable(L); // _R, num, {}
+		lua_settable(L, -3); // _R
 
-		lua_pushvalue(L, LUA_REGISTRYINDEX);
-			lua_pushinteger(L, (long int)L);
-		lua_gettable(L, -2);
+		lua_pushinteger(L, (long int)L); // _R, num
+		lua_gettable(L, -2); // _R, val
 
-		luaL_getmetatable(L, "null_meta");
-		lua_setmetatable(L, -2);
+		luaL_getmetatable(L, "null_meta"); //, _R, val, meta
+		lua_setmetatable(L, -2); // _R, val
+
+		lua_remove(L, -2); // val
 	}
 }
 
@@ -95,54 +98,48 @@ inline bool my_push(lua_State *L, T *ptr, const char *meta_name)
 {
 	if (ptr != nullptr)
 	{
-		auto box = (T **)lua_newuserdata(L, sizeof(void *));
+		auto box = (T **)lua_newuserdata(L, sizeof(void *)); // udata
 		*box = ptr;
 
-		luaL_getmetatable(L, meta_name);
-		lua_setmetatable(L, -2);
+		luaL_getmetatable(L, meta_name); // udata, meta
+		lua_setmetatable(L, -2); // udata
 
 		return true;
 	}
 	
-	my_pushnull(L);
+	my_pushnull(L); // udata
 
 	return false;
 }
 
 inline bool my_pushentity(lua_State *L, const char *meta_name, unsigned long long id = 0)
 {
-	// _R.ptrtbl
-	if (my_getptrtable(L))
+	my_getptrtable(L); // ptrtbl
+	
+	lua_rawgeti(L, -1, id); // ptrtbl, val
+
+	// doesn't exist? create it
+	if (!lua_istable(L, -1))
 	{
-		// _R.ptrtbl[id]
-		lua_rawgeti(L, -1, id);
+		lua_remove(L, -1); // ptrtbl
 
-		// doesn't exist? create it
-		if (!lua_istable(L, -1))
-		{
-			lua_remove(L, -1);
+		lua_newtable(L); // ptrtbl, {}
 
-			// {}
-			lua_newtable(L);
+		lua_pushstring(L, "___id"); // ptrtbl, {}, "__id"
+		lua_pushinteger(L, id); // ptrtbl, {}, "__id", id
+		lua_rawset(L, -3); // ptrtbl, {}
 
-			// {___id = id}
-			lua_pushstring(L, "___id");
-			lua_pushinteger(L, id);
-			lua_rawset(L, -3);
+		// _R.ptrtbl[id] = {___id = id}
+		lua_rawseti(L, -2, id); // ptrtbl
 
-			// _R.ptrtbl[id] = {___id = id}
-			lua_rawseti(L, -2, id);
-		}
-
-
-		lua_newtable(L);
-		luaL_getmetatable(L, meta_name);
-		lua_setmetatable(L, -2);
-		
-		return true;
+		lua_remove(L, -1); //
 	}
 
-	return false;
+	lua_newtable(L); // {}
+	luaL_getmetatable(L, meta_name);  // {}, meta
+	lua_setmetatable(L, -2); // {}
+		
+	return true;
 }
 
 template<typename T>

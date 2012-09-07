@@ -64,7 +64,7 @@ function util.DeriveMetaFromBase(meta_name, base_name, func_name)
 
 	local func = meta[func_name]
 
-	if not func then error("could not find the function name " .. func_name, 1) end
+	if not func then error("could not find the function name " .. func_name, 2) end
 
 	for name in pairs(base) do
 		if not meta[name] then

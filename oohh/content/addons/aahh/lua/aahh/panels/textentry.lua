@@ -46,7 +46,7 @@ end
 
 function PANEL:OnMouseInput(key, press, pos)
 	if press then	
-		self.CaretPos = math.ceil(((pos.x / self:GetWide()) * #self.Text)) -- wrong
+		self.CaretPos = math.clamp(math.ceil(((pos.x / self:GetTextSize().w) * #self.Text)), 0, #self.Text)
 		self:MakeActivePanel()
 	end
 end
@@ -106,8 +106,13 @@ function PANEL:HandleKey(key)
 		self.Text = self.Text:sub(1, self.CaretPos-1) .. self.Text:sub(self.CaretPos+1)
 		self:HandleKey("left")
 	elseif key == "space" then
-		self.Text = self.Text:sub(1, self.CaretPos+1) .. " " .. self.Text:sub(self.CaretPos+2)
-		self:HandleKey("right")
+		if self.CaretPos == #self.Text then
+			self.Text = self.Text .. " "
+			self.CaretPos = self.CaretPos + 1
+		else
+			self.Text = self.Text:sub(1, self.CaretPos) .. " " .. self.Text:sub(self.CaretPos+1)
+		end
+		--self:HandleKey("right")
 	--elseif key == "tab" then
 	--	self.Text = self.Text .. "\t"
 	--	self:HandleKey("right")

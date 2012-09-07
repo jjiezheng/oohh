@@ -57,15 +57,17 @@ if _ACTION == "link" then
 	link_dir("addons", "oohh/content/addons")
 	link_dir("Game/Scripts", "oohh/content/Game/Scripts")
 	link_dir("Game/Entities", "oohh/content/Game/Entities")
-
-	link_fil("bin32/lua51.dll", "mmyy/lib/lua51.dll")
 	
-	table.insert(cmd, [[BSLASH copy "WORKING_DIR/oohh/auto_dev_login.exe" "TARGET_DIR/bin32"]])
+		
+	local function copy(a, b) table.insert(cmd, f([[BSLASH copy "WORKING_DIR/%s" "TARGET_DIR/%s"]], a, b)) end
+	
+	copy("mmyy/lib/lua51.dll", "bin32")
+	copy("oohh/auto_dev_login.exe", "bin32")
+	copy("awesomium/build/bin/*", "bin32")
 	
 	if not WARS then
 		link_dir("Game/Levels/oh_island", "oohh/content/Game/Levels/oh_island")
-		link_dir("Game/Levels/oohh_flatgrass", "oohh/content/Game/Levels/oohh_flatgrass")
-		link_dir("Game/Levels/nope", "oohh/content/Game/Levels/nope")
+		link_dir("Game/Levels/oh_grass", "oohh/content/Game/Levels/oh_grass")
 	end
 
 	for i, line in ipairs(cmd) do
@@ -89,7 +91,10 @@ solution("oohh")
 
 	platforms("x32")
 	defines("FORCE_STANDARD_ASSERT")
-	
+	defines("NDEBUG")
+	defines("GAMEDLL_EXPORTS")
+	defines("_XKEYCHECK_H")
+		
 	if WARS then
 		defines("WARS")
 	else
@@ -121,6 +126,8 @@ solution("oohh")
 		
 		includedirs("../oohh/")
 		includedirs("../mmyy/include/")
+		includedirs("../awesomium/")
+		includedirs("../awesomium/include")
 
 		includedirs(FOLDER .. "/Code/CryEngine/CryAction/")
 		includedirs(FOLDER .. "/Code/CryEngine/CryCommon/")
@@ -146,6 +153,10 @@ solution("oohh")
 
 		files("../oohh/**.hpp")
 		files("../oohh/**.cpp")
+				
+		files("../awesomium/**.h")
+		files("../awesomium/**.hpp")
+		files("../awesomium/**.cpp")
 
 		excludes("../oohh/content/*")
 
@@ -154,12 +165,13 @@ solution("oohh")
 			["gamedll/*"] = path.getabsolute("../gamedll" .. (WARS and "_wars" or "")),
 			["oohh/*"] = path.getabsolute("../oohh"),
 			["mmyy/*"] = path.getabsolute("../mmyy/include"),
+			["awesomium/*"] = path.getabsolute("../awesomium"),
 		}
 		
-		defines("GAMEDLL_EXPORTS")
-
 		libdirs("../mmyy/lib/")
+		libdirs("../awesomium/build/lib/")
 		links("lua51")
+		links("awesomium")
 
 		configuration("debug")
 			flags("Symbols")

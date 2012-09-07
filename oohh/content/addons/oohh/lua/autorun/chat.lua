@@ -65,7 +65,12 @@ console.AddCommand("say_safe", function(ply, line)
 	hook.CallOnShared("PlayerSay", nil, ply, line)
 end, true)
 
-
 console.AddCommand("say", function(ply, line)
 	hook.CallOnShared("PlayerSay", nil, ply, line)
 end, true)
+
+if SERVER then
+	function Say(str)
+		hook.CallOnShared("PlayerSay", nil, entities.GetLocalPlayer(), str)
+	end
+end

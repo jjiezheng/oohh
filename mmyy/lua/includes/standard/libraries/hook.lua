@@ -82,6 +82,29 @@ function hook.UserDataCall(udata, event, ...)
 	end
 end
 
+local _event
+local _unique
+local function OnError(msg)
+	MsgN("== HOOK ERROR ==")
+	
+	for k, v in pairs(debug.traceback():Explode("\n")) do
+		local source, msg = v:match("(.+): in function (.+)")
+		if source and msg then
+			MsgN((k-1) .. "    " .. source:trim() or "nil")
+			MsgN("     " .. msg:trim() or "nil")
+			MsgN("")
+		end
+	end
+	
+
+	MsgN("")
+	local source, msg = msg:match("(.+): (.+)")
+	MsgN(source:trim())
+	MsgN(msg:trim())
+	
+	MsgN("")
+end
+
 function hook.Call(event, ...)
 	if hook.active[event] then
 		for unique, data in pairs(hook.active[event]) do
@@ -93,7 +116,7 @@ function hook.Call(event, ...)
 				time = SysTime()
 			end
 
-			status, a,b,c,d,e,f,g,h = pcall(data.func, ...)
+			status, a,b,c,d,e,f,g,h = xpcall(data.func, data.on_error or OnError, ...)
 
 			if a == hook.destroy_tag then
 				hook.Remove(event, unique)
@@ -105,13 +128,12 @@ function hook.Call(event, ...)
 				hook.profil[event][unique].count = (hook.profil[event][unique].count or 0) + 1
 			end
 
-			if status == false then
+			if status == false then		
 				if type(data.on_error) == "function" then
 					data.on_error(a, event, unique)
 				else
 					hook.Remove(event, unique)
-					printf("hook[%q][%q] removed:", event, unique)
-					printf("\t%q", tostring(a))
+					printf("hook [%q][%q] removed", event, unique)
 				end
 
 				hook.errors[event] = hook.errors[event] or {}

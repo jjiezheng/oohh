@@ -42,6 +42,21 @@ end)
 hook.Add("ProcessPlayerGroundMove", "gmod_move", function(ply)
     if typex(ply) ~= "player" or ply == entities.GetLocalPlayer() and SERVER then return end
 	
+	do 
+		local phys = ply:GetPhysics()
+		
+		local dir = physics.TraceDir(phys:GetPos(), Vec3(0,0,-1), phys).HitNormal
+		
+		if tonumber(tostring(dir.y)) then
+			local ang = math.abs(dir.z) 
+
+			if ang < 0.7 then
+				return phys:GetVelocity() + (physics.GetGravity() * 0.1)
+			end
+		end
+		
+	end
+	
 	ply.move_vel = ply.move_vel or Vec3(0,0,0)
 
     local dir = Vec3(0,0,0)

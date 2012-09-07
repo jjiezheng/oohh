@@ -167,34 +167,6 @@ LUALIB_FUNCTION(entities, GetAll)
     return 1;
 }
 
-LUALIB_FUNCTION(entities, GetAllByClass)
-{
-    my->NewTable();
-
-	if (gEnv->pEntitySystem)
-	{
-		auto iterator = gEnv->pEntitySystem->GetEntityIterator();
-
-		string match = my->ToString(1);
-		string temp = "";
-
-		while (!iterator->IsEnd())
-		{
-			if (IEntity * entity = iterator->Next())
-			{
-				temp = entity->GetClass()->GetName();
-				if (temp.compareNoCase(match)) continue;
-    
-				my->Push(oohh::GetEntityId(entity));
-				my->Push(entity);
-				my->SetTable(-3);
-			}
-		}
-	}
-
-    return 1;	
-}
-
 LUALIB_FUNCTION(entities, GetLocalPlayer)
 {
 	auto ply = gEnv->pGame ? gEnv->pGame->GetIGameFramework()->GetClientActor() : NULL;

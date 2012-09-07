@@ -16,6 +16,11 @@ LUALIB_FUNCTION(_G, Texture)
 		auto id = my->ToNumber(1);
 		self = gEnv->pRenderer->EF_GetTextureByID(id);
 	}
+	else if (my->IsNumber(1) && my->IsNumber(2))
+	{
+		auto id = gEnv->pRenderer->SF_CreateTexture(my->ToNumber(1), my->ToNumber(2), 0, 0, my->ToEnum<ETEX_Format>(3, eTF_A8R8G8B8), my->ToNumber(4, 0));
+		self = gEnv->pRenderer->EF_GetTextureByID(id);
+	}
 #else
 	auto self = gEnv->pRenderer->EF_LoadTexture(path, my->ToEnum<ETEX_Type>(2, eTT_2D), 0);
 #endif

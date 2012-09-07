@@ -2,24 +2,26 @@
 // getmetatable( obj )[ "Type" ] or "uknown_metaname"
 inline const char *my_getmetaname(lua_State *L, int idx)
 {
-	if (lua_getmetatable(L, idx))
+	if (lua_getmetatable(L, idx)) // meta
 	{
-		lua_pushstring(L, "Type");
-		lua_rawget(L, -2);
+		lua_pushstring(L, "Type"); // meta, "Type"
+		lua_rawget(L, -2); // meta, val
 
-		lua_remove(L, -2);
+		lua_remove(L, -2); // val
 
 		if (lua_type(L, -1) == LUA_TSTRING)
 		{
 			auto temp = lua_tostring(L, -1);
 
-			lua_remove(L, -1);
+			lua_remove(L, -1); //
 
 			if (temp)
 			{
 				return temp;
 			}
 		}
+
+		lua_remove(L, -1); //
 	}
 
 	return "uknown_metaname";
@@ -29,19 +31,19 @@ inline const char *my_getmetaname(lua_State *L, int idx)
 // getmetatable( obj )[ key ]
 inline bool my_getmetafield(lua_State *L, int idx, const char *key, int expected_type)
 {
-	if (lua_getmetatable(L, idx))
+	if (lua_getmetatable(L, idx)) // meta
 	{
-		lua_pushstring(L, key);
-		lua_rawget(L, -2);
+		lua_pushstring(L, key); // meta, key
+		lua_rawget(L, -2); // meta, val
 
-		lua_remove(L, -2);
+		lua_remove(L, -2); // val
 
 		if (lua_type(L, -1) == expected_type)
 		{
 			return true;
 		}
 
-		lua_remove(L, -1);
+		lua_remove(L, -1); //
 	}
 
 	return false;
@@ -51,17 +53,22 @@ inline bool my_getmetafield(lua_State *L, int idx, const char *key, int expected
 // getmetatable( obj )[ key ]( obj )
 inline bool my_callmetafunction(lua_State *L, int idx, const char *key, int expected_type)
 {
-	if (my_getmetafield(L, idx, key, LUA_TFUNCTION))
+	if (my_getmetafield(L, idx, key, LUA_TFUNCTION)) // func
 	{
-		lua_pushvalue(L, idx);
-		lua_call(L, 1,1);
+		lua_pushvalue(L, idx); // func, self
+		if (auto msg = my_call(L, 1, 1)) // res
+		{
+			lua_remove(L, -1); // res
+
+			return false;
+		}
 
 		if (lua_type(L, -1) == expected_type)
 		{
 			return true;
 		}
 
-		lua_remove(L, -1);
+		lua_remove(L, -1); //		
 	}
 
 	return false;
@@ -77,11 +84,11 @@ inline unsigned long long my_getuniqueid(lua_State *L, int idx)
 
 	// check if the userdata's metatable has a __uniuqeid
 	// function and call that to get a unique id
-	if (my_callmetafunction(L, idx, "__uniqueid", LUA_TNUMBER))
+	if (my_callmetafunction(L, idx, "__uniqueid", LUA_TNUMBER)) // number
 	{
 		auto id = luaL_checkinteger(L, -1);
 
-		lua_remove(L, -1);
+		lua_remove(L, -1); //
 
 		return id;
 	}
@@ -94,23 +101,33 @@ inline unsigned long long my_getuniqueid(lua_State *L, int idx)
 // returns
 // _R[ "ptrtable" ]
 // if the table doesn't exist it, will create it
-inline bool my_getptrtable(lua_State *L)
+inline void my_getptrtable(lua_State *L)
 {
-	lua_getregistry(L);
+	// get the registry table
+	lua_getregistry(L); // _R
 
-	lua_pushstring(L, "ptrtable");
-	lua_rawget(L, -2);
+	// get _R["ptrtable"]
+	lua_pushstring(L, "ptrtable"); // _R, "ptrtable"
+	lua_rawget(L, -2); // _R, val
 	
-	if (lua_isnil(L, -1))
+	// does it not exist?
+	if (!lua_istable(L, -1))
 	{
-		lua_remove(L, -1);
+		// remove the nil value
+		lua_remove(L, -1); // _R
 
-		lua_pushstring(L, "ptrtable");
-		lua_newtable(L);
-		lua_rawset(L, -3);
+		// create the table
+		lua_pushstring(L, "ptrtable"); // _R, "ptrtable"
+		lua_newtable(L); // _R, "ptrtable", {}
+		lua_rawset(L, -3); // _R
+		
+		// rawset pops the table so we have to get it again, but this time we know it exists
+		lua_pushstring(L, "ptrtable"); // _R, "ptrtable"
+		lua_rawget(L, -2); // _R, val
 	}
 
-	return true;
+	// remove _R
+	lua_remove(L, -2); // val
 }
 
 // returns
@@ -118,17 +135,30 @@ inline bool my_getptrtable(lua_State *L)
 // if the table doesn't exist, it pushes nothing
 inline bool my_getuidtable(lua_State *L, unsigned long long id = 0)
 {
-	if (!my_getptrtable(L)) return false;
+	my_getptrtable(L); // ptrtbl
 	
-	lua_rawgeti(L, -1, id);
+	// ptrtbl[id]
+	lua_rawgeti(L, -1, id); // ptrtbl, val
 
+	// is this not a table?
 	if (lua_type(L, -1) != LUA_TTABLE)
 	{
-		lua_remove(L, -1);
+		// remove it
+		lua_remove(L, -1); // ptrtbl
 
-		return false;
+		// create it
+		lua_newtable(L); // ptrtbl, table
+
+		lua_pushvalue(L, -1); // ptrtbl, table, table
+
+		// pops the newly created table only
+		lua_rawseti(L, -3, id); // ptrtbl, table
 	}
 
+	// remove the ptr table from the stack
+	lua_remove(L, -2); // table
+
+	// push the table
 	return true;
 }
 
@@ -137,19 +167,23 @@ inline bool my_getuidtable(lua_State *L, unsigned long long id = 0)
 // if the table doesn't exist, it will create it
 inline bool my_getentitytable(lua_State *L, int idx)
 {
+	// maybe put a warning here since this is only supposed to be called on userdata
 	if (lua_type(L, idx) != LUA_TUSERDATA)
 		return false;
 
 	auto id = my_getuniqueid(L, idx);
 
-	if (!my_getuidtable(L, id))
+	// does the uid table not exist?
+	if (!my_getuidtable(L, id)) // uidtable
 	{
-		if (!my_getptrtable(L)) return false;
-			lua_newtable(L);
-		lua_rawseti(L, -2, id);
+		// if so create it
+		my_getptrtable(L); // ptrtable 
+			lua_newtable(L); // ptrtable, {}
+			lua_pushvalue(L, -1); // ptrtable, {}, {}
+		lua_rawseti(L, -3, id); // ptrtable, {}
 
-		if (!my_getptrtable(L)) return false;
-		lua_rawgeti(L, -1, id);
+		// remove the ptr table from the stack
+		lua_remove(L, -2); // {}
 	}
 
 	return true;
@@ -160,19 +194,19 @@ inline bool my_getentitytable(lua_State *L, int idx)
 // this won't look up in the meta table!
 inline bool my_getentityfield(lua_State *L, int idx, const char *key, int expected_type)
 {
-	if (my_getentitytable(L, idx))
+	if (my_getentitytable(L, idx)) // enttbl
 	{
-		lua_pushstring(L, key);
-		lua_rawget(L, -2);
+		lua_pushstring(L, key); // enttbl, key
+		lua_rawget(L, -2); // enttbl, val
 
-		lua_remove(L, -2);
+		lua_remove(L, -2); // val
 
 		if (lua_type(L, -1) == expected_type)
 		{
 			return true;
 		}
 
-		lua_remove(L, -1);
+		lua_remove(L, -1); //
 	}
 
 	return false;

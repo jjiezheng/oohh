@@ -22,7 +22,6 @@ LUALIB_FUNCTION(engine3d, CheckIntersectClouds)
 	return 1;
 }
 
-
 LUALIB_FUNCTION(engine3d, EnableOceanRendering)
 {
 	gEnv->p3DEngine->EnableOceanRendering(my->ToBoolean(1));

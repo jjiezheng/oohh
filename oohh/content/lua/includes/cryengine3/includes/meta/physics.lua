@@ -5,16 +5,24 @@ function META:SmoothPosMove(pos, mult, part, delta)
 	delta = delta or FrameTime()
 
 	if pos then
-		self:SetVelocity(((pos - self:GetPos()) * self:GetMass() ^ 0.6) * mult * delta, nil, part)
+		self:SetVelocity((pos - self:GetPos()) * self:GetMass() * mult * delta / 100, nil, part)
 	end
 end
 
-function META:SmoothDirMove(dir, mult, part, delta)
-	mult = mult or 1
+function META:SmoothAngMove(ang, mult, part, delta)
+	mult = mult or 10
 	delta = delta or FrameTime()
 
-	if dir then
-		self:SetLocalAngleVelocity((dir * self:GetMass()) * mult * delta, nil, part)
+	if ang then
+		local dir = Vec3(0,0,0)
+		
+		local curang = self:GetRotation():GetAng3()
+			
+		dir.z = ang:GetForward():Dot(curang:GetForward()) - 1
+		dir.x = ang:GetRight():Dot(curang:GetRight()) - 1
+		dir.y = ang:GetUp():Dot(curang:GetUp()) - 1
+		
+		self:SetAngleVelocity((dir * self:GetMass() ^ 0.6) * mult * delta, nil, part)
 	end
 end
 

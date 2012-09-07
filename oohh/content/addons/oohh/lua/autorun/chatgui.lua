@@ -42,7 +42,12 @@ function chatgui.AddLine(str)
 end
 
 function chatgui.PlayerSay(ply, str)
-	chatgui.AddLine(chatgui.GetTimeStamp() .. ply:GetNickname() .. ": " .. str)
+	if typex(ply) == "player" then
+		ply = ply:GetNickname()
+	else
+		ply = tostring(ply)
+	end
+	chatgui.AddLine(chatgui.GetTimeStamp() .. ply .. ": " .. str)
 end
 
 hook.Add("PlayerSay", "chatgui", chatgui.PlayerSay)

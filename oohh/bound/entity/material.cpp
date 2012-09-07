@@ -79,6 +79,18 @@ LUALIB_FUNCTION(_G, Material)
 	return 1;
 }
 
+LUAMTA_FUNCTION(material, __tostring)
+{
+	auto self = my->ToMaterial(1);
+
+	auto str = string("");
+	str.Format("material[%s]", self->GetName());
+
+	my->Push(str);
+
+	return 1;
+}
+
 LUAMTA_FUNCTION(material, SetName)
 {
 	auto self = my->ToMaterial(1);

@@ -19,7 +19,7 @@ local META = {}
 					local pos = self.Owner:GetEyePos()
 					local dir = self.Owner:GetEyeDir()
 
-					phys:SetRotation(self.Data.Rot)
+					phys:SmoothAngMove(self.Data.Rot:GetAng3())
 					phys:SmoothPosMove((pos + (dir * self.Data.Length)) + self.Data.LocalPos)
 				end
 			end

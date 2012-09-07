@@ -147,13 +147,14 @@ function menu.MakeButtons()
 	menu.AddButton("Host", function() 
 		aahh.StringInput("Enter the map name", cookies.Get("lastmap", "oohh_flatgrass"), function(str)
 			cookies.Set("lastmap", str)
-			console.RunString("map " .. str .. " s")
-			menu.Close()
+			os.execute([[start "" "%CD%\bin32\launcher.exe" "server" "+map ]] .. str .. [[ s"]])
+			--console.RunString("map " .. str .. " s")
+			--menu.Close()
 		end)
 	end)
 	menu.AddButtonSpace()
 
-	menu.AddButton("Lua", function()
+	menu.AddButton("Tests", function()
 
 		local frame = aahh.Create("frame")
 		frame:SetTitle("test")
@@ -213,12 +214,16 @@ function menu.MakeButtons()
 			--frame:SetHeight(grid:GetCurrentSize().h + 33)
 			--frame:RequestLayout(true)
 		end
-
-		populate("!/../addons/testing/lua/")
+		
+		if not MULTIPLAYER then
+			populate("!/../addons/testing/lua/menu")
+		else
+			populate("!/../addons/testing/lua/")
+		end
 	end)
 	menu.AddButtonSpace()
 
-	menu.AddButton("Aahh Stats", function() 
+	--[[menu.AddButton("Aahh Stats", function() 
 		local frame = aahh.Create("frame")
 		frame:SetTitle("stats")
 		frame:SetSize(Vec2(200, 200))
@@ -232,10 +237,10 @@ function menu.MakeButtons()
 			end
 		end
 	end)
-	menu.AddButtonSpace()
+	menu.AddButtonSpace()]]
 	menu.AddButton("Restart", function() timer.Simple(0.1, function() console.RunString("reoh", true, true) end) end)
 	menu.AddButton("Exit", function() console.RunString("quit") end)
-
+	
 	menu.SetupButtons()
 end
 

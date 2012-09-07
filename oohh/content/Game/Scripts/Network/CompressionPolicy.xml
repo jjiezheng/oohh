@@ -35,60 +35,34 @@
 	</Policy>
 	<Policy name="wrl2" impl="AdaptiveVec3">
 		<XParams
-			min="0"
-			max="4095"
 			nbits="24"
 			probHeight="1024"
-			minRange="0.0312"
-			maxRange="1"
 			quantization="RoundLeft"
 			inRange="85"/>
 		<YParams
-			min="0"
-			max="4095"
 			nbits="24"
 			probHeight="1024"
-			minRange="0.0312"
-			maxRange="1"
 			quantization="RoundLeft"
 			inRange="85"/>
 		<ZParams
-			min="0"
-			max="2047"
 			nbits="24"
 			probHeight="1024"
-			minRange="0.0312"
-			maxRange="1"
-			quantization="NeverLower"
+			quantization="RoundLeft"
 			inRange="85"/>
 	</Policy>
 	<Policy name="wrl3" impl="AdaptiveVec3"><!-- for positions that can be out of terrain range usually "target destination" -->
 		<XParams
-			min="-2045"
-			max="6145"
 			nbits="30"
-			probHeight="1024"
-			minRange="0.0312"
-			maxRange="1"
 			quantization="RoundLeft"
 			inRange="85"/>
 		<YParams
-			min="-2045"
-			max="6145"
 			nbits="30"
-			probHeight="1024"
-			minRange="0.0312"
-			maxRange="1"
 			quantization="RoundLeft"
 			inRange="85"/>
 		<ZParams
-			min="-2095"
-			max="6145"
 			nbits="28"
 			probHeight="1024"
-			minRange="0.0312"
-			maxRange="1"
-			quantization="NeverLower"
+			quantization="RoundLeft"
 			inRange="85"/>
 	</Policy>
 	<Policy name="frad" impl="FloatAsInt">
