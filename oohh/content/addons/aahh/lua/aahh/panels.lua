@@ -825,13 +825,13 @@ do -- meta
 	end
 	
 	function PANEL:KeyInput(key, press)
-		if self == aahh.ActivePanel then
+		if self:IsActivePanel() then
 			return true, self:SafeCall("OnKeyInput", key, press)
 		end
 	end
 
 	function PANEL:CharInput(key, press)
-		if self == aahh.ActivePanel then
+		if self:IsActivePanel() then
 			return true, self:SafeCall("OnCharInput", key, press)
 		end
 	end

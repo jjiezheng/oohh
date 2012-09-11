@@ -12,7 +12,7 @@
 #include "physinterface.h"
 #include "Weapon.h"
 
-#include <Awesomium/WebView.h>
+#include <Awesomium\WebView.h>
 
 #define VC_EXTRALEAN
 #define WIN32_LEAN_AND_MEAN
@@ -170,6 +170,11 @@ namespace oohh
 		void Open();
 		void Close();
 	}*/
+
+	bool IsFocused();
+	bool IsRendering();
+	void EnableFocus(bool b);
+	void EnableRender(bool b);
 
 	void Open(bool once = false);
 	void Close();

@@ -568,7 +568,13 @@ extern Vec3 g_vel;
 
 int CGame::Update(bool haveFocus, unsigned int updateFlags)
 {
-	bool bRun = m_pFramework->PreUpdate( true, updateFlags );
+	bool bRun = m_pFramework->PreUpdate(oohh::IsFocused(), updateFlags);
+
+	if (!oohh::IsRendering())
+	{
+		m_pFramework->PostUpdate(oohh::IsFocused(), updateFlags);
+		return bRun ? 1 : 0;
+	}
 
 	float frameTime = gEnv->pTimer->GetFrameTime();
 	m_colorGradientManager->UpdateForThisFrame(frameTime);

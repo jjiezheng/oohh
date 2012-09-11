@@ -48,3 +48,37 @@ LUALIB_FUNCTION(system, ConsolePrint)
 	return 0;
 }
 
+LUALIB_FUNCTION(system, EnableRendering)
+{
+	oohh::EnableRender(my->ToBoolean(1));
+
+	return 0;
+}
+
+LUALIB_FUNCTION(system, IsRendering)
+{
+	my->Push(oohh::IsRendering());
+
+	return 1;
+}
+
+LUALIB_FUNCTION(system, EnableFocus)
+{
+	oohh::EnableFocus(my->ToBoolean(1));
+
+	return 0;
+}
+
+LUALIB_FUNCTION(system, IsFocused)
+{
+	my->Push(oohh::IsFocused());
+
+	return 1;
+}
+
+LUALIB_FUNCTION(system, ResetGame)
+{
+	gEnv->pGameFramework->Reset(!my->ToBoolean(1));
+
+	return 1;
+}

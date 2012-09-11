@@ -11,6 +11,14 @@ oohhState *my = NULL;
  
 namespace oohh
 {
+	bool m_bFocus = true;
+	bool m_bRender = true;
+
+	bool IsFocused() { return m_bFocus; }
+	bool IsRendering() { return m_bRender; }
+	void EnableFocus(bool b) { m_bFocus = b; }
+	void EnableRender(bool b) { m_bRender = b; }
+
 	void CMD_RunLua(IConsoleCmdArgs *args)
 	{
 		if (!my)

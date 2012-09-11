@@ -1,11 +1,12 @@
 graphics = {}
 
-function graphics.Set2DFlags()
+function graphics.Set2DFlags(...)
 	render.SetState(
 		bit.bor(
 			GS_BLSRC_SRCALPHA,
 			GS_BLDST_ONEMINUSSRCALPHA,
-			GS_NODEPTHTEST
+			GS_NODEPTHTEST,
+			...
 		)
 	)
 end

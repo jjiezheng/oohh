@@ -216,7 +216,7 @@ function menu.MakeButtons()
 		end
 		
 		if not MULTIPLAYER then
-			populate("!/../addons/testing/lua/menu")
+			populate("!/../addons/testing/lua/menu/")
 		else
 			populate("!/../addons/testing/lua/")
 		end

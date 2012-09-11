@@ -778,3 +778,47 @@ enum --EVarFlags
 	VF_INTERNAL_FLAGS_END = 0x00000080,
 
 };
+
+-- Whether or not a Shift key is down
+kModShiftKey = 1
+
+-- Whether or not a Control key is down
+kModControlKey = 2
+
+-- Whether or not an ALT key is down
+kModAltKey = 4
+
+-- Whether or not a meta key (Command-key on Mac, Windows-key on Win) is down
+kModMetaKey = 8
+
+-- Whether or not the key pressed is on the keypad
+kModIsKeypad = 16
+
+-- Whether or not the character input is the result of an auto-repeat timer.
+kModIsAutorepeat = 32
+
+-- Key-Down type
+kTypeKeyDown = 0
+
+-- Key-Up type
+kTypeKeyUp = 1
+
+-- Character input type
+kTypeChar = 2
+
+
+enum --EEfResTextures
+{
+	EFTT_DIFFUSE,
+	EFTT_BUMP, 
+	EFTT_GLOSS,
+	EFTT_ENV,
+	EFTT_DETAIL_OVERLAY,
+	EFTT_BUMP_DIFFUSE,
+	EFTT_BUMP_HEIGHT,
+	EFTT_DECAL_OVERLAY,
+	EFTT_SUBSURFACE,
+	EFTT_CUSTOM,
+	EFTT_CUSTOM_SECONDARY,
+	EFTT_OPACITY,
+};

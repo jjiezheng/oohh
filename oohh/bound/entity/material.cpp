@@ -109,44 +109,117 @@ LUAMTA_FUNCTION(material, GetName)
 	return 1;
 }
 
-LUAMTA_FUNCTION(material, SetParam)
+LUAMTA_FUNCTION(material, GetTexture)
 {
 	auto self = my->ToMaterial(1);
-	
-	if (my->IsType(2, LUA_TNUMBER))
-	{
-		auto arg = my->ToNumber(3);
-		self->SetGetMaterialParamFloat(my->ToString(2), (float&)arg, false);
-	}
-	else
-	{
-		auto arg = my->ToVec3(3);
-		self->SetGetMaterialParamVec3(my->ToString(2), (Vec3&)arg, false);
-	}
 
-	return 0;
+	my->Push(self->GetShaderItem().m_pShaderResources->GetTexture(my->ToNumber(2))->m_Sampler.m_pITex);
+
+	return 1;
 }
 
 LUAMTA_FUNCTION(material, GetParam)
 {
 	auto self = my->ToMaterial(1);
-	
-	if (my->IsTrue(3))
+	auto str = my->ToString(2);
+
+	auto shader_item = self->GetShaderItem();
+	if (!shader_item.m_pShader) return 0;
+	auto params = shader_item.m_pShader->GetPublicParams();
+
+	for (auto it = params.begin(), end = params.end(); it != end; ++it)
 	{
-		auto var = 0.0f;
+		auto val = *it;
+		
+		if(strcmp(str, val.m_Name) == 0)
+		{
+			if (val.m_Type == eType_FLOAT)
+			{
+				my->Push(val.m_Value.m_Float);
 
-		if (!self->SetGetMaterialParamFloat(my->ToString(2), var, true)) return 0;
+				return 1;
+			}
+			else if (val.m_Type == eType_VECTOR)
+			{
+				auto v = val.m_Value.m_Vector;
+				my->Push(Vec3(v[0], v[1], v[2]));
 
-		my->Push(var);
+				return 1;
+			}
+			else if (val.m_Type == eType_FCOLOR)
+			{
+				auto v = val.m_Value.m_Color;
+				my->Push(ColorF(v[0], v[1], v[2], v[4]));
+
+				return 1;
+			}
+			else if (val.m_Type == eType_BOOL)
+			{
+				my->Push(val.m_Value.m_Bool);
+
+				return 1;
+			}
+
+			break;
+		}
 	}
-	else
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(material, SetParam)
+{
+	auto self = my->ToMaterial(1);
+	auto str = my->ToString(2);
+
+	auto shader_item = self->GetShaderItem();
+	if (!shader_item.m_pShader) return 0;
+	auto params = shader_item.m_pShader->GetPublicParams();
+
+	for (auto it = params.begin(), end = params.end(); it != end; ++it)
 	{
-		auto var = Vec3(0, 0, 0);
+		auto val = *it;
 
-		if (!self->SetGetMaterialParamVec3(my->ToString(2), var, true)) return 0;
+		if(strcmp(str, val.m_Name) == 0)
+		{
+			UParamVal value;
 
-		my->Push(var);
+			if (my->IsNumber(3))
+			{
+				value.m_Float = my->ToNumber(3);
+			}
+			else if (my->IsVec3(3))
+			{
+				auto vec = my->ToVec3(3);
+
+				value.m_Vector[0] = vec.x;
+				value.m_Vector[1] = vec.y;
+				value.m_Vector[2] = vec.z;
+			}
+			else if (my->IsColor(3))
+			{
+				auto col = my->ToColor(3);
+
+				value.m_Color[0] = col.r;
+				value.m_Color[1] = col.g;
+				value.m_Color[2] = col.b;
+				value.m_Color[3] = col.a;
+			}			
+			else if (my->IsVec3(3))
+			{
+				value.m_Bool = my->ToBoolean(3);
+			}
+
+			val.SetParam(str, &params, value);
+
+			SInputShaderResources results;
+			shader_item.m_pShaderResources->ConvertToInputResource(&results);
+			results.m_ShaderParams = params;
+			shader_item.m_pShaderResources->SetShaderParams(&results, shader_item.m_pShader);
+
+			break;
+		}
 	}
 
-	return 1;
+	return 0;
 }
