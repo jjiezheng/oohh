@@ -17,7 +17,7 @@ function PANEL:Initialize()
 end
 
 function PANEL:OnRemove()
-	
+	self.webview:Remove()
 end
 
 local function D(name)
@@ -47,13 +47,13 @@ end
 
 function PANEL:OnCharInput(char, press)
 	if press then
-		self.webview:InjectKeyboardEvent(char:byte(), kTypeChar, kModIsAutorepeat)
+		self.webview:InjectKeyboardEvent(char:byte(), kTypeChar, input.GetModifiers())
 	end
 end
 
 function PANEL:OnKeyInput(key, press)
 	if press then
-		self.webview:InjectKeyboardEvent(char:byte(), kTypeChar, kModIsAutorepeat)
+		self.webview:InjectKeyboardEvent(input.GetSymbolByName(key), press and kTypeKeyDown or kTypeKeyUp, input.GetModifiers())
 	end
 end
 

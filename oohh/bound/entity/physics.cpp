@@ -6,7 +6,10 @@ LUAMTA_FUNCTION(entity, GetPhysics)
 	auto self = my->ToEntity(1);
 
 	if (self->IsGarbage() || !(IEntityPhysicalProxy *)self->GetProxy(ENTITY_PROXY_PHYSICS))
-		return 0;
+	{
+		my_pushnull(L);
+		return 1;
+	}
 	
 	my->Push(self->GetPhysics());
 	

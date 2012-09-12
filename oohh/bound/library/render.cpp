@@ -91,6 +91,10 @@ LUALIB_FUNCTION(render, WorldToScreen)
 
 		return 1;
 	}
+
+	//scale projected values to the actual screen resolution
+	spos.x *= 0.01f * (float)gEnv->pRenderer->GetWidth();
+	spos.y *= 0.01f * (float)gEnv->pRenderer->GetHeight();;
 	
 	my->Push(Vec2(spos.x, spos.y));
 	my->Push(spos.z); // i'm guessing this is always 0?

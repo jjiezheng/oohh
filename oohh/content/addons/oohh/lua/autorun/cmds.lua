@@ -8,13 +8,12 @@ console.RunString(
 
 	net_disconnect_on_rmi_error 0
 	net_automigrate_host 0
-	net_migrate_timeout 30
-	
+	net_migrate_timeout 30	
 
 	g_godMode 1
 	g_inventoryNoLimits 1
 	sys_maxfps 0
-	g_forceFastUpdate 1
+	g_forceFastUpdate 0
 	g_deathcam 0
 	g_battleDust_enable 1
 	g_friendlyfireratio 0
@@ -28,16 +27,15 @@ console.RunString(
 	sv_packetRate 1
 	cl_packetRate 1
 	net_breakage_sync_entities 1
+		
+	sys_flash 0 disables scaleform
+	net_maxpacketsize 10000
+	net_packetsendrate 0
+	sv_packetRate 0
 	
 	]], 
 	true -- this silence oh i will shut down the sounds
 )
 console.RunString("log_verbosity 5", true)
---[[ 
-sys_flash 0 disables scaleform
-net_maxpacketsize 10000
-net_packetsendrate 0
-sv_packetRate 0
-]]
 
 engine3d.PauseTOD(true)

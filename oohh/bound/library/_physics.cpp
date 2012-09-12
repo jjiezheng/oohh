@@ -56,14 +56,14 @@ LUALIB_FUNCTION(physics, RayWorldIntersection)
     return 1;
 }
 
-LUALIB_FUNCTION(physics, SetPhysicsTime)
+LUALIB_FUNCTION(physics, SetTime)
 {
 	gEnv->pPhysicalWorld->SetPhysicsTime(my->ToNumber(1));
 
 	return 1;
 }
 
-LUALIB_FUNCTION(physics, GetPhysicsTime)
+LUALIB_FUNCTION(physics, GetTime)
 {
 	my->Push(gEnv->pPhysicalWorld->GetPhysicsTime());
 

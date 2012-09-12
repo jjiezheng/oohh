@@ -1,4 +1,4 @@
-input = {}
+input = input or {}
 
 input.PressedThreshold = 0.2
 

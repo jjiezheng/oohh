@@ -19,7 +19,7 @@ LUALIB_FUNCTION(awesomium, Open)
 
 	WebConfig config;
 	core = WebCore::Initialize(config);
-	
+
 	return 0;
 }
 
@@ -272,6 +272,13 @@ public:
 
 LUALIB_FUNCTION(_G, WebView)
 {
+	WebPreferences params;
+	params.enable_web_gl = true;
+	params.enable_web_audio = true;
+	params.allow_running_insecure_content = true;
+	params.enable_plugins = true;
+	auto session = core->CreateWebSession(WSLit(""), params);
+
 	auto self = core->CreateWebView(my->ToNumber(1), my->ToNumber(2));
 	auto listener = new MyWebViewListener();
 	self->set_view_listener(listener);
@@ -279,6 +286,13 @@ LUALIB_FUNCTION(_G, WebView)
 	my->Push(self);
 
 	return 1;
+}
+
+LUAMTA_FUNCTION(webview, Remove)
+{
+	my->ToWebView(1)->Destroy();
+
+	return 0;
 }
 
 LUAMTA_FUNCTION(webview, LoadURL)

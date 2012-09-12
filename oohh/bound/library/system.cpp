@@ -19,20 +19,6 @@ LUALIB_FUNCTION(system, GetCommandLine)
 	return 1;
 }
 
-LUALIB_FUNCTION(system, SetPhysicsTime)
-{
-    gEnv->pPhysicalWorld->SetPhysicsTime(my->ToNumber(1));
-    
-    return 0;
-}
-
-LUALIB_FUNCTION(system, GetPhysicsTime)
-{
-    my->Push(gEnv->pPhysicalWorld->GetPhysicsTime());
-    
-    return 1;
-}
-
 LUALIB_FUNCTION(system, RunCryScriptString)
 {
     string script = my->ToString(1);
