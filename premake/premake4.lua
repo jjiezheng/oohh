@@ -7,8 +7,6 @@ if not os.isdir(FOLDER) then
 	error("cannot find the cryengine3 '" .. cryengine3 .. "' is not a valid directory")
 end
 
-local WARS = os.isfile(FOLDER .. "/bin32/crysis.exe")
-
 if _ACTION == "link" then
 	local function exists(cmd)
 		os.execute("@echo off")
@@ -56,19 +54,17 @@ if _ACTION == "link" then
 	link_dir("lua/includes/cryengine3", "oohh/content/lua/includes/cryengine3")
 	link_dir("addons", "oohh/content/addons")
 	link_dir("Game/Scripts", "oohh/content/Game/Scripts")
-	link_dir("Game/Entities", "oohh/content/Game/Entities")
-	
+	link_dir("Game/Entities", "oohh/content/Game/Entities")	
 		
 	local function copy(a, b) table.insert(cmd, f([[BSLASH copy "WORKING_DIR/%s" "TARGET_DIR/%s"]], a, b)) end
 	
 	copy("mmyy/lib/lua51.dll", "bin32")
 	copy("oohh/auto_dev_login.exe", "bin32")
+	copy("oohh/crygame.dll", "bin32")
 	copy("awesomium/build/bin/*", "bin32")
 	
-	if not WARS then
-		link_dir("Game/Levels/oh_island", "oohh/content/Game/Levels/oh_island")
-		link_dir("Game/Levels/oh_grass", "oohh/content/Game/Levels/oh_grass")
-	end
+	link_dir("Game/Levels/oh_island", "oohh/content/Game/Levels/oh_island")
+	link_dir("Game/Levels/oh_grass", "oohh/content/Game/Levels/oh_grass")
 
 	for i, line in ipairs(cmd) do
 		line = line:gsub("LINK_DIR", LINK_DIR)
@@ -88,20 +84,16 @@ return end
 
 solution("oohh")
 	location(FOLDER .. "/oohh_project_files/" .. _ACTION)
-
+	
 	platforms("x32")
 	defines("FORCE_STANDARD_ASSERT")
 	defines("NDEBUG")
 	defines("GAMEDLL_EXPORTS")
 	defines("_XKEYCHECK_H")
 		
-	if WARS then
-		defines("WARS")
-	else
-		defines("CE3")
-	end
+	defines("CE3")
 
-	if _ACTION == "vs2010" or _ACTION == "vs2008"  then
+	if _ACTION == "vs2010" or _ACTION == "vs2008" then
 		buildoptions("/MP")
 		flags("NoMinimalRebuild")
 	end
@@ -112,17 +104,11 @@ solution("oohh")
 		language("C++")
 		kind("SharedLib")
 
-		targetname("CryGame")
-		
-		if WARS then
-			targetdir(FOLDER .. "/Mods/oohh/Bin32/")
-			debugdir(FOLDER .. "/Mods/oohh/Bin32/")
-			objdir(FOLDER .. "/Mods/oohh/BinTemp/")
-		else
-			targetdir(FOLDER .. "/Bin32/")
-			debugdir(FOLDER .. "/Bin32/")
-			objdir(FOLDER .. "/BinTemp/")
-		end
+		targetname("CryGame")		
+	
+		targetdir(FOLDER .. "/Bin32/")
+		debugdir(FOLDER .. "/Bin32/")
+		objdir(FOLDER .. "/BinTemp/")
 		
 		includedirs("../oohh/")
 		includedirs("../mmyy/include/")
@@ -130,23 +116,14 @@ solution("oohh")
 		includedirs("../awesomium/include")
 
 		includedirs(FOLDER .. "/Code/CryEngine/CryAction/")
-		includedirs(FOLDER .. "/Code/CryEngine/CryCommon/")
-		
-		if WARS then
-			includedirs("../gamedll_wars/")
-		else
-			includedirs("../gamedll/")
-			includedirs(FOLDER .. "/Code/SDKs/boost/")
-			includedirs(FOLDER .. "/Code/SDKs/STLPORT/")
-		end
-		
-		if WARS then
-			files("../gamedll_wars/**.h")
-			files("../gamedll_wars/**.cpp")
-		else
-			files("../gamedll/**.h")
-			files("../gamedll/**.cpp")
-		end
+		includedirs(FOLDER .. "/Code/CryEngine/CryCommon/")		
+	
+		includedirs("../gamedll/")
+		includedirs(FOLDER .. "/Code/SDKs/boost/")
+		includedirs(FOLDER .. "/Code/SDKs/STLPORT/")
+	
+		files("../gamedll/**.h")
+		files("../gamedll/**.cpp")
 
 		files("../mmyy/include/**.cpp")
 		files("../mmyy/include/**.hpp")
@@ -162,7 +139,7 @@ solution("oohh")
 
 		vpaths
 		{
-			["gamedll/*"] = path.getabsolute("../gamedll" .. (WARS and "_wars" or "")),
+			["gamedll/*"] = path.getabsolute("../gamedll"),
 			["oohh/*"] = path.getabsolute("../oohh"),
 			["mmyy/*"] = path.getabsolute("../mmyy/include"),
 			["awesomium/*"] = path.getabsolute("../awesomium"),
@@ -172,9 +149,12 @@ solution("oohh")
 		libdirs("../awesomium/build/lib/")
 		links("lua51")
 		links("awesomium")
+			
+		postbuildcommands(([[copy "%s" "%s"]]):format((FOLDER .. "/bin32/crygame.dll"):gsub("/", "\\"), (path.getabsolute("../oohh/")):gsub("/", "\\")))
+		debugargs("-noborder -dx9")
 
 		configuration("debug")
 			flags("Symbols")
-
+			
 		configuration("release")
 			flags("Optimize")
