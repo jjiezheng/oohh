@@ -7,6 +7,7 @@ if SERVER or system.GetCommandLine().server then
 			s_SoundEnable 0
 			s_MusicEnable 0
 			e_render 0
+			sys_maxfps 30
 		]]
 		)
 				
