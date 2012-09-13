@@ -89,12 +89,22 @@ LUAMTA_FUNCTION(player, ForceFreeFall)
 	return 0;
 }
 
-
 #define CHECKCHANNEL \
 INetChannel *chan = NULL; \
 chan = gEnv->pGame->GetIGameFramework()->GetNetChannel(self->GetChannelId());\
 if (!chan) \
 	chan = gEnv->pGame->GetIGameFramework()->GetClientChannel();
+
+LUAMTA_FUNCTION(player, GetName)
+{
+	auto self = my->ToPlayer(1);
+	
+	CHECKCHANNEL;
+
+	my->Push(chan->GetName());
+	
+	return 1;
+}
 
 LUAMTA_FUNCTION(player, GetProfileId)
 {
@@ -102,7 +112,7 @@ LUAMTA_FUNCTION(player, GetProfileId)
 	
 	CHECKCHANNEL;
 
-	my->Push(chan->GetName());
+	my->Push(chan->GetProfileId());
 	
 	return 1;
 }

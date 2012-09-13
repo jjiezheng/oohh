@@ -26,6 +26,7 @@
 	<Class name="MH60_Blackhawk" policy="car" own="own"/>
 	<Class name="Dodge_Charger" policy="car" own="own"/>
 	<Class name="Abrams" policy="car" own="own"/>
+	<Class name="Abrams_MP" policy="car" own="own"/>
 	<Class name="SpeedBoat" policy="car" own="own"/>
 	
 	<!-- basic physicalized objects -->

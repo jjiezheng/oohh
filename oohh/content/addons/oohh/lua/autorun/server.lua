@@ -1,11 +1,12 @@
 if SERVER or system.GetCommandLine().server then 
 	timer.Simple(1, function()
 		console.RunString([[
-			r_displayInfo = 1
+			r_displayInfo 1
 
-			s_DummySound = 1
-			s_SoundEnable = 0
-			s_MusicEnable = 0
+			s_DummySound 1
+			s_SoundEnable 0
+			s_MusicEnable 0
+			e_render 0
 		]]
 		)
 				

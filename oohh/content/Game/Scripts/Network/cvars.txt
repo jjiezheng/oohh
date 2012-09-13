@@ -8,6 +8,7 @@ e_WaterTesselationSwathWidth
 r_Contrast
 r_Gamma
 r_Brightness
+e_render
 
 r_TexturesFilteringQuality 
 r_DynTexAtlasMaxSize 
@@ -139,9 +140,9 @@ r_TexMaxAnisotropy
 r_TexturesFilteringQuality
 r_MultiGPU
 
-r_FSAA
-r_FSAA_samples
-r_FSAA_quality
+r_MSAA
+r_MSAA_samples
+r_MSAA_quality
 r_WaterUpdateFactor
 r_WaterReflections
 r_WaterRefractions
@@ -487,4 +488,4 @@ sv_password
 cl_nickname
 g_immersive
 
-e_Render
+e_ObjectLayersActivation
