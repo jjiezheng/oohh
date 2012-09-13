@@ -6,4 +6,13 @@ hook.Add("PostDrawMenu", "FPS", function()
 		smoothfps = smoothfps + ((fps - smoothfps) * FrameTime())
 		graphics.DrawText("FPS: "..math.round(smoothfps), Vec2(3, 3))
 	end
+	
+	-- this shouldn't really be here..
+	if CLIENT then
+		if not window.IsFocused() and console.GetCVarNumber("e_render") == 1 then
+			console.RunString("e_render 0")
+		elseif window.IsFocused() and console.GetCVarNumber("e_render") == 0 then
+			console.RunString("e_render 1")
+		end
+	end
 end)
