@@ -46,7 +46,7 @@ if _ACTION == "link" then
 	table.insert(cmd, [[mkdir "TARGET_DIR/lua/includes"]])
 
 	link_fil("lua/init.lua", "mmyy/lua/init.lua")
-	link_fil("lua/wiki.lua", "mmyy/lua/wiki.lua")
+	link_fil("lua/init.lua", "mmyy/lua/init.lua")
 	link_dir("lua/includes/modules", "mmyy/lua/includes/modules")
 	link_dir("lua/includes/nil", "mmyy/lua/includes/nil")
 	link_dir("lua/includes/standard", "mmyy/lua/includes/standard")
@@ -59,11 +59,13 @@ if _ACTION == "link" then
 	local function copy(a, b) table.insert(cmd, f([[BSLASH copy "WORKING_DIR/%s" "TARGET_DIR/%s"]], a, b)) end
 	
 	copy("mmyy/lib/lua51.dll", "bin32")
-	copy("oohh/auto_dev_login.exe", "bin32")
-	copy("oohh/crygame.dll", "bin32")
-	copy("oohh/content/bin32/*", "bin32")
+	copy("oohh/content/bin32/auto_dev_login.exe", "bin32")
+	copy("oohh/content/bin32/msvcr110d.dll", "bin32")
+	copy("oohh/content/bin32/msvcp110d.dll", "bin32")
 	copy("awesomium/build/bin/*", "bin32")
-	
+
+	copy("oohh/content/bin32/CryGame.dll", "bin32")
+
 	link_dir("Game/Levels/oh_island", "oohh/content/Game/Levels/oh_island")
 	link_dir("Game/Levels/oh_grass", "oohh/content/Game/Levels/oh_grass")
 
@@ -107,7 +109,7 @@ solution("oohh")
 
 		targetname("CryGame")		
 	
-		targetdir(FOLDER .. "/Bin32/")
+		targetdir("../oohh/content/bin32")
 		debugdir(FOLDER .. "/Bin32/")
 		objdir(FOLDER .. "/BinTemp/")
 		
@@ -150,9 +152,11 @@ solution("oohh")
 		libdirs("../awesomium/build/lib/")
 		links("lua51")
 		links("awesomium")
-			
-		postbuildcommands(([[copy "%s" "%s"]]):format((FOLDER .. "/bin32/crygame.dll"):gsub("/", "\\"), (path.getabsolute("../oohh/")):gsub("/", "\\")))
+		
+		postbuildcommands(([[copy "%s" "%s"]]):format(path.getabsolute("../oohh/"):gsub("/", "\\"), (FOLDER .. "/bin32/crygame.*"):gsub("/", "\\")))
+		
 		debugargs("-noborder -dx9")
+		debugdir(FOLDER.."/bin32")
 
 		configuration("debug")
 			flags("Symbols")
