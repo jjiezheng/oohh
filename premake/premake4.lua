@@ -61,6 +61,7 @@ if _ACTION == "link" then
 	copy("mmyy/lib/lua51.dll", "bin32")
 	copy("oohh/auto_dev_login.exe", "bin32")
 	copy("oohh/crygame.dll", "bin32")
+	copy("oohh/content/bin32/*", "bin32")
 	copy("awesomium/build/bin/*", "bin32")
 	
 	link_dir("Game/Levels/oh_island", "oohh/content/Game/Levels/oh_island")
