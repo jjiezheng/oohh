@@ -27,6 +27,53 @@ LUALIB_FUNCTION(_G, Texture)
 	return 1;
 }
 
+LUAMTA_FUNCTION(texture, SetData)
+{
+	auto self = my->ToTexture(1);
+	unsigned char *buffer;
+
+	if (lua_type(L, 2) == 10)
+	{
+		buffer = (unsigned char *)lua_topointer(L, 2);
+	}
+	else
+	{
+		// this won't really work that well since char is only 0-127
+		buffer = (unsigned char *)my->ToString(2);
+	}
+
+	auto rect = my->ToRect(3, Rect(0, 0, self->GetWidth(), self->GetHeight()));
+
+	if (buffer[2])
+	{
+		gEnv->pRenderer->UpdateTextureInVideoMemory(
+			self->GetTextureID(), 
+			buffer, 
+			rect.x, 
+			rect.y, 
+			rect.w,
+			rect.h, 
+			my->ToEnum<ETEX_Format>(4, eTF_A8R8G8B8)
+		);
+		
+		my->Push(true);
+
+		return 1;
+	}
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(texture, GetData)
+{
+	auto self = my->ToTexture(1);
+
+	lua_pushlightuserdata(L, self->GetSystemCopy());
+
+	return 1;
+}
+
+
 LUAMTA_FUNCTION(texture, GetSize)
 {
 	auto self = my->ToTexture(1);

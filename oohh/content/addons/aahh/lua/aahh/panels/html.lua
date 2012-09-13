@@ -14,19 +14,21 @@ function PANEL:Initialize()
 	self.webview = WebView(scrw, scrh)
 	self.webview:SetTransparent(true)
 	self.texture = Texture(scrw, scrh, ETF_A8R8G8B8)
+	
+	WEBTEX = self.texture
 end
 
 function PANEL:OnRemove()
 	self.webview:Remove()
 end
 
-local function D(name)
+local function DELEGATE(name)
 	PANEL[name] = function(s, ...)
 		return s.webview[name](s.webview, ...)
 	end
 end
 
-D("LoadURL")
+DELEGATE("LoadURL")
 
 function PANEL:OnRequestLayout()	
 	local siz = self:GetSize()
@@ -35,14 +37,7 @@ end
 
 function PANEL:OnDraw()
 	self.webview:UpdateTexture(self.texture)
-	surface.SetTexture(self.texture:GetId())
-			
-	graphics.Set2DFlags()
-	surface.SetColor(Color(1,1,1,1))
-	surface.DrawTexturedRectEx(
-		0, 0, 
-		scrw, scrh
-	)
+	graphics.DrawTexture(self.texture, Rect(0, 0, scrw, scrh), nil, nil, true)
 end
 
 function PANEL:OnCharInput(char, press)

@@ -153,7 +153,7 @@ solution("oohh")
 		links("lua51")
 		links("awesomium")
 		
-		postbuildcommands(([[copy "%s" "%s"]]):format(path.getabsolute("../oohh/"):gsub("/", "\\"), (FOLDER .. "/bin32/crygame.*"):gsub("/", "\\")))
+		postbuildcommands(([[xcopy /Y "%s" "%s"]]):format(path.getabsolute("../oohh/content/bin32/CryGame.*"):gsub("/", "\\"), (FOLDER .. "/bin32/"):gsub("/", "\\")))
 		
 		debugargs("-noborder -dx9")
 		debugdir(FOLDER.."/bin32")
