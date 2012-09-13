@@ -241,6 +241,13 @@ LUAMTA_FUNCTION(entity, SetParent)
 	return 0;
 }
 
+LUAMTA_FUNCTION(entity, AddChild)
+{
+	my->ToEntity(1)->AttachChild(my->ToEntity(2));
+
+	return 0;
+}
+
 LUAMTA_FUNCTION(entity, GetParent)
 {
 	my->Push(my->ToEntity(1)->GetParent());
@@ -357,6 +364,11 @@ LUAMTA_FUNCTION(entity, SetKeyValue)
 	{
 		self->GetScriptTable()->SetValue(my->ToString(2), (float)my->ToNumber(3));
 	}
+	else 
+	if (my->IsVec3(3))
+	{
+		self->GetScriptTable()->SetValue(my->ToString(2), my->ToVec3(3));
+	}
 
 	return 0;
 }
@@ -376,19 +388,37 @@ LUAMTA_FUNCTION(entity, GetKeyValues)
 		if (iter.key.type == ANY_TSTRING)
 		{	
 			if (iter.value.type == ANY_TSTRING)
+			{
 				my->SetMember(-1, iter.key.str, iter.value.str);
+			}
 			else
 			if (iter.value.type == ANY_TNUMBER)
+			{
 				my->SetMember(-1, iter.key.str, iter.value.number);
+			}
+			else
+			if (iter.value.type == ANY_TVECTOR)
+			{
+				my->SetMember(-1, iter.key.str, Vec3(iter.value.vec3.x, iter.value.vec3.y, iter.value.vec3.z));
+			}
 		}
 		else
 		if (iter.key.type == ANY_TNUMBER)
 		{	
 			if (iter.value.type == ANY_TSTRING)
+			{
 				my->SetMember(-1, iter.key.number, iter.value.str);
+			}
 			else
 			if (iter.value.type == ANY_TNUMBER)
+			{
 				my->SetMember(-1, iter.key.number, iter.value.number);
+			}
+			else
+			if (iter.value.type == ANY_TVECTOR)
+			{
+				my->SetMember(-1, iter.key.number, Vec3(iter.value.vec3.x, iter.value.vec3.y, iter.value.vec3.z));
+			}
 		}
 #else
 		my->SetMember(-1, iter.sKey, iter.value.str);

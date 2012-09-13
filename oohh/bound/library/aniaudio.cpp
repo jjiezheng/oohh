@@ -68,7 +68,7 @@ LUALIB_FUNCTION(aniaudio, Process)
 
 		for(UINT32 j = 0; j < format->nChannels; ++j)
 		{
-			auto wave = my->ToNumber(j+1);
+			auto wave = my->ToNumber(j+1, 0);
 			reinterpret_cast<float*>(data)[i * format->nChannels + j] = wave;
 		}
 	}
