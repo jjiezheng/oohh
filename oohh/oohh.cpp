@@ -66,10 +66,15 @@ namespace oohh
 			add_cmds_once = false;
 		}
 	}
+	static bool done = false;
 	void RegisterFactory(IGameFramework *framework)
 	{
+		if (done) return;
+
 		RegisterScriptedWeapon(framework);
 		RegisterScriptedEntity(framework);
+
+		done = true;
 	}
 
 	static CListener *listener;
@@ -87,6 +92,8 @@ namespace oohh
 			return;
 		}
 		
+		RegisterFactory(gEnv->pGame->GetIGameFramework());
+
 		//InitializeDirect3D();
 		AddCommands();
 
@@ -108,6 +115,8 @@ namespace oohh
 
 		//UnlockDirect3d();
 		my->CallHook("LuaOpen");
+
+
 	}
 
 	void Close()

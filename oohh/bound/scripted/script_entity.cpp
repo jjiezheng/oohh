@@ -2,22 +2,26 @@
 #include "oohh.hpp"
 #include <IGameObject.h>
 
-class scripted_entity : public CGameObjectExtensionHelper<scripted_entity, IGameObjectExtension>
+class PropNetworked : public CGameObjectExtensionHelper<PropNetworked, IGameObjectExtension>
 {	
-	bool Init( IGameObject * pGameObject )
+	bool Init(IGameObject * obj)
 	{
-		SetGameObject(pGameObject);
+		SetGameObject(obj);
 
-		GetGameObject()->EnablePhysicsEvent(true, eEPE_AllImmediate);
-		GetGameObject()->BindToNetwork();
-		GetGameObject()->EnableAspect(eEA_Physics, true);
-		GetGameObject()->EnablePrePhysicsUpdate(ePPU_Always);
+		obj->EnablePrePhysicsUpdate(ePPU_Always);
+		obj->EnablePhysicsEvent(true, eEPE_OnPostStepImmediate);
+
+		obj->SetAspectProfile(eEA_Physics, ePT_Rigid);
+
+		if (!obj->BindToNetwork())
+			return false;
 
 		return true;
 	}
 	
-	void PostInit( IGameObject * pGameObject )
+	void PostInit(IGameObject * obj)
 	{
+		obj->EnableUpdateSlot(this, 0);
 	}
 	
 	void InitClient(int channelId)
@@ -30,14 +34,14 @@ class scripted_entity : public CGameObjectExtensionHelper<scripted_entity, IGame
 	
 	void Release()
 	{
-		delete this;
+		//delete this;
 	}
 	
-	void FullSerialize( TSerialize ser )
+	void FullSerialize(TSerialize ser)
 	{
 	}
 	
-	bool NetSerialize( TSerialize ser, EEntityAspects aspect, uint8 profile, int pflags )
+	bool NetSerialize(TSerialize ser, EEntityAspects aspect, uint8 profile, int pflags)
 	{
 		return true;
 	}
@@ -46,7 +50,7 @@ class scripted_entity : public CGameObjectExtensionHelper<scripted_entity, IGame
 	{
 	}
 
-	void SerializeSpawnInfo( TSerialize ser )
+	void SerializeSpawnInfo(TSerialize ser)
 	{
 	}
 	
@@ -55,15 +59,15 @@ class scripted_entity : public CGameObjectExtensionHelper<scripted_entity, IGame
 		return 0;
 	}
 	
-	void Update( SEntityUpdateContext& ctx, int updateSlot )
+	void Update(SEntityUpdateContext& ctx, int updateSlot)
 	{
 	}
 	
-	void HandleEvent( const SGameObjectEvent& event )
+	void HandleEvent(const SGameObjectEvent& event)
 	{
 	}
 	
-	void ProcessEvent( SEntityEvent& event )
+	void ProcessEvent(SEntityEvent& event)
 	{
 	}
 	
@@ -71,11 +75,11 @@ class scripted_entity : public CGameObjectExtensionHelper<scripted_entity, IGame
 	{
 	}
 	
-	void SetAuthority( bool auth )
+	void SetAuthority(bool auth)
 	{
 	}
 	
-	void PostUpdate( float frameTime )
+	void PostUpdate(float frameTime)
 	{
 	}
 	
@@ -83,16 +87,16 @@ class scripted_entity : public CGameObjectExtensionHelper<scripted_entity, IGame
 	{
 	}
 
-	bool ReloadExtension( IGameObject * pGameObject, const SEntitySpawnParams &params )
+	bool ReloadExtension(IGameObject * pGameObject, const SEntitySpawnParams &params)
 	{
 		return true;
 	}
 
-	void PostReloadExtension( IGameObject * pGameObject, const SEntitySpawnParams &params )
+	void PostReloadExtension(IGameObject * pGameObject, const SEntitySpawnParams &params)
 	{
 	}
 
-	bool GetEntityPoolSignature( TSerialize signature )
+	bool GetEntityPoolSignature(TSerialize signature)
 	{
 		return true;
 	}
@@ -103,7 +107,27 @@ class scripted_entity : public CGameObjectExtensionHelper<scripted_entity, IGame
 	}
 };
 
+#define REGISTER_GAME_OBJECT(framework, name, script)\
+	{\
+		IEntityClassRegistry::SEntityClassDesc clsDesc;\
+		clsDesc.sName = #name;\
+		clsDesc.sScriptFile = script;\
+		struct name##Creator : public IGameObjectExtensionCreatorBase\
+		{\
+			name *Create()\
+			{\
+				return new name();\
+			}\
+			void GetGameObjectExtensionRMIData(void ** ppRMI, size_t * nCount)\
+			{\
+			name::GetGameObjectExtensionRMIData(ppRMI, nCount);\
+			}\
+		};\
+		static name##Creator _creator;\
+		framework->GetIGameObjectSystem()->RegisterExtension(#name, &_creator, &clsDesc);\
+	}
+
 void oohh::RegisterScriptedEntity(IGameFramework *framework)
 {
-	REGISTER_FACTORY(framework, "oohh_scripted_entity", scripted_entity, false);
+	REGISTER_GAME_OBJECT(framework, PropNetworked, "scripts/entities/PropNetworked.lua");
 }

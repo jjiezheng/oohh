@@ -49,18 +49,28 @@ LUAMTA_FUNCTION(entity, EnablePhysics)
 	return 0;
 }
 
-LUAMTA_FUNCTION(entity, Physicialize)
+LUAMTA_FUNCTION(entity, Physicalize)
 {
 	auto self = my->ToEntity(1);
 
 	SEntityPhysicalizeParams params;
 		params.type = my->ToNumber(2);
-		params.nSlot = my->ToNumber(3, -1);
+		params.mass = my->ToNumber(3, 1);
+		params.nSlot = my->ToNumber(4, -1);
 	self->Physicalize(params);
 	
 	my->Push(self->GetPhysics());
 
 	return 1;
+}
+
+LUAMTA_FUNCTION(physics, Wake)
+{
+	pe_action_awake action;
+	action.bAwake = !my->ToBoolean(2);
+	my->ToPhysics(1)->Action(&action);
+
+	return 0;
 }
 
 LUAMTA_FUNCTION(physics, StepBack)

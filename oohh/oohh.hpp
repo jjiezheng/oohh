@@ -71,6 +71,8 @@ public:
 	MMYY_WRAP_CLASS_NO_PUSH(CActor, Actor, actor)
 	MMYY_WRAP_CLASS(IPhysicalEntity, Physics, physics)
 	MMYY_WRAP_CLASS(CCamera, Camera, camera)
+	MMYY_WRAP_CLASS(IParticleEmitter, ParticleEmitter, particle_emitter)
+
 
 	MMYY_WRAP_CLASS(Awesomium::WebView, WebView, webview)
 

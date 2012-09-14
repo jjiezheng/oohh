@@ -14,8 +14,6 @@ function PANEL:Initialize()
 	self.webview = WebView(scrw, scrh)
 	self.webview:SetTransparent(true)
 	self.texture = Texture(scrw, scrh, ETF_A8R8G8B8)
-	
-	WEBTEX = self.texture
 end
 
 function PANEL:OnRemove()

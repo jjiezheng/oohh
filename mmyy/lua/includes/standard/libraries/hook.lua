@@ -11,8 +11,8 @@ hook.destroy_tag = HOOK_DESTROY
 
 hook.profiler_enabled = false
 
-function hook.Add(a, b, c, on_error)
-	local event, unique, func
+function hook.Add(a, b, c, d, e)
+	local event, unique, func, on_error, priority
 
 	if type(a) == "table" and type(b) == "string" then
 		event = b
@@ -23,16 +23,36 @@ function hook.Add(a, b, c, on_error)
 		unique = b
 		func = c
 	end
+	
+	if type(d) == "number" then
+		priority = d
+	elseif type(d) == "function" then
+		on_error = d
+	end
+	
+	if type(e) == "number" then
+		priority = e
+	else
+		priority = 0
+	end
 
 	check(event, "string")
 	check(func, "function")
 
+	hook.Remove(event, unique)
+	
 	hook.active[event] = hook.active[event] or {}
-	hook.active[event][unique] =
-	{
-		func = func,
-		on_error = on_error,
-	}
+	table.insert(
+		hook.active[event],
+		{
+			func = func,
+			on_error = on_error,
+			priority = priority or 0,
+			unique = unique,
+		}
+	)
+	
+	hook.SortByPriority()
 end
 
 function hook.Remove(a, b)
@@ -46,10 +66,22 @@ function hook.Remove(a, b)
 		unique = b
 	end
 
-	if unique ~= nil and hook.active[event] and hook.active[event][unique] then
-		hook.active[event][unique] = nil
+	if unique ~= nil and hook.active[event] then
+		for key, val in pairs(hook.active[event]) do
+			if unique == val.unique then
+				table.remove(hook.active[event], key)
+			end
+		end
 	else
 		Msg(("Tried to remove non existing hook '%s:%s'"):format(event, tostring(unique)))
+	end
+	
+	hook.SortByPriority()
+end
+
+function hook.SortByPriority()
+	for key, tbl in pairs(hook.GetTable()) do
+		table.sort(tbl, function(a, b) return a.priority > b.priority end)
 	end
 end
 
@@ -105,9 +137,12 @@ local function OnError(msg)
 	MsgN("")
 end
 
+local unique
+
 function hook.Call(event, ...)
 	if hook.active[event] then
-		for unique, data in pairs(hook.active[event]) do
+		for key, data in ipairs(hook.active[event]) do
+			unique = data.unique
 
 			if hook.profiler_enabled == true then
 				hook.profil[event] = hook.profil[event] or {}

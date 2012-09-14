@@ -41,15 +41,17 @@
 	</Group>
 
 	<!-- vehicles -->
-	<Group name="car" priority="7" drawn="1" normalDistance="80" close="2" far="2" foi="120" front="2" back="2">
+	<Group name="car" priority="16" drawn="1" normalDistance="80" close="2" far="2" foi="120" front="2" back="2">
 		<Pulse name="bump" bump="2" decayTime="2"/>
 		<Pulse name="bang" bump="5" decayTime="0.35"/>
 	</Group>
 	
 	<!-- physicalized objects -->
-	<Group name="phys" priority="6" drawn="1" normalDistance="40" close="3" far="1" foi="60" front="3" back="2">
+	<Group name="phys" priority="16" drawn="1" normalDistance="80" close="2" far="2" foi="120" front="2" back="2">
 		<Pulse name="bump" bump="2" decayTime="2"/>
+		<Pulse name="bang" bump="5" decayTime="0.35"/>
 	</Group>
+	
 
 	<!-- vehicle seat serializer -->
 	<Group name="cart" priority="7" drawn="0" normalDistance="80" close="2" far="1" foi="120" front="2" back="2">
@@ -65,5 +67,9 @@
 
 
 	<!-- basic object configuration -->
-	<Group name="obj" priority="0"/>
+	<Group name="obj" priority="16" drawn="1" normalDistance="80" close="2" far="2" foi="120" front="2" back="2">
+		<Pulse name="bump" bump="2" decayTime="2"/>
+		<Pulse name="bang" bump="5" decayTime="0.35"/>
+	</Group>
+	
 </Scheduler>

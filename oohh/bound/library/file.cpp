@@ -40,7 +40,7 @@ LUALIB_FUNCTION(file, ExistsInPak)
 LUALIB_FUNCTION(file, FindInPak)
 {
     _finddata_t fd;
-    intptr_t handle = gEnv->pCryPak->FindFirst(base + my->ToString(1), &fd);
+    intptr_t handle = gEnv->pCryPak->FindFirst(my->ToString(1), &fd);
 
     my->NewTable();
 

@@ -232,3 +232,16 @@ LUALIB_FUNCTION(engine3d, UpdateSky)
 
 	return 0;
 }
+
+LUALIB_FUNCTION(engine3d, RayObjectsIntersection2D)
+{
+	Vec3 hitpos;
+	if (gEnv->p3DEngine->RayObjectsIntersection2D(my->ToVec3(1), my->ToVec3(2), hitpos, my->ToEnum<EERType>(3, eERType_Brush)))
+	{
+		my->Push(hitpos);
+
+		return 1;
+	}
+
+	return 0;
+}

@@ -673,6 +673,11 @@ bool CGameStartup::InitFramework(SSystemInitParams &startupParams)
 		SubclassWindow((HWND)startupParams.hWnd, (WNDPROC)CGameStartup::WndProc);
 #endif
 
+	startupParams.bTesting = false; 
+	startupParams.bTestMode = false;
+	startupParams.bUIFramework = false;
+
+
 	// initialize the engine
 	if (!m_pFramework->Init(startupParams))
 	{
@@ -788,8 +793,8 @@ LRESULT CALLBACK CGameStartup::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		}
 		return  0;
 	case WM_HOTKEY:
-	case WM_SYSCHAR:	// prevent ALT + key combinations from creating 'ding' sounds
-		return  0;
+	/*case WM_SYSCHAR:	// prevent ALT + key combinations from creating 'ding' sounds
+		return  0;*/
 	case WM_CHAR:
 		{
 			if (gEnv && gEnv->pInput)
@@ -809,7 +814,7 @@ LRESULT CALLBACK CGameStartup::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			}
 		}
 		break;
-	case WM_SYSKEYDOWN:	// prevent ALT-key entering menu loop
+	/*case WM_SYSKEYDOWN:	// prevent ALT-key entering menu loop
 			if (wParam != VK_RETURN && wParam != VK_F4)
 			{
 				return 0;
@@ -830,7 +835,7 @@ LRESULT CALLBACK CGameStartup::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 				}
 				// let the F4 pass through to default handler (it will send an WM_CLOSE)
 			}
-		break;
+		break;*/
 	case WM_SETCURSOR:
 		if(g_pGame)
 		{

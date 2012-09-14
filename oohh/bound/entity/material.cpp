@@ -53,9 +53,9 @@ LUALIB_FUNCTION(materials, CopyMaterial)
 LUALIB_FUNCTION(materials, CreateFromXML)
 {
 	auto name = my->ToString(1);
-	auto str = my->ToString(2);
+	auto str = (string)my->ToString(2);
 	
-	auto xml = GetISystem()->LoadXmlFromBuffer(str, sizeof(str));
+	auto xml = GetISystem()->LoadXmlFromBuffer(str.c_str(), str.size());
 
 	if (xml)
 		gEnv->p3DEngine->GetMaterialManager()->LoadMaterialFromXml(name, xml);
@@ -64,15 +64,17 @@ LUALIB_FUNCTION(materials, CreateFromXML)
 }
 #endif
 
+LUALIB_FUNCTION(materials, GetSkymaterial)
+{
+	my->Push(gEnv->p3DEngine->GetSkyMaterial());
+
+	return 1;
+}
+
 LUALIB_FUNCTION(_G, Material)
 {
-	auto self = gEnv->p3DEngine->GetMaterialManager()->CreateMaterial(my->ToPath(1, "materials"), 
-#ifdef CE3
-		my->ToEnum<EMaterialCopyFlags>(2, MTL_COPY_DEFAULT));
-#else
-		my->ToNumber(2));
-#endif
 
+	auto self = gEnv->p3DEngine->GetMaterialManager()->CreateMaterial(my->ToPath(1, "materials"), my->ToNumber(2, 0));
 
 	my->Push(self);
 
@@ -113,9 +115,18 @@ LUAMTA_FUNCTION(material, GetTexture)
 {
 	auto self = my->ToMaterial(1);
 
-	my->Push(self->GetShaderItem().m_pShaderResources->GetTexture(my->ToNumber(2))->m_Sampler.m_pITex);
+	auto res = self->GetShaderItem().m_pShaderResources;
+	if (res)
+	{
+		auto val = res->GetTexture(my->ToNumber(2));
 
-	return 1;
+		if (val && val->m_Sampler.m_pITex)
+			my->Push(val->m_Sampler.m_pITex);
+
+		return 1;
+	}
+
+	return 0;
 }
 
 LUAMTA_FUNCTION(material, GetParam)

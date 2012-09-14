@@ -23,8 +23,28 @@ namespace oohh
 		, public IEntitySystemSink
 		, public IEntityEventListener
 		, public IWeaponEventListener
+
+		, public IMaterialManagerListener
 	{
 	public:
+
+		#pragma region materialmanager
+		virtual IMaterial* OnLoadMaterial(const char *sMtlName,bool bForceCreation=false,unsigned long nLoadingFlags=0 )
+		{
+			if (my->CallHook("OnLoadMaterial", sMtlName, bForceCreation, nLoadingFlags) && my->IsMaterial(-1))
+				return my->ToMaterial(-1);
+
+			return nullptr;
+		}
+		virtual void OnCreateMaterial( IMaterial *pMaterial )
+		{
+			my->CallHook("OnCreateMaterial", pMaterial);
+		}
+		virtual void OnDeleteMaterial( IMaterial *pMaterial )
+		{
+			my->CallHook("OnDeleteMaterial", pMaterial);
+		}
+		#pragma endregion
 
 		#pragma region framework
 			// eFLPriority_Game, "PreGameRender", "PostGameUpdate", "oohh_game"
@@ -85,7 +105,7 @@ namespace oohh
 
 			virtual bool OnRemove(IEntity *ent)
 			{
-				my->CallHook("EntityRemove", ent, 1);
+				my->CallHook("EntityRemoved", ent, 1);
 			
 				if (my->IsFalse(-1))
 					return false;
@@ -370,6 +390,8 @@ namespace oohh
 
 		void Start()
 		{
+			gEnv->p3DEngine->GetMaterialManager()->SetListener(this);
+
 			gEnv->pSystem->GetISystemEventDispatcher()->RegisterListener(this);
 
 			gEnv->pConsole->AddOutputPrintSink(this);
@@ -414,6 +436,8 @@ namespace oohh
 
 		void Stop()
 		{
+			gEnv->p3DEngine->GetMaterialManager()->SetListener(nullptr);
+
 			gEnv->pSystem->GetISystemEventDispatcher()->RemoveListener(this);
 			
 			gEnv->pConsole->RemoveOutputPrintSink(this);

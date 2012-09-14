@@ -84,6 +84,24 @@ LUAMTA_FUNCTION(texture, GetSize)
 	return 2;
 }
 
+LUAMTA_FUNCTION(texture, GetFormat)
+{
+	auto self = my->ToTexture(1);
+
+	my->Push(self->GetTextureSrcFormat());
+
+	return 1;
+}
+
+LUAMTA_FUNCTION(texture, GetTypeName)
+{
+	auto self = my->ToTexture(1);
+
+	my->Push(self->GetTypeName());
+
+	return 1;
+}
+
 LUAMTA_FUNCTION(texture, GetId)
 {
 	auto self = my->ToTexture(1);

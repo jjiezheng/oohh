@@ -32,17 +32,20 @@ if _ACTION == "link" then
 	local cmd = {}
 
 	local link_dir = function(a,b)
-		table.insert(cmd, f([[rmdir "TARGET_DIR/%s"]], a))
+		table.insert(cmd, f([[rmdir /S /Q "TARGET_DIR/%s"]], a))
 		table.insert(cmd, f([[LINK_DIR "TARGET_DIR/%s" "WORKING_DIR/%s"]], a, b))
 	end
 
 	local link_fil = function(a,b)
-		table.insert(cmd, f([[del "TARGET_DIR/%s"]], a))
+		table.insert(cmd, f([[del /S /F "TARGET_DIR/%s"]], a))
 		table.insert(cmd, f([[LINK_FIL "TARGET_DIR/%s" "WORKING_DIR/%s"]], a, b))
 	end
 
+	table.insert(cmd, [[rmdir "TARGET_DIR/data"]])
 	table.insert(cmd, [[mkdir "TARGET_DIR/data"]])
+	table.insert(cmd, [[rmdir /S /Q "TARGET_DIR/lua"]])
 	table.insert(cmd, [[mkdir "TARGET_DIR/lua"]])
+	table.insert(cmd, [[rmdir /S /Q "TARGET_DIR/lua/includes"]])
 	table.insert(cmd, [[mkdir "TARGET_DIR/lua/includes"]])
 
 	link_fil("lua/init.lua", "mmyy/lua/init.lua")
@@ -75,10 +78,12 @@ if _ACTION == "link" then
 		line = line:gsub("WORKING_DIR", path.getabsolute("../"))
 		line = line:gsub("TARGET_DIR", FOLDER)
 		
-		if line:find("BSLASH") then
+		if line:find("BSLASH") or line:find("rmdir") then
 			line = line:gsub("BSLASH", "")
-			line = line:gsub("/", "\\")
+			line = line:gsub("(.-)(\".+)", function(a, s) return a.. s:gsub("/", "\\") end)
 		end
+		
+		print(line)
 			
 		os.execute(line)
 	end

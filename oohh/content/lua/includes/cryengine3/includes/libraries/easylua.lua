@@ -119,7 +119,6 @@ function easylua.CreateEntity(class)
 	if class:lower():find("cgf") then
 		local ent = entities.Create("BasicEntity")
 		ent:Spawn()
-		ent:BindToNetwork()
 		ent:SetPos(there)
 		ent:SetModel(class)
 		return ent
@@ -159,7 +158,7 @@ function easylua.Start(ply)
 		vars.create = s.CreateEntity
 		vars.prints = s.PrintOnServer
 
-		if vars.phys then
+		if vars.phys:IsValid() then
 			vars.this = vars.phys:GetEntity()
 			--vars.model = vars.this:GetModel()
 		end

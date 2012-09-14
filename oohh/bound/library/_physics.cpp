@@ -25,19 +25,6 @@ LUALIB_FUNCTION(physics, RayWorldIntersection)
     //So it will be the first hit
     auto hits = gEnv->pPhysicalWorld->RayWorldIntersection(origin, direction, type, mask, &params, 1, skip);
     
-    //If it hit anything, store the IEntity pointer it hit
-    if (hits > 0)
-    {	
-        //Get and check if the physics are valid from the entity the ray intersection hit
-        if (auto phys = params.pCollider)
-        {
-            //Store the entity pointer in the lua table
-            my->SetMember(-1, "HitPhysics", phys);
-        }
-    }
-
-    //Store the rest of the values in the table
-
     my->SetMember(-1, "StartPos", origin);
     my->SetMember(-1, "EndPos", end_pos);
     my->SetMember(-1, "HitPos", params.pt);
@@ -50,6 +37,7 @@ LUALIB_FUNCTION(physics, RayWorldIntersection)
     my->SetMember(-1, "PartID", params.partid);
     my->SetMember(-1, "SurfaceIndex", params.surface_idx); 
     my->SetMember(-1, "Hit", hits > 0);
+	my->SetMember(-1, "HitPhysics", params.pCollider);
    
     my->PushValue(-1);
 

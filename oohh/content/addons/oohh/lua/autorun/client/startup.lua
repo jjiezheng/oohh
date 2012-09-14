@@ -16,6 +16,7 @@ end
 
 function menu.RenderBackground()	
 	if entities.GetLocalPlayer():IsValid() then return end
+	mouse.ShowCursor(true)
 	local scrw, scrh = render.GetScreenSize()
 	
 	--graphics.DrawFilledRect(Rect(0, 0, scrw, scrh), aahh.GetSkinColor("light"))

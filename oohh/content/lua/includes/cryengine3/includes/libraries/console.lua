@@ -92,12 +92,12 @@ do -- commands
 			ply = ply or entities.GetLocalPlayer()
 
 			if CLIENT then
-				if data.server == true then
+				if data.server == true or data.server == "server" then
 					message.SendToServer("cmd", cmd, ...)
 				elseif data.server == "shared" then
 					call(data, ply, line, ...)
 					message.SendToServer("cmd", cmd, ...)
-				elseif not data.server then
+				elseif not data.server or data.server == "client" then
 					call(data, ply, line, ...)
 				end
 			end
