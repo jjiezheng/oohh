@@ -42,16 +42,12 @@ if CLIENT then
 						end
 					end
 					
-					aahh.ActivePanel = NULL
-
-					input.DisableFocus = false
 					mouse.ShowCursor(false)
 					showing = false
 					
-					panel:SetVisible(false)
+					panel:Remove()
 				end
 			
-			input.DisableFocus = true
 			mouse.ShowCursor(true)
 			showing = true
 		end

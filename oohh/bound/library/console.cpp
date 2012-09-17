@@ -13,6 +13,12 @@ LUALIB_FUNCTION(console, FindKeyBind)
 
     return 1;
 }
+LUALIB_FUNCTION(console, Show)
+{
+	gEnv->pConsole->ShowConsole(my->ToBoolean(1), my->ToNumber(2, -1));
+
+    return 0;
+}
 LUALIB_FUNCTION(console, IsVisible)
 {
     my->Push(gEnv->pConsole->GetStatus());

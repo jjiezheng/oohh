@@ -45,7 +45,6 @@ if CLIENT then
 	
 	hook.Add("EntitySpawned", "call_on_client", function(ent)
 		timer.Simple(0.5, function()
-			printf("entity %s with id %s spawned", ent:GetClass(), ent:GetId())
 			local id = ent:GetId()
 			local data = buffer[id]
 			

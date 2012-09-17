@@ -25,7 +25,8 @@ function addons.Autorun(addon, autorun_folder)
 				local func, msg = loadfile(fullpath)
 				if func then
 					_G.INFO = info
-						func()
+						local func, msg = pcall(func)
+						if not func then print(msg) end
 					_G.INFO = nil
 				else
 					print(msg)

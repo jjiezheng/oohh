@@ -114,7 +114,7 @@ solution("oohh")
 
 		targetname("CryGame")		
 	
-		targetdir("../oohh/content/bin32")
+		targetdir(FOLDER .. "/Bin32")
 		debugdir(FOLDER .. "/Bin32/")
 		objdir(FOLDER .. "/BinTemp/")
 		
@@ -158,7 +158,7 @@ solution("oohh")
 		links("lua51")
 		links("awesomium")
 		
-		postbuildcommands(([[xcopy /Y "%s" "%s"]]):format(path.getabsolute("../oohh/content/bin32/CryGame.*"):gsub("/", "\\"), (FOLDER .. "/bin32/"):gsub("/", "\\")))
+		postbuildcommands(([[xcopy /Y "%s" "%s"]]):format((FOLDER .. "/bin32/CryGame.dll"):gsub("/", "\\"), path.getabsolute("../oohh/content/bin32/"):gsub("/", "\\")))
 		
 		debugargs("-noborder -dx9")
 		debugdir(FOLDER.."/bin32")

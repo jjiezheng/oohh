@@ -149,11 +149,25 @@ inline T my_tostruct(lua_State *L, int idx, const char *meta_name, bool check = 
 
 	if (check)
 	{
-		var = *(T *)luaL_checkudata(L, idx, meta_name);
+		if (lua_type(L, idx) == 10)
+		{
+			var = *(T *)lua_topointer(L, idx);
+		}
+		else
+		{
+			var = *(T *)luaL_checkudata(L, idx, meta_name);
+		}
 	}
 	else
 	{
-		var = *(T *)lua_touserdata(L, idx);
+		if (lua_type(L, idx) == 10)
+		{
+			var = *(T *)lua_topointer(L, idx);
+		}
+		else
+		{
+			var = *(T *)lua_touserdata(L, idx);
+		}
 	}
 
 	return var;
@@ -173,16 +187,33 @@ inline T *my_tostructpointer(lua_State *L, int idx, const char *meta_name, bool 
 {
 	if (check)
 	{
-		auto ptr = (T *)luaL_checkudata(L, idx, meta_name);
+		if (lua_type(L, idx) == 10)
+		{
+			auto ptr = (T *)lua_topointer(L, idx);
 
-		if(ptr != nullptr)
-			return ptr;
+			if(ptr != nullptr)
+				return ptr;
+		}
+		else
+		{
+			auto ptr = (T *)luaL_checkudata(L, idx, meta_name);
+
+			if(ptr != nullptr)
+				return ptr;
+		}
 
 		luaL_typerror(L, idx, meta_name);
 	}
 	else
 	{
-		return (T *)lua_touserdata(L, idx);
+		if (lua_type(L, idx) == 10)
+		{
+			return (T *)lua_topointer(L, idx);
+		}
+		else
+		{
+			return (T *)lua_touserdata(L, idx);
+		}
 	}
 
 	return nullptr;
@@ -191,7 +222,7 @@ inline T *my_tostructpointer(lua_State *L, int idx, const char *meta_name, bool 
 template<typename T>
 inline T *my_tostructpointer(lua_State *L, int idx, const char *meta_name, T *def)
 {
-	if (lua_type(L, idx) == meta_name)
+	if (my_istype(L, idx, meta_name))
 		return my_tostructpointer<T>(L, idx, meta_name, false);
 
 	return def;

@@ -6,8 +6,9 @@ hook.Add("SystemEvent", "noborder", function(event)
 				window.SetRect(window.GetWorkingRect())
 				window.SetNoBorder(true)
 				
-				timer.Simple(0, function()
+				timer.Simple(0.1, function()
 					if aahh then
+						hook.Call("ResolutionChanged")
 						aahh.World:RequestLayout()
 					end
 				end)

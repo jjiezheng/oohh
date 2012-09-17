@@ -63,7 +63,7 @@ if CRYENGINE3 then
 			end
 		end
 	
-		if aahh.ActivePanel:IsValid() and aahh.ActivePanel:IsInFront() then
+		if aahh.ActivePanel:IsValid() then
 			input.DisableFocus = true
 		else
 			input.DisableFocus = false

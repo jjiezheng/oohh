@@ -1,6 +1,7 @@
 if SERVER or system.GetCommandLine().server then 
 	timer.Simple(1, function()
-		console.RunString([[
+		console.RunString(
+			[[
 			r_displayInfo 1
 
 			s_DummySound 1
@@ -8,10 +9,16 @@ if SERVER or system.GetCommandLine().server then
 			s_MusicEnable 0
 			e_render 0
 			sys_maxfps 30
-		]]
+			]]
 		)
+		
+		hook.Add("PostGameUpdate", "server", function()
+			render.Clear(Color(0,0,0,1))
+		end)
 				
 		timer.Create("server_kl", 0.1, 0, function()
+			console.Show(true)
+			
 			local pos = Vec3(0,0,0)
 			local server = entities.GetLocalPlayer()
 			local players = entities.GetAllPlayers()

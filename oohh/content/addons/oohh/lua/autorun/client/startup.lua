@@ -243,6 +243,7 @@ function menu.MakeButtons()
 	menu.AddButton("Exit", function() console.RunString("quit") end)
 	
 	menu.SetupButtons()
+	hook.Add("ResolutionChanged", "startup", menu.SetupButtons)
 end
 
 if not MULTIPLAYER then

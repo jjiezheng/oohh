@@ -112,6 +112,11 @@ namespace oohh
 
 				my->CallEntityHook(ent, "OnRemove");
 
+				for ( int flag = 0; flag != ENTITY_EVENT_LAST; flag++ )
+				{
+					gEnv->pEntitySystem->RemoveEntityEventListener(ent->GetId(), (EEntityEvent)flag, this);
+				}
+
 				if (my_getuidtable(my->L, ent->GetId()))
 				{
 					luaL_getmetatable(my->L, "null_meta");

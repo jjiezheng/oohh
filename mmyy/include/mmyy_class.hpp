@@ -259,7 +259,7 @@ inline void Print(const char *str)
 
 	inline bool IsType(int idx, int type)
 	{
-		return lua_type(L, idx) == type;
+		return lua_type(L, idx) == type || lua_type(L, idx) == 10;
 	}
 
 	inline bool IsType(int idx, const char *type)

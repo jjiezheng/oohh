@@ -57,9 +57,9 @@ end
 
 function typex(var)
 
-	if istype(var, "userdata", "table") then
+	if istype(var, "userdata", "cdata", "table") then
 		local meta = getmetatable(var)
-		return meta and meta.Type or type(var)
+		return meta == "ffi" and var.Type or meta and meta.Type or type(var)
 	end
 
 	return type(var)

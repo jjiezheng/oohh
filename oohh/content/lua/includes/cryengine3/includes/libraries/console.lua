@@ -137,8 +137,10 @@ do -- commands
 	end
 
 	function console.InternalCommandHook(line)
-		local cmd = line:match(console.Prefix.."(.-) ") or line:match(console.Prefix.."(.+)") or ""
-		local arg_line = line:match(console.Prefix..".- (.+)") or ""
+	
+		local prefix = line:sub(0, #console.Prefix) == console.Prefix and console.Prefix or ""
+		local cmd = line:match(prefix.."(.-) ") or line:match(prefix.."(.+)") or ""
+		local arg_line = line:match(prefix..".- (.+)") or ""		
 
 		cmd = cmd:lower()
 		

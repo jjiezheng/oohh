@@ -49,16 +49,6 @@ do -- filter
 	end
 end
 
-local function fix_tbl(tbl)
-	local new = {} -- ?????
-
-	for key, value in pairs(tbl) do
-		table.insert(new, value)
-	end
-
-	return new
-end
-
 local function decode(str)
 	local args = sigh.Decode(str)
 	local id = args[1]
@@ -77,6 +67,8 @@ if CLIENT then
 
 		message.RawSendToServer(str)
 	end
+	
+	message.Send = SendToServer
 
 	function message.NetMsgReceiveFromServer(str)
 		local id, args = decode(str)
@@ -106,6 +98,8 @@ if SERVER then
 		end
 	end
 
+	message.Send = SendToClient
+	
 	function message.NetMsgReceiveFromClient(ply, str)
 		if not ply then return end
 
@@ -115,6 +109,6 @@ if SERVER then
 			message.Hooks[id](ply, unpack(args))
 		end
 	end
-
+	
 	hook.Add("NetMsgReceiveFromClient", "message", message.NetMsgReceiveFromClient, print)
 end
