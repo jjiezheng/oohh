@@ -6,7 +6,7 @@ return
 	description = "oohh's gui",
 	startup = "aahh/init.lua",
 	
-	priority = math.huge,
+	priority = 10,
 
 	load = CRYENGINE3 ~= nil,
 }

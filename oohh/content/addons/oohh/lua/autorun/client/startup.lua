@@ -37,7 +37,7 @@ function menu.RenderBackground()
 	for i=0, steps-1 do
 		local fract = i/steps
 		local f = math.sin(fract*100/wavelength+CurTime()*speed)*amplitude+median
-		graphics.DrawFilledRect(Rect(0, scrh*fract, scrw, scrh/steps), Color(r*f, g*f, b*f, a))
+		graphics.DrawFilledRect(Rect(0, scrh*fract, scrw, scrh/steps), Color(r*f, g*f, b*f, 1))
 	end
 end
 

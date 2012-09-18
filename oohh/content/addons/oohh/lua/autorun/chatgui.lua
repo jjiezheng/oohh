@@ -58,7 +58,7 @@ function chatgui.Draw()
 		if not data.fade then data.alpha = math.min(data.alpha + FrameTime() * 8, 1) end
 		graphics.DrawText(
 			data.str,
-			Vec2(x, (data.alpha * chatgui.font_size) + graphics.GetScreenSize().h * 0.5) + Vec2(chatgui.font_size, ((key - #chatgui.history) * chatgui.font_size * chatgui.spacing)),  
+			Vec2(0, (data.alpha * chatgui.font_size) + graphics.GetScreenSize().h * 0.5) + Vec2(chatgui.font_size, ((key - #chatgui.history) * chatgui.font_size * chatgui.spacing)),  
 			chatgui.font, 
 			chatgui.font_size, 
 			Color(1, 1, 1, data.alpha),

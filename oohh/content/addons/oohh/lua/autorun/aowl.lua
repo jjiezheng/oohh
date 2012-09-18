@@ -679,7 +679,7 @@ do -- added commands
 
 		end
 
-		if CLIENT then
+		if CLIENT and false then
 			local CONFIG = {}
 
 			CONFIG.TargetTime 	= 0

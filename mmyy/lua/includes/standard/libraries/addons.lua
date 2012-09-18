@@ -19,7 +19,7 @@ function addons.Autorun(addon, autorun_folder)
 		end
 				
 		for file_name in pairs(file.Find(path .. "*", true)) do
-			if file_name ~= "." and file_name ~= ".." then
+			if file_name ~= "." and file_name ~= ".." and file_name:sub(-4) == ".lua" then
 				local fullpath = BASE_FOLDER .. path .. file_name
 
 				local func, msg = loadfile(fullpath)

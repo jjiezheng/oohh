@@ -2,13 +2,22 @@ if not ffi then return end
 
 structs = structs or {}
 
+local blacklist = 
+{
+	SetTable = true,
+	GetTable = true,
+	IsValid = true,
+	Type = true,
+	GetUniqueID = true,		
+}
+
 function structs.Register(META)
 	local base = util.FindMetaTable(META.ClassName)
 	
 	if base then
 		for key, value in pairs(base) do
-			if key:sub(1, 1) ~= "_" and not META[key] then
-				printf("merging base function %s to %s", key, META.ClassName)
+			if key:sub(1, 1) ~= "_" and not META[key] and not blacklist[key] then
+				--printf("merging base function %s to %s", key, META.ClassName)
 				META[key] = value
 			end
 		end
@@ -47,11 +56,38 @@ function structs.Register(META)
 		end
 	end
 	
+	local tr
+	META.__newindex = function(self, key, val)
+		tr = translation[key]
+		if tr then
+			self[tr] = val
+		end
+	end
+		
 	META.Type = META.ClassName:lower()
 	
-	ffi.cdef("typedef struct {" .. META.NumberType .. " " .. arg_line .. ";}" .. META.ClassName .. ";")
-	structs[META.ClassName] = ffi.metatype(META.ClassName, META)
+	ffi.cdef("typedef struct " .. META.ClassName .. " { " .. META.NumberType .. " " .. arg_line .. "; }" .. META.ClassName .. ";")
+	local obj = ffi.metatype(META.ClassName, META)
 	
+	if META.Constructor then
+		structs[META.ClassName] = function(...) return obj(META.Constructor(...)) end
+	else
+		-- speed? runtime checks are bad
+		
+		local count = #META.Args
+		
+		if count == 2 then
+			structs[META.ClassName] = function(a, b) return obj(a or 0, b or 0) end
+		elseif count == 3 then
+			structs[META.ClassName] = function(a, b, c) return obj(a or 0, b or 0, c or 0) end
+		elseif count == 4 then
+			structs[META.ClassName] = function(a, b, c, d) return obj(a or 0, b or 0, c or 0, d or 0) end
+		elseif count == 5 then
+			structs[META.ClassName] = function(a, b, c, d, e) return obj(a or 0, b or 0, c or 0, d or 0, e or 0) end
+		else
+			structs[META.ClassName] = function(...) return obj(...) end
+		end
+ 	end
 	_G[META.ClassName] = structs[META.ClassName]
 end 
  
@@ -110,7 +146,7 @@ local function parse_args(META, lua, sep, protect)
 	return str
 end
  
-function structs.AddOperator(META, operator)
+function structs.AddOperator(META, operator, ...)
 	if operator == "tostring" then
 		local lua = [==[
 		local META = ({...})[1]
@@ -135,9 +171,7 @@ function structs.AddOperator(META, operator)
 		lua = lua:gsub("LINE", str)
 		
 		lua = parse_args(META, lua, ", ")
-		
-		table.print(lua:explode("\n"))
-		
+				
 		assert(loadstring(lua, META.ClassName .. " operator " .. operator))(META)
 	elseif operator == "unpack" then
 		local lua = [==[
@@ -165,7 +199,7 @@ function structs.AddOperator(META, operator)
 		lua = parse_args(META, lua, " and ")
 
 		assert(loadstring(lua, META.ClassName .. " operator " .. operator))(META)
-	elseif operator == "-" then
+	elseif operator == "unm" then
 		local lua = [==[
 		local META = ({...})[1]
 		META["__unm"] = function(a)
@@ -199,7 +233,7 @@ function structs.AddOperator(META, operator)
 	elseif operator == "copy" then
 		local lua = [==[
 		local META = ({...})[1]
-		META["copy"] = function(a)
+		META["Copy"] = function(a)
 				return
 				CTOR(
 					a.KEY
@@ -212,7 +246,52 @@ function structs.AddOperator(META, operator)
 		lua = lua:gsub("CTOR", "structs."..META.ClassName)
 		
 		assert(loadstring(lua, META.ClassName .. " operator " .. operator))(META)
-	else
+	elseif operator == "math" then
+		local args = {...}
+		local func_name = args[1]
+		local accessor_name = args[2]
+		local accessor_name_get = args[3]
+		
+		local lua = [==[
+		local META = ({...})[1]
+		META["ACCESSOR_NAME"] = function(a, ...)
+			a.KEY = math.FUNC_NAME(a.KEY, ...)
+			
+			return a 
+		end
+		]==]
+		
+		lua = parse_args(META, lua, "")
+		
+		lua = lua:gsub("CTOR", "structs."..META.ClassName)
+		lua = lua:gsub("FUNC_NAME", func_name)
+		lua = lua:gsub("ACCESSOR_NAME", accessor_name)
+				
+		assert(loadstring(lua, META.ClassName .. " operator " .. func_name))(META)
+		
+		structs.AddGetFunc(META, accessor_name, accessor_name_get)
+	elseif operator == "random" then
+		local lua = [==[
+		local META = ({...})[1]
+		META["Random"] = function(a, ...)
+				a.KEY = math.randomf(...)
+				
+				return a
+			end
+		]==]
+		
+		lua = parse_args(META, lua, "")
+		
+		lua = lua:gsub("CTOR", "structs."..META.ClassName)
+		
+		assert(loadstring(lua, META.ClassName .. " operator " .. operator))(META)
+		
+		structs.AddGetFunc(META, "Random")
+		
+		_G[META.ClassName .. "Rand"] = function(min, max)
+			return structs[META.ClassName]():GetRandom(min or -1, max or 1)
+		end
+	elseif structs.OperatorTranslate[operator] then
 		local lua = [==[
 		local META = ({...})[1]
 		META[structs.OperatorTranslate["OPERATOR"]] = function(a, b)
@@ -235,10 +314,13 @@ function structs.AddOperator(META, operator)
 		lua = parse_args(META, lua, ", ", true)
 				
 		lua = lua:gsub("CTOR", "structs."..META.ClassName)
-		lua = lua:gsub("OPERATOR", operator)
-		lua = lua:gsub("PROTECT", "a.")
 		
+		lua = lua:gsub("OPERATOR", operator == "%" and "%%" or operator)
+		lua = lua:gsub("PROTECT", "a.")
+				
 		assert(loadstring(lua, META.ClassName .. " operator " .. operator))(META)
+	else
+		print("unhandled operator " .. operator)
 	end
 end
 
@@ -248,16 +330,19 @@ function structs.AddAllOperators(META)
 	structs.AddOperator(META, "*")
 	structs.AddOperator(META, "/")
 	structs.AddOperator(META, "^")
-	structs.AddOperator(META, "-")
+	structs.AddOperator(META, "unm")
 	structs.AddOperator(META, "%")
 	structs.AddOperator(META, "==")
 	structs.AddOperator(META, "copy")
 	structs.AddOperator(META, "unpack")
 	structs.AddOperator(META, "tostring")
 	structs.AddOperator(META, "zero")
+	structs.AddOperator(META, "random")
+	structs.AddOperator(META, "math", "abs", "Abs")
+	structs.AddOperator(META, "math", "round", "Round", "Rounded")
+	structs.AddOperator(META, "math", "ceil", "Ceil", "Ceiled")
+	structs.AddOperator(META, "math", "floor", "Floor", "Floored")
+	structs.AddOperator(META, "math", "clamp", "Clamp", "Clamped")
 end
 
-include("structs/Vec3.lua")
-include("structs/Ang3.lua")
-include("structs/Color.lua")
---include("structs/Quat.lua")
+include("structs/*")

@@ -191,7 +191,6 @@ include("includes/standard/libraries/lpeg.lua")
 include("includes/standard/libraries/base64.lua")
 include("includes/standard/libraries/path.lua")
 include("includes/standard/libraries/input.lua")
-include("includes/standard/libraries/hllib.lua")
 
 -- meta
 include("includes/standard/meta/nil.lua")

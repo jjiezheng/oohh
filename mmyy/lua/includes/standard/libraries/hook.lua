@@ -73,7 +73,7 @@ function hook.Remove(a, b)
 			end
 		end
 	else
-		Msg(("Tried to remove non existing hook '%s:%s'"):format(event, tostring(unique)))
+		--print(("Tried to remove non existing hook '%s:%s'"):format(event, tostring(unique)))
 	end
 	
 	hook.SortByPriority()

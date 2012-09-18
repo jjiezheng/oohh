@@ -108,7 +108,7 @@ function util.MonitorFileReoh(source, target)
 	target = target or source
 
 	util.MonitorFile(source, function()
-		printf("reloading %q ", target, os.clock())
+		--printf("reloading %q ", target, os.clock())
 		timer.Simple(0, function()
 			console.RunString("reoh")
 		end)
@@ -119,8 +119,8 @@ function util.MonitorFileInclude(source, target)
 	source = source or path.GetPath(3)
 	target = target or source
 
-	printf("monitoring %s", source)
-	printf("to reload %s", target)
+	--printf("monitoring %s", source)
+	--printf("to reload %s", target)
 	
 	util.MonitorFile(source, function()
 		timer.Simple(0, function()

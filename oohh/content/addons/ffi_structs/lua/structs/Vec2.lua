@@ -1,141 +1,61 @@
 local META = {}
 
-META.ClassName = "Vec2" -- temp
+META.ClassName = "Vec2"
 
-META.FFIDef = "double x, y"
-META.LuaDef = function(x,y) return {x=x or 0 ,y=y or 0} end
+META.NumberType = "float"
+META.Args = {{"x", "w", "p"}, {"y", "h", "y"}}
 
-do -- standard
-	function META:__tostring()
-		return self.ClassName .. string.format("(%f, %f)", self.x, self.y)
+structs.AddAllOperators(META) 
+
+-- length stuff
+do 
+	function META:GetLengthSquared()
+		return self.x * self.x + self.y * self.y
 	end
 
-	function META:Unpack()
-		return self.x, self.y
+	function META:SetLength(num)
+		local scale = num * 1/math.sqrt(self:GetLengthSquared())
+		
+		self.x = self.x * scale
+		self.y = self.y * scale
 	end
 
-	function META:Copy()
-		return self * 1
+	function META:GetLength()
+		return math.sqrt(self:GetLengthSquared())
 	end
 
-	function META.__eq(a,b)
-		return
-			a.x == b.x and
-			a.y == b.y
-	end
+	META.__len = META.GetLength
 
-	function META.__add(a, b)
-		if type(b) == "number" then
-			return Vec2(
-				a.x + b,
-				a.y + b
-			)
-		elseif type(a) == "number" then
-			return Vec2(
-				a + b.x,
-				a + b.y
-			)
-		else
-			return Vec2(
-				a.x + b.x,
-				a.y + b.y
-			)
+	function META.__lt(a, b)
+		if typex(a) == META.Type and type(b) == "number" then
+			return a:GetLength() < b
+		elseif typex(b) == META.Type and type(a) == "number" then
+			return b:GetLength() < a
 		end
 	end
 
-	function META.__sub(a, b)
-		if type(b) == "number" then
-			return Vec2(
-				a.x - b,
-				a.y - b
-			)
-		elseif type(a) == "number" then
-			return Vec2(
-				a - b.x,
-				a - b.y
-			)
-		else
-			return Vec2(
-				a.x - b.x,
-				a.y - b.y
-			)
+	function META.__le(a, b)
+		if typex(a) == META.Type and type(b) == "number" then
+			return a:GetLength() <= b
+		elseif typex(b) == META.Type and type(a) == "number" then
+			return b:GetLength() <= a
 		end
 	end
 
-	function META.__mul(a, b)
-		if type(b) == "number" then
-			return Vec2(
-				a.x * b,
-				a.y * b
-			)
-		elseif type(a) == "number" then
-			return Vec2(
-				a * b.x,
-				a * b.y
-			)
-		else
-			return Vec2(
-				a.x * b.x,
-				a.y * b.y
-			)
+	function META:SetMaxLength(num)
+		local length = self:GetLengthSquared()
+		
+		if length * length > num then
+			local scale = num * 1/math.sqrt(length)
+			
+			self.x = self.x * scale
+			self.y = self.y * scale
 		end
 	end
-
-	function META.__div(a, b)
-		if type(b) == "number" then
-			return Vec2(
-				a.x / b,
-				a.y / b
-			)
-		elseif type(a) == "number" then
-			return Vec2(
-				a / b.x,
-				a / b.y
-			)
-		else
-			return Vec2(
-				a.x / b.x,
-				a.y / b.y
-			)
-		end
+	
+	function META.Distane(a, b)
+		return (a - b):GetLength()
 	end
-
-	function META.__pow(a, b)
-		if type(b) == "number" then
-			return Vec2(
-				a.x ^ b,
-				a.y ^ b
-			)
-		elseif type(a) == "number" then
-			return Vec2(
-				a ^ b.x,
-				a ^ b.y
-			)
-		else
-			return Vec2(
-				a.x ^ b.x,
-				a.y ^ b.y
-			)
-		end
-	end
-
-	function META.__unm(a)
-		return Vec2(
-			-a.x,
-			-a.y
-		)
-	end
-end
-
-function META.GetLength(a)
-	return math.sqrt(
-		a.x * a.x +
-		a.y * a.y
-	)
-end
-
-function META.Distane(a, b)
-	return (a - b):GetLength()
 end
 
 function META.GetDot(a, b)
@@ -144,9 +64,38 @@ function META.GetDot(a, b)
 		a.y * b.y
 	end
 
-function META:GetNormalized()
-	return self / self:GetLength()
+function META:Normalize()
+	local inverted_length = 1/math.sqrt(self:GetLengthSquared())
+	
+	self.x = self.x * inverted_length
+	self.y = self.y * inverted_length
+	
+	return self
 end
 
-structs.Register(META, true) -- change true to nil for ffi
+function META.GetCrossed(a, b)
+	return a.x * b.y - a.y * b.x
+end
+
+function META:Rotate90CCW()
+	local x, y = self:Unpack()
+
+	self.x = -y
+	self.y = x
+	
+	return self
+end
+
+function META:Rotate90CW()
+	local x, y = self:Unpack()
+
+	self.x = y
+	self.y = -x
+	
+	return self
+end
+
+structs.AddGetFunc(META, "Normalize", "Normalized")
+
+structs.Register(META)
 
