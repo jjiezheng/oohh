@@ -38,7 +38,7 @@ function aahh.StringInput(msg, default, callback, check)
 	
 	textentry.OnEnter = function(self)
 		local str = textentry:GetText()
-		if not check and check(str, self) ~= false then
+		if not check or check(str, self) ~= false then
 			callback()
 			frame:Remove()
 		end

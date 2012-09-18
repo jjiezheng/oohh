@@ -7,6 +7,10 @@ if not os.isdir(FOLDER) then
 	error("cannot find the cryengine3 '" .. cryengine3 .. "' is not a valid directory")
 end
 
+local function bslash(str)
+	return str:gsub("/", "\\")
+end
+
 if _ACTION == "link" then
 	local function exists(cmd)
 		os.execute("@echo off")
@@ -32,21 +36,21 @@ if _ACTION == "link" then
 	local cmd = {}
 
 	local link_dir = function(a,b)
-		table.insert(cmd, f([[rmdir /S /Q "TARGET_DIR/%s"]], a))
-		table.insert(cmd, f([[LINK_DIR "TARGET_DIR/%s" "WORKING_DIR/%s"]], a, b))
+		table.insert(cmd, f([[rmdir /S /Q "TARGET_DIR\%s"]], bslash(a)))
+		table.insert(cmd, f([[LINK_DIR "TARGET_DIR\%s" "WORKING_DIR\%s"]], bslash(a), bslash(b)))
 	end
 
 	local link_fil = function(a,b)
-		table.insert(cmd, f([[del /S /F "TARGET_DIR/%s"]], a))
-		table.insert(cmd, f([[LINK_FIL "TARGET_DIR/%s" "WORKING_DIR/%s"]], a, b))
+		table.insert(cmd, f([[del /S /F "TARGET_DIR\%s"]], bslash(a)))
+		table.insert(cmd, f([[LINK_FIL "TARGET_DIR\%s" "WORKING_DIR\%s"]], bslash(a), bslash(b)))
 	end
 
-	table.insert(cmd, [[rmdir "TARGET_DIR/data"]])
-	table.insert(cmd, [[mkdir "TARGET_DIR/data"]])
-	table.insert(cmd, [[rmdir /S /Q "TARGET_DIR/lua"]])
-	table.insert(cmd, [[mkdir "TARGET_DIR/lua"]])
-	table.insert(cmd, [[rmdir /S /Q "TARGET_DIR/lua/includes"]])
-	table.insert(cmd, [[mkdir "TARGET_DIR/lua/includes"]])
+	table.insert(cmd, [[rmdir "TARGET_DIR\data"]])
+	table.insert(cmd, [[mkdir "TARGET_DIR\data"]])
+	table.insert(cmd, [[rmdir /S /Q "TARGET_DIR\lua"]])
+	table.insert(cmd, [[mkdir "TARGET_DIR\lua"]])
+	table.insert(cmd, [[rmdir /S /Q "TARGET_DIR\lua\includes"]])
+	table.insert(cmd, [[mkdir "TARGET_DIR\lua\includes"]])
 
 	link_fil("lua/init.lua", "mmyy/lua/init.lua")
 	link_fil("lua/init.lua", "mmyy/lua/init.lua")
@@ -59,7 +63,7 @@ if _ACTION == "link" then
 	link_dir("Game/Scripts", "oohh/content/Game/Scripts")
 	link_dir("Game/Entities", "oohh/content/Game/Entities")	
 		
-	local function copy(a, b) table.insert(cmd, f([[BSLASH copy "WORKING_DIR/%s" "TARGET_DIR/%s"]], a, b)) end
+	local function copy(a, b) table.insert(cmd, f([[copy "WORKING_DIR\%s" "TARGET_DIR\%s"]], bslash(a), bslash(b))) end
 	
 	copy("mmyy/lib/lua51.dll", "bin32")
 	copy("oohh/content/bin32/auto_dev_login.exe", "bin32")
@@ -67,7 +71,7 @@ if _ACTION == "link" then
 	copy("oohh/content/bin32/msvcp110d.dll", "bin32")
 	copy("awesomium/build/bin/*", "bin32")
 
-	copy("oohh/content/bin32/CryGame.dll", "bin32")
+	link_fil("bin32/CryGame.dll", "oohh/content/bin32/CryGame.dll")
 
 	link_dir("Game/Levels/oh_island", "oohh/content/Game/Levels/oh_island")
 	link_dir("Game/Levels/oh_grass", "oohh/content/Game/Levels/oh_grass")
@@ -75,14 +79,9 @@ if _ACTION == "link" then
 	for i, line in ipairs(cmd) do
 		line = line:gsub("LINK_DIR", LINK_DIR)
 		line = line:gsub("LINK_FIL", LINK_FIL)
-		line = line:gsub("WORKING_DIR", path.getabsolute("../"))
-		line = line:gsub("TARGET_DIR", FOLDER)
-		
-		if line:find("BSLASH") or line:find("rmdir") then
-			line = line:gsub("BSLASH", "")
-			line = line:gsub("(.-)(\".+)", function(a, s) return a.. s:gsub("/", "\\") end)
-		end
-		
+		line = line:gsub("WORKING_DIR", bslash(path.getabsolute("../")))
+		line = line:gsub("TARGET_DIR", bslash(FOLDER))
+
 		print(line)
 			
 		os.execute(line)
@@ -158,7 +157,10 @@ solution("oohh")
 		links("lua51")
 		links("awesomium")
 		
-		postbuildcommands(([[xcopy /Y "%s" "%s"]]):format((FOLDER .. "/bin32/CryGame.dll"):gsub("/", "\\"), path.getabsolute("../oohh/content/bin32/"):gsub("/", "\\")))
+		local bin32dir = bslash(path.getabsolute("../oohh/content/bin32/"))
+		local dllpath = bslash(FOLDER .. "/bin32/CryGame.dll")
+		prelinkcommands(([[del /S /F "%s"]]):format(dllpath))
+		postbuildcommands(([[xcopy /Y "%s" "%s"]]):format(dllpath, bin32dir))
 		
 		debugargs("-noborder -dx9")
 		debugdir(FOLDER.."/bin32")

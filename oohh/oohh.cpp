@@ -8,7 +8,7 @@
 #undef GetCommandLine
 
 oohhState *my = NULL;
- 
+  
 namespace oohh
 {
 	bool m_bFocus = true;

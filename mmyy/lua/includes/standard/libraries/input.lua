@@ -65,7 +65,7 @@ function input.CallOnTable(tbl, name, key, press, up_id, down_id, skip_hook)
 		if press and not tbl[down_id][index] then
 			
 			if input.debug then
-				print("input_debug_down", name, key, press, char, skip_hook)
+				print("input_debug_down", name, key, press, skip_hook)
 			end
 		
 			if not skip_hook then
@@ -77,7 +77,7 @@ function input.CallOnTable(tbl, name, key, press, up_id, down_id, skip_hook)
 		elseif not press and tbl[down_id][index] and not tbl[up_id][index] then
 			
 			if input.debug then
-				print("input_debug_up", name, key, press, char, skip_hook)
+				print("input_debug_up", name, key, press, skip_hook)
 			end
 		
 			if not skip_hook then

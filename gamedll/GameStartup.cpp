@@ -747,7 +747,7 @@ void CGameStartup::ShutdownWindow()
 //////////////////////////////////////////////////////////////////////////
 #ifdef WIN32
 
-//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 LRESULT CALLBACK CGameStartup::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(msg)
@@ -793,10 +793,28 @@ LRESULT CALLBACK CGameStartup::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		}
 		return  0;
 	case WM_HOTKEY:
+		return DefWindowProc(hWnd, msg, wParam, lParam);
+	case WM_KEYDOWN:
+		return DefWindowProc(hWnd, msg, wParam, lParam);
+	case WM_KEYUP:
+		return DefWindowProc(hWnd, msg, wParam, lParam);
 	/*case WM_SYSCHAR:	// prevent ALT + key combinations from creating 'ding' sounds
 		return  0;*/
 	case WM_CHAR:
 		{
+			if (my)
+			{ 
+				wchar_t wstr[] = {(wchar_t)wParam};
+				char cstr[8] = {0};
+
+				wcstombs(cstr, wstr, wcslen(wstr));
+
+				if (my->CallHook("WindowsMessageChar", (const char *)cstr, 1) && my->IsTrue(-1))
+				{
+					return DefWindowProc(hWnd, msg, wParam, lParam);
+				}
+			}
+
 			if (gEnv && gEnv->pInput)
 			{
 				SInputEvent event;

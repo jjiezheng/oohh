@@ -130,15 +130,22 @@ function PANEL:HandleKey(key)
 end
 
 function PANEL:HandleChar(char)
-	if char and char ~= "" and char:byte() > 32 then
+	local byte = char:byte()
+	if byte > 32 then
 		self:Append(char)
 		self:HandleKey("right")
+	elseif byte == 8 then
+		self:HandleKey("backspace")
+	elseif byte == 32 then
+		self:HandleKey("space")
 	else
 		self:OnUnhandledChar(char)
 	end
 end
 
 function PANEL:OnKeyInput(key, press)
+	
+	if key == "space" or key == "backspace" then return end
 	
 	if self.suppress_key then
 		self.suppress_key = false
@@ -161,13 +168,13 @@ function PANEL:OnCharInput(char, press)
 		return
 	end
 		
-	if press then
+	--if press then
 		self.Char = char
 		self:HandleChar(char)
-		self:DoChoke()
-	else
-		self.Char = nil
-	end
+		--self:DoChoke()
+	--else
+	--	self.Char = nil
+	--end
 end
 
 local blink_rate = 0.6
@@ -181,10 +188,7 @@ function PANEL:OnDraw()
 end
 
 function PANEL:OnThink()
-	if self.Visible and self.Key and (not self.Choke or self.Choke < CurTime()) then
-		self:HandleKey(self.Key)
-		self:HandleChar(self.Char)
-	end
+
 end
 
 function PANEL:OnEnter(str)
@@ -196,7 +200,7 @@ function PANEL:OnUnhandledKey(key)
 end
 
 function PANEL:OnUnhandledChar(char)
-
+	print(char:byte())
 end
 
 aahh.RegisterPanel(PANEL)
