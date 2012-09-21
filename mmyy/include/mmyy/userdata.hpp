@@ -236,4 +236,6 @@ inline void my_push(lua_State *L, T var, const char *meta_name)
 
 	luaL_getmetatable(L, meta_name);
 	lua_setmetatable(L, -2);
+
+	//lua_pushlightuserdata(L, &var);
 }

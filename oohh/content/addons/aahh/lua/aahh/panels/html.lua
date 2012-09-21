@@ -1,9 +1,5 @@
 if not awesomium then return end
 
-awesomium.Open()
-
-hook.Add("PostGameUpdate", "awesomium", function() awesomium.Update() end)
-
 local PANEL = {}
 
 PANEL.ClassName = "html"
@@ -38,10 +34,8 @@ function PANEL:OnDraw()
 	graphics.DrawTexture(self.texture, Rect(0, 0, scrw, scrh), nil, nil, true)
 end
 
-function PANEL:OnCharInput(char, press)
-	if press then
-		self.webview:InjectKeyboardEvent(char:byte(), kTypeChar, input.GetModifiers())
-	end
+function PANEL:OnCharInput(char)
+	self.webview:InjectKeyboardEvent(char:byte(), kTypeChar, input.GetModifiers())
 end
 
 function PANEL:OnKeyInput(key, press)

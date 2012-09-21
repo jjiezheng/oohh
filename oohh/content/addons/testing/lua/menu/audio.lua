@@ -91,14 +91,13 @@ local function waveform()
 	end
 end
 
-hook.Add("PostGameUpdate",1, function()
+rawaudio.Open(0.1)
+
+hook.Add("PostGameUpdate", 1, function()
 	GetVolumeData()
-	aniaudio.Process()
 end)
 
 hook.Add("AudioSample", 1, function(pos)
 	time = pos
 	return waveform()
 end)
-
-aniaudio.Start(0.1)

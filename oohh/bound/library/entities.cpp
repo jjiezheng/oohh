@@ -103,7 +103,7 @@ LUALIB_FUNCTION(entities, Create)
 		SEntitySpawnParams params;
 			params.pClass = ent_class;
 			params.nFlags = my->ToNumber(3, 0);
-			params.id = gEnv->pEntitySystem->GetNumEntities() + 1;
+			//params.id = gEnv->pEntitySystem->GetNumEntities() + 1;
 			
 		
 		/*{

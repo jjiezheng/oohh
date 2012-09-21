@@ -214,5 +214,5 @@ inline bool my_getentityfield(lua_State *L, int idx, const char *key, int expect
 
 inline bool my_istype(lua_State *L, int idx, const char *type) 
 { 
-	return strcmp(my_getmetaname(L, idx), type) == 0 || lua_type(L, idx) == 10; 
+	return lua_type(L, idx) == 10 || strcmp(my_getmetaname(L, idx), type) == 0;
 }

@@ -8,7 +8,7 @@
 #undef GetCommandLine
 
 oohhState *my = NULL;
-  
+ 
 namespace oohh
 {
 	bool m_bFocus = true;
@@ -94,7 +94,6 @@ namespace oohh
 		
 		RegisterFactory(gEnv->pGame->GetIGameFramework());
 
-		//InitializeDirect3D();
 		AddCommands();
 
 		my = new oohhState();
@@ -113,10 +112,10 @@ namespace oohh
 
 		oohh::SetCursor(LoadCursor(NULL, IDC_ARROW));
 
-		//UnlockDirect3d();
 		my->CallHook("LuaOpen");
 
-
+		//my->RunString("awesomium.Close()");
+		my->RunString("awesomium.Open()");
 	}
 
 	void Close()

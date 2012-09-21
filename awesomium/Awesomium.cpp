@@ -15,21 +15,25 @@ WebCore* core = 0;
 
 LUALIB_FUNCTION(awesomium, Open)
 {
-	if (core) return 0;
+	if (!core)
+	{
+		WebConfig config;
+		core = WebCore::Initialize(config);
+	}
 
-	WebConfig config;
-	core = WebCore::Initialize(config);
+	my->RunString("hook.Add(\"PostGameUpdate\", \"awesomium\", function() awesomium.Update() end, print)");
 
 	return 0;
 }
 
 LUALIB_FUNCTION(awesomium, Close)
 {
-	if (core) return 0;
-
-	WebCore::Shutdown();
+	if (core)
+	{
+		WebCore::Shutdown();
 	
-	core = nullptr;
+		core = nullptr;
+	}
 
 	return 0;
 }
@@ -382,9 +386,18 @@ LUAMTA_FUNCTION(webview, UpdateTexture)
 
 LUAMTA_FUNCTION(webview, ExecuteJavascriptWithResult)
 {
-	auto val = my->ToWebView(1)->ExecuteJavascriptWithResult(WSLit(my->ToString(1)), WSLit(my->ToString(2, "")));
+	auto val = my->ToWebView(1)->ExecuteJavascriptWithResult(WSLit(my->ToString(2)), WSLit(my->ToString(3, "")));
 	
 	my->Push(ToString(val.ToString()).c_str());
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(webview, GetAudioBuffer)
+{
+	/*auto val = my->ToWebView(1)->session()->preferences().
+	
+	my->Push(ToString(val.ToString()).c_str());*/
 
 	return 0;
 }

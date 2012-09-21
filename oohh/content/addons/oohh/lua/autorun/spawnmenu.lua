@@ -94,7 +94,7 @@ end
 
 --if SERVER then
 console.AddCommand("spawn_prop", function(ply, line)
-	local ent = entities.Create("PropNetworked")
+	local ent = entities.Create("BasicEntity")
 	ent:Spawn()
 	ent:SetPos(ply:GetEyeTrace().HitPos)
 	ent:SetModel(line)

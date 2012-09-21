@@ -7,57 +7,67 @@
 #include <mmsystem.h>
 #include <queue>
 
-IMMDeviceEnumerator* enumerator;
-IMMDevice* device;
 IAudioClient* client;
 IAudioRenderClient* render;
 WAVEFORMATEX* format;
-HANDLE event;
 UINT32 buffer;
 
-LUALIB_FUNCTION(aniaudio, Start)
+LUALIB_FUNCTION(rawaudio, Open)
 {
-	CoInitializeEx(NULL, COINIT_DISABLE_OLE1DDE | COINIT_SPEED_OVER_MEMORY);
-	CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator), reinterpret_cast<LPVOID*>(&enumerator));
-	enumerator->GetDefaultAudioEndpoint(eRender, eConsole, &device);
-	device->Activate(__uuidof(IAudioClient), CLSCTX_INPROC_SERVER, NULL, reinterpret_cast<void**>(&client));
+	IMMDeviceEnumerator* enumerator;
+	IMMDevice* device;
 
-	client->GetMixFormat(&format);
-	client->Initialize(AUDCLNT_SHAREMODE_SHARED, AUDCLNT_STREAMFLAGS_EVENTCALLBACK, (REFERENCE_TIME)(my->ToNumber(1)*10000000), 0, format, NULL);
-	event = CreateEvent(NULL, FALSE, FALSE, NULL);
-	client->SetEventHandle(event);
-	client->GetService(__uuidof(IAudioRenderClient), reinterpret_cast<void**>(&render));
-	client->GetBufferSize(&buffer);
+	// this needs to be called once before we're about to use the COM api
+	CoInitializeEx(nullptr, COINIT_DISABLE_OLE1DDE | COINIT_SPEED_OVER_MEMORY);
 
-	client->Start();
+	// get the MMDeviceEnumerator class
+	if (CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator), reinterpret_cast<LPVOID*>(&enumerator)) == S_OK)
+	{
+		// get the IMMDevice of this program
+		if (enumerator->GetDefaultAudioEndpoint(eRender, eMultimedia, &device) == S_OK)
+		{
+			// and finally get the IAudioClient
+			if (device->Activate(__uuidof(IAudioClient), CLSCTX_INPROC_SERVER, nullptr, reinterpret_cast<void**>(&client)) == S_OK)
+			{
+				// buffer size in seconds
+				auto buffer_size = (REFERENCE_TIME)(my->ToNumber(1)*10000000);
 
-	my->Push((double)format->nSamplesPerSec);
+				client->GetMixFormat(&format);
+				client->Initialize(AUDCLNT_SHAREMODE_SHARED, AUDCLNT_STREAMFLAGS_EVENTCALLBACK, buffer_size, 0, format, nullptr);
+				auto event = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+				client->SetEventHandle(event);
+				client->GetService(__uuidof(IAudioRenderClient), reinterpret_cast<void**>(&render));
+				client->GetBufferSize(&buffer);
+
+				client->Start();
+
+				my->Push((double)format->nSamplesPerSec);
+			}
+		}
+	}
+
+	my->RunString("hook.Add(\"PostGameUpdate\", \"rawaudio\", rawaudio.Update)");
 
 	return 1;
 }
 
-LUALIB_FUNCTION(aniaudio, Stop)
+LUALIB_FUNCTION(rawaudio, Close)
 {
 	client->Stop();
 	render->Release();
 	client->Release();
 
+	my->RunString("hook.Remove(\"PostGameUpdate\", \"rawaudio\")");
+
 	return 0;
 }
 
-LUALIB_FUNCTION(aniaudio, Beep)
+LUALIB_FUNCTION(rawaudio, Update)
 {
-	my->Push(Beep(my->ToNumber(1), my->ToNumber(2)) == 1);
-
-	return 1;
-}
-
-LUALIB_FUNCTION(aniaudio, Process)
-{
-	UINT32 padding, available;
-	client->GetCurrentPadding(&padding);
-	available = buffer - padding;
+	UINT32 padding;
 	BYTE* data;
+	client->GetCurrentPadding(&padding);
+	auto available = buffer - padding;
 	render->GetBuffer(available, &data);
 
 	static UINT64 position;
