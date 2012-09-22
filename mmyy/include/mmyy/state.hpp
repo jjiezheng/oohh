@@ -40,16 +40,11 @@ inline void my_regentfuncs(lua_State *L, const char *meta, const char *name, lua
 
 		luaL_newmetatable(L, meta);
 			my_setmember(L, -1, "Type", meta, true);
-			my_setmember(L, -1, "GetUniqueID", default_meta::GetUniqueID, true);
 
 			my_setmember(L, -1, "__eq", default_meta::__eq, true);
 			my_setmember(L, -1, "__tostring", default_meta::__tostring, true);
 			my_setmember(L, -1, "__index", default_meta::__index, true);
-			my_setmember(L, -1, "__newindex", default_meta::__newindex, true);
-
-			my_setmember(L, -1, "SetTable", default_meta::SetTable, true);
-			my_setmember(L, -1, "GetTable", default_meta::GetTable, true);
-
+			
 			my_setmember(L, -1, "IsValid", default_meta::IsValid, true);
 	}
 

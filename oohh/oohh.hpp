@@ -66,9 +66,9 @@ public:
 	MMYY_WRAP_CLASS(ITexture, Texture, texture)
 	MMYY_WRAP_CLASS(IMaterial, Material, material)
 	MMYY_WRAP_CLASS(IFFont, Font, font)
-	MMYY_WRAP_CLASS(CWeapon, Weapon, weapon)
-	MMYY_WRAP_CLASS(CPlayer, Player, player)
-	MMYY_WRAP_CLASS_NO_PUSH(CActor, Actor, actor)
+	//MMYY_WRAP_CLASS(CWeapon, Weapon, weapon)
+	//MMYY_WRAP_CLASS(CPlayer, Player, player)
+	//MMYY_WRAP_CLASS_NO_PUSH(CActor, Actor, actor)
 	MMYY_WRAP_CLASS(IPhysicalEntity, Physics, physics)
 	MMYY_WRAP_CLASS(CCamera, Camera, camera)
 	MMYY_WRAP_CLASS(IParticleEmitter, ParticleEmitter, particle_emitter)
@@ -76,7 +76,7 @@ public:
 
 	MMYY_WRAP_CLASS(Awesomium::WebView, WebView, webview)
 
-	MMYY_WRAP_CLASS_NO_PUSH(IEntity, Entity, entity)
+	//MMYY_WRAP_CLASS_NO_PUSH(IEntity, Entity, entity)
 
 	inline void Push(string var)
 	{
@@ -85,9 +85,121 @@ public:
 
 	inline void Push(IWeapon *var)
 	{
-		Push((CWeapon *)var);
+		Push<CWeapon>((CWeapon *)var, "weapon");
+	}
+	inline void Push(CWeapon *var)
+	{
+		Push<CWeapon>(var, "weapon");
+	}
+	inline void Push(CPlayer *var)
+	{
+		Push<CPlayer>(var, "player");
 	}
 
+	inline IEntity *ToEntity(int idx, bool check = true)
+	{
+		auto T = my_getmetaname(L, idx);
+
+		if (strcmp(T, "entity") == 0)
+		{
+			return ToPointer<IEntity>(idx, "entity");
+		}
+		if (strcmp(T, "actor") == 0)
+		{
+			return ToPointer<CActor>(idx, "actor")->GetEntity();
+		}
+		else
+		if (strcmp(T, "player") == 0)
+		{
+			return ToPointer<CPlayer>(idx, "player")->GetEntity();
+		}
+		else
+		if (strcmp(T, "weapon") == 0)
+		{
+			return ToPointer<CWeapon>(idx, "weapon")->GetEntity();
+		}
+
+		luaL_typerror(L, idx, "entity");
+
+		return nullptr;
+	}
+	inline CWeapon *ToWeapon(int idx, bool check = true)
+	{
+		auto T = my_getmetaname(L, idx);
+
+		if (strcmp(T, "weapon") == 0)
+		{
+			return ToPointer<CWeapon>(idx, "weapon");
+		}
+		else
+		if (strcmp(T, "entity") == 0)
+		{
+			auto item = gEnv->pGame->GetIGameFramework()->GetIItemSystem()->GetItem(ToPointer<IEntity>(idx, "entity")->GetId());
+			if (item)
+			{
+				return (CWeapon *)item;			
+			}
+		}
+
+		luaL_typerror(L, idx, "weapon");
+
+		return nullptr;
+	}
+	inline CPlayer *ToPlayer(int idx, bool check = true)
+	{
+		auto T = my_getmetaname(L, idx);
+		
+		if (strcmp(T, "player") == 0)
+		{
+			return ToPointer<CPlayer>(idx, "player");
+		}
+		else
+		if (strcmp(T, "entity") == 0)
+		{
+			auto actor = gEnv->pGame->GetIGameFramework()->GetIActorSystem()->GetActor(ToPointer<IEntity>(idx, "entity")->GetId());
+
+			if (actor)
+			{
+				return (CPlayer *)actor;
+			} 
+		}
+		else
+		if (strcmp(T, "actor") == 0)
+		{
+			return (CPlayer *)ToPointer<CActor>(idx, "player");
+		}
+
+		luaL_typerror(L, idx, "weapon");
+
+		return nullptr;
+	}
+	inline CActor *ToActor(int idx, bool check = true)
+	{
+		auto T = my_getmetaname(L, idx);
+
+		if (strcmp(T, "actor") == 0)
+		{
+			return ToPointer<CActor>(idx, "actor");
+		}
+		if (strcmp(T, "entity") == 0)
+		{
+			auto actor = gEnv->pGame->GetIGameFramework()->GetIActorSystem()->GetActor(ToPointer<IEntity>(idx, "entity")->GetId());
+
+			if (actor)
+			{
+				return (CActor *)actor;
+			} 
+		}
+		else
+		if (strcmp(T, "player") == 0)
+		{
+			return (CActor *)ToPointer<CPlayer>(idx, "player");
+		}
+		
+		luaL_typerror(L, idx, "weapon");
+
+		return nullptr;
+	}
 	inline void Push(IActor *var, bool cast = true)
 	{
 		Push((CActor *)var, cast);

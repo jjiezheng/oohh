@@ -128,3 +128,21 @@ LUALIB_FUNCTION(_G, RenderMeshTest)
 
 	return 0;
 }
+
+LUALIB_FUNCTION(_G, CastingTest)
+{
+	auto ent = gEnv->pEntitySystem->GetEntity(my->ToNumber(1, 1));
+
+	if (ent)
+	{
+		auto cls = ent->GetClass()->GetName();
+	}
+
+	auto iact = reinterpret_cast<IActor *>(ent);
+	auto ply = reinterpret_cast<CPlayer *>(ent);
+	auto act = reinterpret_cast<CActor *>(ent);
+	auto itm = reinterpret_cast<CItem *>(ent);
+	auto wep = reinterpret_cast<CWeapon *>(ent);
+
+	return 0;
+}

@@ -104,7 +104,7 @@ function hook.UserDataCall(udata, event, ...)
 				table.remove(args, 1)
 				return unpack(args)
 			else
-				if (type(udata) == "userdata" or type(udata) == "table") and udata.Type and udata.ClassName then
+				if hasindex(udata) and udata.Type and udata.ClassName then
 					printf("scripted class %s %q errored: %s", udata.Type, udata.ClassName, args[2])
 				else
 					printf(args[2])

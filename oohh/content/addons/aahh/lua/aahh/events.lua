@@ -15,8 +15,9 @@ function aahh.Draw(delta)
 		aahh.ActiveSkin.FT = delta
 		aahh.ActiveSkin:Think(delta)
 	end
-
-	aahh.World:Draw()
+	if aahh.World:IsValid() then
+		aahh.World:Draw()
+	end
 end
 
 function aahh.EndDraw()

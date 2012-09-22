@@ -164,7 +164,7 @@ solution("oohh")
 		
 		local bin32dir = bslash(path.getabsolute("../oohh/content/bin32/"))
 		local dllpath = bslash(FOLDER .. "/bin32/CryGame.dll")
-		prelinkcommands(([[del /S /F "%s"]]):format(dllpath))
+		os.execute(([[del /S /F "%s"]]):format(dllpath))
 		postbuildcommands(([[xcopy /Y "%s" "%s"]]):format(dllpath, bin32dir))
 		
 		debugargs("-noborder -dx9")

@@ -117,10 +117,15 @@ namespace oohh
 					gEnv->pEntitySystem->RemoveEntityEventListener(ent->GetId(), (EEntityEvent)flag, this);
 				}
 
-				if (my_getuidtable(my->L, ent->GetId()))
+				if (my_getuidtable(my->L, ent))
 				{
 					luaL_getmetatable(my->L, "null_meta");
 					lua_setmetatable(my->L, -2);	
+
+					my_getptrtable(my->L);
+					lua_pushlightuserdata(my->L, ent);
+					lua_pushnil(my->L);
+					lua_rawset(my->L, -3);					
 					
 					my->Remove(-1);
 				}

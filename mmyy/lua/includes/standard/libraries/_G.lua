@@ -55,11 +55,24 @@ function istype(var, ...)
 	return false
 end
 
+function hasindex(var)
+	if type(var) == "table" then
+		return true
+	end
+	
+	local meta = getmetatable(var)
+	
+	if meta == "ffi" then return true end
+	
+	local T = type(meta)
+		
+	return T == "table" and meta.__index ~= nil 
+end
+
 function typex(var)
 
-	if istype(var, "userdata", "cdata", "table") then
-		local meta = getmetatable(var)
-		return meta == "ffi" and var.Type or meta and meta.Type or type(var)
+	if hasindex(var) then
+		return var.Type or type(var)
 	end
 
 	return type(var)

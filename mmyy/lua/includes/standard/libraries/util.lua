@@ -65,12 +65,18 @@ function util.DeriveMetaFromBase(meta_name, base_name, func_name)
 	local func = meta[func_name]
 
 	if not func then error("could not find the function name " .. func_name, 2) end
-
+	
+	local new
 	for name in pairs(base) do
 		if not meta[name] then
-			meta[name] = function(s, ...)
-				s = func(s, ...)
-				return s[name](s, ...)
+			meta[name] = base[name] or function(s, ...)
+				new = func(s, ...)
+				
+				if new == s then
+					error(("%s tried to use %s on self but returned itself"):format(meta_name, func_name))
+				end
+				
+				return new[name](new, ...)
 			end
 		end
 	end

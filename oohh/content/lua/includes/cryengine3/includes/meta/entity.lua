@@ -22,9 +22,17 @@ end
 
 hook.Add("PostGameUpdate", "entity_update", function()
 	for key, ent in pairs(entities.GetAll()) do
+		if not getmetatable(ent).Type then
+			_R.ptrtable = {}
+			print(key)
+			goto asdf
+		end
+		--if type(ent) then print("SADASDASDASD", ent, ent.Type) end
 		if ent.OnUpdate then
 			ent:OnUpdate()
 		end
+		
+		::asdf::
 	end
 end, print)
 

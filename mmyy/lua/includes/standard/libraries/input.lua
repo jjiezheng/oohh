@@ -9,7 +9,7 @@ function input.SetupAccessorFunctions(tbl, name, up_id, down_id)
 	local self
 	tbl["Is" .. name .. "Down"] = function(self, ...)
 		local args
-		if type(self) ~= "userdata" then args = {self, ...} self = tbl else args = {...} end			
+		if not hasindex(self) then args = {self, ...} self = tbl else args = {...} end			
 		if not self[down_id] then self[down_id] = {} end
 
 		for _, val in ipairs(args) do
@@ -22,19 +22,19 @@ function input.SetupAccessorFunctions(tbl, name, up_id, down_id)
 	end
 	
 	tbl["Get" .. name .. "UpTime"] = function(self, key)
-		if type(self) ~= "userdata" then key = self self = tbl end
+		if not hasindex(self) then key = self self = tbl end
 		if not self[up_id] then self[up_id] = {} end
 		return os.clock() - (self[up_id][key] or 0)
 	end
 	
 	tbl["Was" .. name .. "Pressed"] = function(self, key)
-		if type(self) ~= "userdata" then key = self self = tbl end
+		if not hasindex(self) then key = self self = tbl end
 		if not self[down_id] then self[down_id] = {} end
 		return os.clock() - (self[down_id][key] or 0) < input.PressedThreshold
 	end
 
 	tbl["Get" .. name .. "DownTime"] = function(self, key)
-		if type(self) ~= "userdata" then key = self self = tbl end
+		if not hasindex(self) then key = self self = tbl end
 		if not self[down_id] then self[down_id] = {} end
 		return os.clock() - (self[down_id][key] or 0)
 	end

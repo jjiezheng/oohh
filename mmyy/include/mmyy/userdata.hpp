@@ -1,19 +1,36 @@
 template<typename T>
 inline T *my_topointer(lua_State *L, int idx, const char *meta_name, bool check = true)
 {
+	if (lua_istable(L, idx))
+	{
+		lua_getfield(L, idx, "Type"); //val
+
+		if (strcmp(lua_tostring(L, -1), meta_name) == 0)
+		{
+			lua_remove(L, -1); //
+
+			lua_getfield(L, idx, "__ptr"); // val
+
+			if (lua_islightuserdata(L, -1))
+			{
+				auto ptr = (T *)lua_touserdata(L, -1);
+				if (ptr)
+				{
+					lua_remove(L, -1);
+
+					return ptr;
+				}
+			}
+
+			lua_remove(L, -1);
+		}
+
+		lua_remove(L, -1); //
+	}
+
 	if (check)
 	{
-		auto ptr = (T **)luaL_checkudata(L, idx, meta_name);
-		if(*ptr != nullptr)
-			return *ptr;
-
 		luaL_typerror(L, idx, meta_name);
-	}
-	else
-	{
-		auto ptr = (T **)lua_touserdata(L, idx);
-		if(*ptr != nullptr)
-			return *ptr;
 	}
 
 	return nullptr;
@@ -27,119 +44,49 @@ inline T *my_topointer(lua_State *L, int idx, const char *meta_name, T *def)
 	return ptr ? ptr : def;
 }
 
-
-namespace null_meta
-{
-	inline int false_func(lua_State *L)
-	{
-		lua_pushboolean(L, 0);
-
-		return 1;
-	}
-
-	inline int __tostring(lua_State *L)
-	{
-		lua_pushstring(L, "NULL");
-
-		return 1;
-	}
-
-	inline int __index(lua_State *L)
-	{
-		auto key = lua_tostring(L, 2);
-
-		if (key && strcmp(key, "IsValid") == 0)
-		{
-			lua_pushcfunction(L, false_func);
-
-			return 1;
-		}
-
-		luaL_error(L, "tried to index %s on a NULL value", key);
-
-		return 0;
-	}
-}
-
-inline void my_pushnull(lua_State *L)
-{
-	lua_pushvalue(L, LUA_REGISTRYINDEX); // _R
-		lua_pushinteger(L, (long int)L); // _R, num
-	lua_gettable(L, -2); // _R, val
-	
-	lua_remove(L, -2); // val
-
-	if (lua_isnil(L, -1))
-	{
-		lua_remove(L, -1); //
-
-		luaL_newmetatable(L, "null_meta"); // meta
-			my_setmember(L, -1, "__index", null_meta::__index, true);
-			my_setmember(L, -1, "__tostring", null_meta::__tostring, true);
-		lua_remove(L, -1); //
-
-		lua_pushvalue(L, LUA_REGISTRYINDEX); // _R
-			lua_pushinteger(L, (long int)L); // _R, num
-			lua_newtable(L); // _R, num, {}
-		lua_settable(L, -3); // _R
-
-		lua_pushinteger(L, (long int)L); // _R, num
-		lua_gettable(L, -2); // _R, val
-
-		luaL_getmetatable(L, "null_meta"); //, _R, val, meta
-		lua_setmetatable(L, -2); // _R, val
-
-		lua_remove(L, -2); // val
-	}
-}
-
 template<typename T>
 inline bool my_push(lua_State *L, T *ptr, const char *meta_name)
 {
 	if (ptr != nullptr)
 	{
-		auto box = (T **)lua_newuserdata(L, sizeof(void *)); // udata
-		*box = ptr;
+		my_getptrtable(L); // ptrtbl
+	
+		lua_pushlightuserdata(L, ptr); // ptrtbl, ptr
+		lua_rawget(L, -2); // ptrtbl, val
 
-		luaL_getmetatable(L, meta_name); // udata, meta
-		lua_setmetatable(L, -2); // udata
+		if (!lua_istable(L, -1))
+		{
+			// remove nil
+			lua_remove(L, -1); // ptrtbl
 
+			// create the table
+			lua_newtable(L); // ptrtbl, {}
+
+			// make a value with the key __ptr inside the table containing the pointer to the table for refference
+			lua_pushstring(L, "__ptr"); // ptrtbl, {}, "__id"
+			lua_pushlightuserdata(L, ptr); // ptrtbl, {}, "__id", ptr
+			lua_rawset(L, -3); // ptrtbl, {}
+
+			luaL_getmetatable(L, meta_name);  // ptrtbl, {}, meta
+			lua_setmetatable(L, -2); // ptrtbl, {}
+
+			lua_pushlightuserdata(L, ptr); // ptrtbl, {}, ptr
+			lua_pushvalue(L, -2); // ptrtbl, {}, ptr, {}
+			lua_rawset(L, -4); // ptrtbl, {}
+
+			lua_remove(L, -2);			
+		}
+		else
+		{
+			lua_remove(L, -2);
+		}
+	
 		return true;
 	}
 	
 	my_pushnull(L); // udata
 
 	return false;
-}
-
-inline bool my_pushentity(lua_State *L, const char *meta_name, unsigned long long id = 0)
-{
-	my_getptrtable(L); // ptrtbl
-	
-	lua_rawgeti(L, -1, id); // ptrtbl, val
-
-	// doesn't exist? create it
-	if (!lua_istable(L, -1))
-	{
-		lua_remove(L, -1); // ptrtbl
-
-		lua_newtable(L); // ptrtbl, {}
-
-		lua_pushstring(L, "___id"); // ptrtbl, {}, "__id"
-		lua_pushinteger(L, id); // ptrtbl, {}, "__id", id
-		lua_rawset(L, -3); // ptrtbl, {}
-
-		// _R.ptrtbl[id] = {___id = id}
-		lua_rawseti(L, -2, id); // ptrtbl
-
-		lua_remove(L, -1); //
-	}
-
-	lua_newtable(L); // {}
-	luaL_getmetatable(L, meta_name);  // {}, meta
-	lua_setmetatable(L, -2); // {}
-		
-	return true;
 }
 
 template<typename T>
@@ -236,6 +183,69 @@ inline void my_push(lua_State *L, T var, const char *meta_name)
 
 	luaL_getmetatable(L, meta_name);
 	lua_setmetatable(L, -2);
+}
 
-	//lua_pushlightuserdata(L, &var);
+namespace null_meta
+{
+	inline int false_func(lua_State *L)
+	{
+		lua_pushboolean(L, 0);
+
+		return 1;
+	}
+
+	inline int __tostring(lua_State *L)
+	{
+		lua_pushstring(L, "NULL");
+
+		return 1;
+	}
+
+	inline int __index(lua_State *L)
+	{
+		auto key = lua_tostring(L, 2);
+
+		if (key && strcmp(key, "IsValid") == 0)
+		{
+			lua_pushcfunction(L, false_func);
+
+			return 1;
+		}
+
+		luaL_error(L, "tried to index %s on a NULL value", key);
+
+		return 0;
+	}
+}
+
+inline void my_pushnull(lua_State *L)
+{
+	lua_pushvalue(L, LUA_REGISTRYINDEX); // _R
+		lua_pushlightuserdata(L, L); // _R, num
+	lua_gettable(L, -2); // _R, val
+	
+	lua_remove(L, -2); // val
+
+	if (lua_isnil(L, -1))
+	{
+		lua_remove(L, -1); //
+
+		luaL_newmetatable(L, "null_meta"); // meta
+			my_setmember(L, -1, "__index", null_meta::__index, true);
+			my_setmember(L, -1, "__tostring", null_meta::__tostring, true);
+		lua_remove(L, -1); //
+
+		lua_pushvalue(L, LUA_REGISTRYINDEX); // _R
+			lua_pushlightuserdata(L, L); // _R, num
+			lua_newtable(L); // _R, num, {}
+		lua_settable(L, -3); // _R
+
+		lua_pushlightuserdata(L, L); // _R, num
+		lua_gettable(L, -2); // _R, val
+
+		luaL_getmetatable(L, "null_meta"); //, _R, val, meta
+		lua_setmetatable(L, -2); // _R, val
+
+		lua_remove(L, -2); // val
+	}
 }

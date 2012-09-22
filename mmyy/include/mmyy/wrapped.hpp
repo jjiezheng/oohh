@@ -46,7 +46,9 @@ inline const char *my_call(lua_State *L, int arguments, int results)
 {
 	if (!lua_isfunction(L, -(arguments+1)))
 	{
-		lua_tostring(L, -1);
+		auto err = lua_tostring(L, -1);
+		lua_remove(L, -1);
+		return err;
 	}
 
 	if (lua_pcall(L, arguments, results, 0) != 0)

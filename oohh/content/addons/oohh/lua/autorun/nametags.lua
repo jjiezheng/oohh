@@ -1,6 +1,7 @@
 local DISTANCE = 15
 hook.Add("PostDrawMenu", "3d2dtest", function()
 	local ply = entities.GetLocalPlayer()
+	if not ply:IsValid() then return end
 	for key, ent in pairs(entities.GetAll()) do
 		if ent.GetNickname and ply ~= ent then
 			local wpos = ent.GetEyePos and ent:GetEyePos() or ent:GetPos()
