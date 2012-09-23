@@ -164,15 +164,3 @@ LUALIB_FUNCTION(render, Clear)
 
 	return 0;
 }
-
-LUALIB_FUNCTION(render, RenderWorld)
-{
-	auto cam = my->ToCamera(1);
-	int flags = my->ToNumber(2, SHDF_ALLOWHDR | SHDF_ZPASS | SHDF_ALLOWPOSTPROCESS | SHDF_ALLOW_AO | SHDF_ALLOW_WATER);
-	int draw_flags = my->ToNumber(3, -1);
-	int filter_flags = my->ToNumber(4, -1);
-
-	gEnv->p3DEngine->RenderWorld(flags, cam, 1, "oohh", draw_flags, filter_flags);
-
-	return 0;
-}

@@ -21,6 +21,10 @@ function structs.Register(META)
 				META[key] = value
 			end
 		end
+		
+		for key, value in pairs(META) do
+			base[key] = value
+		end
 	end
 
 	local arg_line = ""

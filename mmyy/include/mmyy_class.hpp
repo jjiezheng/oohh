@@ -389,6 +389,11 @@ inline void Print(const char *str)
 		return my_toenum< T >(L, idx, def);
 	}
 
+	inline void MakeNull(void *ptr)
+	{
+		my_makenull(L, ptr);
+	}
+
 // hook templates
 	////////////
 	inline bool CallHook(

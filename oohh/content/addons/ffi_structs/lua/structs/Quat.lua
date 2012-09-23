@@ -6,7 +6,7 @@ META.NumberType = "float"
 META.Args = {"x", "y", "z", "r"}
 
 structs.AddAllOperators(META)
-
+--[[
 function META:GetVec3()
 	return Vec3(self.x, self.y, self.r)
 end
@@ -36,13 +36,13 @@ end
 function META:SetAng3(ang)
 	ang = ang:ToRad()
 
-	local cp = math.cos(angle.p * 0.5)
-	local cy = math.cos(angle.y * 0.5)
-	local cr = math.cos(angle.r * 0.5)
+	local cp = math.cos(ang.p * 0.5)
+	local cy = math.cos(ang.y * 0.5)
+	local cr = math.cos(ang.r * 0.5)
 
-	local sp = math.sin(angle.p * 0.5)
-	local sy = math.sin(angle.y * 0.5)
-	local sr = math.sin(angle.r * 0.5)
+	local sp = math.sin(ang.p * 0.5)
+	local sy = math.sin(ang.y * 0.5)
+	local sr = math.sin(ang.r * 0.5)
 
 	local cpcy = cp * cy
 	local spsy = sp * sy
@@ -55,31 +55,31 @@ function META:SetAng3(ang)
 end
 
 function META:GetAng3()
-	local angle = Ang3()
+	local ang = Ang3()
+	print(tostring(self))
 	local snglt = (self.y * self.z) + (self.x * self.r)
 
 	 -- singularity at north pole
 	if singularity_checks > 0.499 then
-		angle.p = math.pi * 0.5
-		angle.y = 2 * math.atan2(self.y, self.r)
-		angle.r = 0
+		ang.p = math.pi * 0.5
+		ang.y = 2 * math.atan2(self.y, self.r)
+		ang.r = 0
 
 	-- singularity at south pole
 	elseif singularity_checks < -0.499 then
-		angle.p = math.pi * -.5
-		angle.y = -2 * math.atan2(self.y, self.r)
-		angle.r = 0
+		ang.p = math.pi * -.5
+		ang.y = -2 * math.atan2(self.y, self.r)
+		ang.r = 0
 	else
 		local x_2 = 1 - (2 * self.x ^ 2)
 
-		angle.p = math.asin(  2 * singularity_checks)
-		angle.y = math.atan2((2 * self.z * self.r) - (2 * self.y * self.x), (x_2 - (2 * self.z ^ 2)))
-		angle.r = math.atan2((2 * self.y * self.r) - (2 * self.z * self.x), (x_2 - (2 * self.y ^ 2)))
+		ang.p = math.asin(  2 * singularity_checks)
+		ang.y = math.atan2((2 * self.z * self.r) - (2 * self.y * self.x), (x_2 - (2 * self.z ^ 2)))
+		ang.r = math.atan2((2 * self.y * self.r) - (2 * self.z * self.x), (x_2 - (2 * self.y ^ 2)))
 	end
 
-	return angle:ToDeg()
+	return ang
 end
-
 
 function META:Normalize()
 	local scale = (self.x ^ 2) + (self.y ^ 2) + (self.z ^ 2) + (self.r ^ 2)
@@ -147,6 +147,6 @@ function META:IsIdentity()
 		self.y == 0 and
 		self.z == 0 and
 		self.r == 1
-end
+end]]
 
 structs.Register(META) 

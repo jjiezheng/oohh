@@ -75,7 +75,12 @@ LUAMTA_FUNCTION(entity, Spawn)
 
 LUAMTA_FUNCTION(entity, Remove)
 {
-	gEnv->pEntitySystem->RemoveEntity(my->ToEntity(1)->GetId(), my->ToBoolean(2));
+	auto self = my->ToEntity(1);
+	auto now = my->ToBoolean(2);
+
+	gEnv->pEntitySystem->RemoveEntity(self->GetId(), now);
+	if (now)
+		my->MakeNull(self);
 
 	return 0;
 }
@@ -477,7 +482,56 @@ LUAMTA_FUNCTION(entity, GetBoneCount)
 	return 1;
 }
 
-LUAMTA_FUNCTION(entity, GetPhysicsFromBoneId)
+
+LUAMTA_FUNCTION(entity, SetIKBonePos)
+{
+	auto self = my->ToEntity(1);
+
+	auto chr = self->GetCharacter(my->ToNumber(4, 0));
+
+	if (chr)
+	{
+		auto um = QuatT();
+		um.SetTranslation(my->ToVec3(3));
+
+		my->Push(chr->GetISkeletonPose()->SetHumanLimbIK(um, my->ToNumber(2)));
+
+		return 1;
+	}
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(entity, SetBonePos)
+{
+	auto self = my->ToEntity(1);
+	auto chr = self->GetCharacter(my->ToNumber(4, 0));
+
+	if (chr)
+	{
+		auto um = QuatT();
+		um.SetTranslation(my->ToVec3(3));
+
+		chr->GetISkeletonPose()->SetAbsJointByID(my->ToNumber(2), um);
+	}
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(entity, GoLimp)
+{
+	auto self = my->ToEntity(1);
+	auto chr = self->GetCharacter(my->ToNumber(2, 0));
+
+	if (chr)
+	{
+		chr->GetISkeletonPose()->GoLimp();
+	}
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(entity, GetParentBoneIdFromBoneId)
 {
 	auto self = my->ToEntity(1);
 
@@ -485,14 +539,28 @@ LUAMTA_FUNCTION(entity, GetPhysicsFromBoneId)
 
 	if (chr)
 	{
-		my->Push(chr->GetISkeletonPose()->GetPhysEntOnJoint(my->ToNumber(2)));
+		my->Push(chr->GetISkeletonPose()->GetParentIDByID(my->ToNumber(2)));
 
 		return 1;
 	}
 
-	my_pushnull(L);
+	return 0;
+}
 
-	return 1;
+LUAMTA_FUNCTION(entity, GetPosFromBoneId)
+{
+	auto self = my->ToEntity(1);
+
+	auto chr = self->GetCharacter(my->ToNumber(3, 0));
+
+	if (chr)
+	{
+		my->Push(chr->GetISkeletonPose()->GetAbsJointByID(my->ToNumber(2)).t);
+
+		return 1;
+	}
+
+	return 0;
 }
 
 #define PTR_ISVALID(obj) if(obj == NULL){my->Push(false); my->Push("Pointer invalid: "#obj); return 2;}

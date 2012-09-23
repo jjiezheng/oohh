@@ -1,13 +1,3 @@
-local function LerpVec3(ma, a, b)
-	local mb = 1 - ma
-
-	local new = Vec3(0,0,0)
-
-	new = (a * mb) + (b * ma)
-
-	return new
-end
-
 local function calc_bhop(ply, vel)
 	vel.x = vel.x * 1.25
 	vel.y = vel.y * 1.25
@@ -15,9 +5,9 @@ local function calc_bhop(ply, vel)
 	local eye = math.clamp(-math.deg(ply:GetViewRotation():GetAng3().p)/90, 0, 1) ^ 3
 
 	if eye > 0.3 then
-		vel = LerpVec3(eye, vel, Vec3(0.5, 0.5, 1) * vel + Vec3(0, 0, vel:GetLength() * 0.4))
+		vel:Lerp(eye, Vec3(0.5, 0.5, 1) * vel + Vec3(0, 0, vel:GetLength() * 0.4))
 	end
-
+	
 	return vel
 end
 
@@ -39,16 +29,16 @@ hook.Add("PlayerPreViewProcess", "gmod_move", function(ply, pos, rot, fov)
 	return ply:GetEyePos(), ply:GetViewRotation(), fov + math.rad(15)
 end)
 
-hook.Add("ProcessPlayerGroundMove", "gmod_move", function(ply)
+local function calc(ply)
     if typex(ply) ~= "player" or ply == entities.GetLocalPlayer() and SERVER then return end
 	
 	do 
 		local phys = ply:GetPhysics()
 		
-		local dir = physics.TraceDir(phys:GetPos(), Vec3(0,0,-1), phys).HitNormal
-		
-		if tonumber(tostring(dir.y)) then
-			local ang = math.abs(dir.z) 
+		local z = physics.TraceDir(phys:GetPos(), Vec3(0,0,-1), phys).HitNormal.z
+				
+		if math.isvalid(z) then
+			local ang = math.abs(z) 
 
 			if ang < 0.7 then
 				return phys:GetVelocity() + (physics.GetGravity() * 0.1)
@@ -60,7 +50,7 @@ hook.Add("ProcessPlayerGroundMove", "gmod_move", function(ply)
 	ply.move_vel = ply.move_vel or Vec3(0,0,0)
 
     local dir = Vec3(0,0,0)
-	local ang = ply:GetEyeAngles()
+	local ang = Ang3(ply:GetEyeAngles():Unpack())
 	ang.p = 0
 
     if ply:IsActionDown("moveforward") then
@@ -90,14 +80,26 @@ hook.Add("ProcessPlayerGroundMove", "gmod_move", function(ply)
 	end
 
 	if ply.jumped then
-		local vel = phys:GetVelocity()
+		local vel = Vec3(phys:GetVelocity():Unpack())
 		vel.z = 4.4
 		vel = calc_bhop(ply, vel)
 		ply.jumped = false
 		return vel, 6
 	end
-	
+			
     return ply.move_vel, 1
+end
+
+hook.Add("ProcessPlayerGroundMove", "gmod_move", function(...)
+	local vel, num = calc(...)
+	if vel then
+		if math.isvalid(vel.x) and math.isvalid(vel.y) and math.isvalid(vel.z) then
+			local delta = FrameTime() * 150
+			return vel * delta, num
+		else
+			print(vel, num)
+		end
+	end
 end)
 
 util.MonitorFileInclude()

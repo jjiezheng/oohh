@@ -130,7 +130,9 @@ function util.MonitorFileInclude(source, target)
 	
 	util.MonitorFile(source, function()
 		timer.Simple(0, function()
+			easylua.Start(entities.GetLocalPlayer())
 			include(target)
+			easylua.End(entities.GetLocalPlayer())
 		end)
 	return end)
 end

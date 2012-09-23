@@ -251,7 +251,7 @@ do -- added commands
 							end
 						end)
 					end
-					ply:SetEyeAngles((ent:EyePos() - ply:EyePos()):Angle())
+					ply:SetEyeAngles((ent:GetPos() - ply:GetEyePos()):GetAng3())
 					--ply:EmitSound("buttons/button15.wav")
 
 					return
@@ -547,7 +547,7 @@ do -- added commands
 			end, "developers")
 
 			aowl.AddCommand("name", function(player, line)
-				player:SetNick(line)
+				player:SetNickname(line)
 			end)
 
 			aowl.AddCommand("restart", function(player, line)
@@ -580,8 +580,12 @@ do -- added commands
 				end
 			end, "owners")
 
-			aowl.AddCommand("settod", function(ply, line, tod)
-				engine3d.SetTOD(tod)
+			local day = tod.LoadConfig("day")
+			local night = tod.LoadConfig("night")
+			
+			aowl.AddCommand("settod", function(ply, line, time)
+				tod.SetConfig(tod.LerpConfigs(math.cos((time / 24) * math.pi), day, night))
+				--engine3d.SetTOD(tod)
 			end, "owners")
 			
 			--[[

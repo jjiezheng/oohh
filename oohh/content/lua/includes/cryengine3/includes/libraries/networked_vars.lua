@@ -51,7 +51,13 @@ function nvars.Initialize()
 		nvars.AttachObject(ent)
 	end
 
-	hook.Add("EntitySpawned", "nvars", nvars.AttachObject)
+	hook.Add("EntitySpawned", "nvars", function(ent)
+		timer.Simple(0.5, function()
+			if ent:IsValid() then
+				nvars.AttachObject(ent)
+			end
+		end)
+	end)
 end
 
 function nvars.FullUpdate()

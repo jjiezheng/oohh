@@ -11,7 +11,7 @@ namespace default_meta
 		auto name = my_getmetaname(L, 1);
 		auto id = my_getuniqueid(L, 1);
 
-		lua_pushfstring(L, "[%s][%i]", name, id);
+		lua_pushfstring(L, "[%s][%li]", name, id);
 
 		return 1;
 	}
@@ -28,15 +28,7 @@ namespace default_meta
 
 			lua_remove(L, -1);
 		}
-
-		lua_pushvalue(L, 1);
-		lua_pushstring(L, "__luaindex");
-
-		if (my_rawget(L, -2) && !lua_isnoneornil(L, -1))
-			return 1;
-
-		lua_remove(L, -1);
-
+		
 		return 0;
 	}
 	inline int __eq(lua_State *L)

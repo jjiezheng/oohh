@@ -3,16 +3,39 @@
 
 #include "Cry_Camera.h"
 
-LUALIB_FUNCTION(_G, Camera)
+LUALIB_FUNCTION(render, RenderWorld)
 {
-	auto self = new CCamera();
+	auto cam = my->ToCameraPtr(1);
+	int flags = my->ToNumber(2, SHDF_ALLOWHDR | SHDF_ZPASS | SHDF_ALLOWPOSTPROCESS | SHDF_ALLOW_AO | SHDF_ALLOW_WATER);
+	int draw_flags = my->ToNumber(3, -1);
+	int filter_flags = my->ToNumber(4, -1);
+
+	gEnv->p3DEngine->RenderWorld(flags, cam, 1, "oohh", draw_flags, filter_flags);
+
+	return 0;
+}
+
+LUALIB_FUNCTION(engine3d, GetCurrentCamera)
+{
+	auto cam = gEnv->p3DEngine->GetCurrentCamera();
+
+	my->Push(cam);
 
 	return 1;
 }
 
-LUALIB_FUNCTION(camera, SetPos)
+LUALIB_FUNCTION(_G, Camera)
 {
-	auto self = my->ToCamera(1);
+	auto self = CCamera();
+
+	my->Push(self);
+
+	return 1;
+}
+
+LUAMTA_FUNCTION(camera, SetPos)
+{
+	auto self = my->ToCameraPtr(1);
 
 	self->SetPosition(my->ToVec3(2));
 
@@ -20,36 +43,36 @@ LUALIB_FUNCTION(camera, SetPos)
 }
 
 
-LUALIB_FUNCTION(camera, GetPos)
+LUAMTA_FUNCTION(camera, GetPos)
 {
-	auto self = my->ToCamera(1);
+	auto self = my->ToCameraPtr(1);
 
 	my->Push(self->GetPosition());
 
 	return 1;
 }
 
-LUALIB_FUNCTION(camera, SetAngles)
+LUAMTA_FUNCTION(camera, SetAngles)
 {
-	auto self = my->ToCamera(1);
+	auto self = my->ToCameraPtr(1);
 
 	self->SetAngles(my->ToAng3(2));
 
 	return 0;
 }
 
-LUALIB_FUNCTION(camera, GetAngles)
+LUAMTA_FUNCTION(camera, GetAngles)
 {
-	auto self = my->ToCamera(1);
+	auto self = my->ToCameraPtr(1);
 
 	my->Push(self->GetAngles());
 
 	return 1;
 }
 
-LUALIB_FUNCTION(camera, SetFustrum)
+LUAMTA_FUNCTION(camera, SetFustrum)
 {
-	auto self = my->ToCamera(1);
+	auto self = my->ToCameraPtr(1);
 
 	self->SetFrustum(
 		my->ToNumber(1, gEnv->pRenderer->GetWidth()),
@@ -64,9 +87,9 @@ LUALIB_FUNCTION(camera, SetFustrum)
 }
 
 // where is CCamera::SetFov(float fov)???
-LUALIB_FUNCTION(camera, SetFov)
+LUAMTA_FUNCTION(camera, SetFov)
 {
-	auto self = my->ToCamera(1);
+	auto self = my->ToCameraPtr(1);
 
 	int x = 0;
 	int y = 0;
@@ -87,27 +110,27 @@ LUALIB_FUNCTION(camera, SetFov)
 	return 0;
 }
 
-LUALIB_FUNCTION(camera, GetFov)
+LUAMTA_FUNCTION(camera, GetFov)
 {
-	auto self = my->ToCamera(1);
+	auto self = my->ToCameraPtr(1);
 
 	my->Push(self->GetFov());
 
 	return 1;
 }
 
-LUALIB_FUNCTION(camera, SetZRange)
+LUAMTA_FUNCTION(camera, SetZRange)
 {
-	auto self = my->ToCamera(1);
+	auto self = my->ToCameraPtr(1);
 
 	self->SetZRange(my->ToNumber(1), my->ToNumber(2));
 
 	return 0;
 }
 
-LUALIB_FUNCTION(camera, GetZRange)
+LUAMTA_FUNCTION(camera, GetZRange)
 {
-	auto self = my->ToCamera(1);
+	auto self = my->ToCameraPtr(1);
 
 	my->Push(self->GetZRangeMin());
 	my->Push(self->GetZRangeMax());
@@ -115,9 +138,9 @@ LUALIB_FUNCTION(camera, GetZRange)
 	return 2;
 }
 
-LUALIB_FUNCTION(camera, SetViewPort)
+LUAMTA_FUNCTION(camera, SetViewPort)
 {
-	auto self = my->ToCamera(1);
+	auto self = my->ToCameraPtr(1);
 
 	self->SetViewPort(my->ToNumber(1), my->ToNumber(2), my->ToNumber(3), my->ToNumber(4));
 

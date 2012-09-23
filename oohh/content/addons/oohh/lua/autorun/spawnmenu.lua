@@ -94,11 +94,11 @@ end
 
 --if SERVER then
 console.AddCommand("spawn_prop", function(ply, line)
-	local ent = entities.Create("BasicEntity")
+	local ent = entities.Create("PropNetworked")
 	ent:Spawn()
 	ent:SetPos(ply:GetEyeTrace().HitPos)
 	ent:SetModel(line)
-	ent:Physicalize(PE_RIGID)
-	ent:GetPhysics():Wake()
+	local phys = ent:PhysicalizeEx(PE_RIGID)
+	phys:Wake()
 end, "server")
 --end

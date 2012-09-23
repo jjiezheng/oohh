@@ -9,7 +9,7 @@ function input.SetupAccessorFunctions(tbl, name, up_id, down_id)
 	local self
 	tbl["Is" .. name .. "Down"] = function(self, ...)
 		local args
-		if not hasindex(self) then args = {self, ...} self = tbl else args = {...} end			
+		if not hasindex(self) then args = {self, ...} self = tbl else args = {...} end
 		if not self[down_id] then self[down_id] = {} end
 
 		for _, val in ipairs(args) do

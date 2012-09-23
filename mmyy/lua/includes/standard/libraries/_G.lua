@@ -56,7 +56,13 @@ function istype(var, ...)
 end
 
 function hasindex(var)
-	if type(var) == "table" then
+	local T = type(var)
+	
+	if T == "string" then
+		return false
+	end
+	
+	if T == "table" then
 		return true
 	end
 	
@@ -64,7 +70,7 @@ function hasindex(var)
 	
 	if meta == "ffi" then return true end
 	
-	local T = type(meta)
+	T = type(meta)
 		
 	return T == "table" and meta.__index ~= nil 
 end

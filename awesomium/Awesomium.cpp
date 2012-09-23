@@ -294,7 +294,9 @@ LUALIB_FUNCTION(_G, WebView)
 
 LUAMTA_FUNCTION(webview, Remove)
 {
-	my->ToWebView(1)->Destroy();
+	auto self = my->ToWebView(1);
+	self->Destroy();
+	my->MakeNull(self);
 
 	return 0;
 }

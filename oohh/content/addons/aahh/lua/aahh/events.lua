@@ -71,6 +71,8 @@ if CRYENGINE3 then
 		end
 		
 		surface.StartDraw()
+			graphics.Set2DFlags()
+			
 			hook.Call("DrawHUD")
 	
 			hook.Call("PreDrawMenu")

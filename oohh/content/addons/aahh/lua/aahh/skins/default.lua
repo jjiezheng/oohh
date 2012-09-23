@@ -221,8 +221,8 @@ do--label
 			pnl.AlignNormal * Vec2(-1, -1),
 			pnl.ShadowDir,
 			c.shadow,
-			pnl.ShadowBlur,
-			pnl.ShadowSize
+			pnl.ShadowSize,
+			pnl.ShadowBlur
 		)
 	end
 

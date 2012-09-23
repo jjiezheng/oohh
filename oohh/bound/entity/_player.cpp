@@ -41,6 +41,22 @@ LUAMTA_FUNCTION(player, GetEyePos)
 	return 1;
 }
 
+LUAMTA_FUNCTION(player, SetFOV)
+{
+	auto self = my->ToPlayer(1);
+	self->GetActorParams()->lookFOVRadians = my->ToNumber(2, 90);
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(player, GetFOV)
+{
+	auto self = my->ToPlayer(1);
+	my->Push(self->GetActorParams()->lookFOVRadians);
+
+	return 1;
+}
+
 LUAMTA_FUNCTION(player, GetEyeDir)
 {
 	SMovementState params;

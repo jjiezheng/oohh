@@ -159,7 +159,7 @@ end
 AddChatText()
 
 -- 300 elements woooo!
-for i = 1, 3 do
+for i = 1, 300 do
 	AddChatText()
 end
 

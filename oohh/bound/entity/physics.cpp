@@ -20,27 +20,10 @@ LUAMTA_FUNCTION(physics, IsValid)
 {
 	auto phys = my->ToPhysics(1);
 
-	if (phys == nullptr)
-	{
-		my->Push(false);
-
-		return 1;
-	}
-
-	auto ent = gEnv->pEntitySystem->GetEntityFromPhysics(phys);
-
-	if (ent == nullptr || ent->IsGarbage())
-	{
-		my->Push(false);
-
-		return 1;
-	}
-
-	my->Push(true);
+	my->Push(phys != nullptr);
 
 	return 1;
 }
-
 
 LUAMTA_FUNCTION(entity, EnablePhysics)
 {
@@ -264,6 +247,13 @@ LUAMTA_FUNCTION(physics, GetPos)
 	return 1;
 }
 
+LUAMTA_FUNCTION(physics, SetNetworkAuthority)
+{
+	my->ToPhysics(1)->SetNetworkAuthority(my->ToBoolean(2));
+
+	return 1;
+}
+
 LUAMTA_FUNCTION(physics, SetRotation)
 {
 	pe_params_pos params;
@@ -295,4 +285,33 @@ LUAMTA_FUNCTION(physics, GetEntity)
 	my->Push(ent);
 
 	return 1;
+}
+
+LUAMTA_FUNCTION(physics, GetSnapshot)
+{
+	auto self = my->ToPhysics(1);
+
+	char buffer[256] = {0};
+
+	if (self->GetStateSnapshotTxt(buffer, 256, my->ToNumber(2, 0.0f)))
+	{
+		my->Push(buffer);
+	}
+	else
+	{
+		my->Push(false);
+	}
+
+
+	return 1;
+}
+
+LUAMTA_FUNCTION(physics, SetSnapshot)
+{
+	auto self = my->ToPhysics(1);
+	auto buffer = my->ToString(2);
+
+	self->SetStateFromSnapshotTxt(buffer, sizeof(buffer));
+
+	return 0;
 }

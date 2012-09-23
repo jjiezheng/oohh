@@ -22,7 +22,7 @@ do -- filter
 	end
 
 	function META:AddAllExcept(ply)
-		self:AddAllExcept()
+		self:AddAll()
 		self.players[ply:GetId()] = nil
 
 		return self
@@ -68,7 +68,7 @@ if CLIENT then
 		message.RawSendToServer(str)
 	end
 	
-	message.Send = SendToServer
+	message.Send = message.SendToServer
 
 	function message.NetMsgReceiveFromServer(str)
 		local id, args = decode(str)
@@ -98,7 +98,7 @@ if SERVER then
 		end
 	end
 
-	message.Send = SendToClient
+	message.Send = message.SendToClient
 	
 	function message.NetMsgReceiveFromClient(ply, str)
 		if not ply then return end

@@ -27,7 +27,9 @@ function http.HeaderToTable(header)
 	for key, line in pairs(header:Explode("\n")) do
 		if #line ~= 0 then
 			local key, value = line:match("(.+):%s+(.+)")
-			tbl[key] = value
+			if key and value then
+				tbl[key] = value
+			end
 		end
 	end
 
@@ -57,41 +59,25 @@ function http.Get(url, callback, header)
 	if not get then
 		host = url:gsub("/", "")
 		get = ""
-	end
+	end	
 
-	local socket, err = luasocket.socket.connect(host, 80)
-	if not socket then print("$4"..err) return end
-
-	socket:send(F("GET /%s HTTP/1.1\n", get))
-	socket:send(F("Host: %s\n", host))
-	socket:send("User-Agent: oohh\n")
-	socket:send("\n")
-
+	local socket = luasocket.Client("tcp")
+	socket:Connect(host, 80)
+	
+	socket:Send(F("GET /%s HTTP/1.1\r\n", get))
+	socket:Send(F("Host: %s\r\n", host))
+	socket:Send("User-Agent: oohh\r\n")
+	socket:Send("\r\n")
+	socket:SetMaxTimeouts(5000)
+	
 	local header = ""
 	local content = ""
 	local status
-
 	local isheader = true
 
-	Thinker(function()
-		local line, err, rest = socket:receive("*line")
-		socket:settimeout(0)
-
-		if err then
-			local ok, err = pcall(callback, {content = content, header = http.HeaderToTable(header), status = status})
-
-			if err then
-				print(err)
-			end
-
-			socket:close()
-
-			return true
-		end
-
+	function socket:OnReceive(line)
 		if not status then
 			status = line
-			return
 		end
 
 		if isheader then
@@ -103,7 +89,14 @@ function http.Get(url, callback, header)
 		else
 			content = content .. line .. "\n"
 		end
-	end)
+	end
+	
+	function socket:OnClose()
+		local ok, err = pcall(callback, {content = content, header = http.HeaderToTable(header), status = status})
+		if err then
+			print(err)
+		end
+	end
 end
 
 do -- tcp socket meta
@@ -163,7 +156,7 @@ do -- tcp socket meta
 				break
 			end
 		end
-		MakeNULL(self)
+		timer.Simple(0.1, function() MakeNULL(self) end)
 	end
 
 	do -- client
@@ -199,9 +192,20 @@ do -- tcp socket meta
 			self.connecting = true
 		end
 
-		function CLIENT:Send(str)
+		function CLIENT:Send(str, instant)
 			if self.socket_type == "tcp" then
-				table.insert(self.Buffer, str)
+				if instant then
+					local bytes,b,c,d = self.socket:send(str)
+
+					if bytes then
+						if self.OnSend then
+							self:OnSend(data, bytes, b,c,d)
+						end
+						self:DebugPrintf("sucessfully sent %q", data)
+					end
+				else
+					table.insert(self.Buffer, str)
+				end
 			else
 				self.socket:send(str)
 			end
@@ -237,21 +241,27 @@ do -- tcp socket meta
 			end
 
 			if self.socket_type == "tcp" and self.connected then
-				local data = self.Buffer[1]
-				if data then
-					local bytes,b,c,d = sock:send(data)
+				while true do
+					local data = self.Buffer[1]
+					if data then
+						local bytes,b,c,d = sock:send(data)
 
-					if bytes then
-						if self.OnSend then
-							self:OnSend(data, bytes, b,c,d)
+						if bytes then
+							if self.OnSend then
+								self:OnSend(data, bytes, b,c,d)
+							end
+							self:DebugPrintf("sucessfully sent %q", data)
+							table.remove(self.Buffer, 1)
 						end
-						self:DebugPrintf("sucessfully sent %q", data)
-						table.remove(self.Buffer, 1)
+					else
+						break
 					end
 				end
 
-				local data, err, partial = sock:receive()
+				local data, err, partial = sock:receive("*line")
 
+				--self:DebugPrintf("receive: %s, %s, %s, %i", data or "", err or "", partial or "", self.Timeouts)
+				
 				if data then
 					if self.OnReceive then
 						self:OnReceive(data)
@@ -268,6 +278,7 @@ do -- tcp socket meta
 					if self.OnClose then
 						self:OnClose()
 					end
+					self:Remove()
 				elseif self.OnError then
 					self:OnError(err)
 					self:DebugPrintf("errored: %s", err)
@@ -284,9 +295,9 @@ do -- tcp socket meta
 				if self.Timeouts > self.MaxTimeouts then
 					if self.OnClose then
 						self:OnClose()
-					else
-						self:Remove()
 					end
+					
+					self:Remove()
 				end
 			end
 		end
@@ -452,9 +463,9 @@ do -- tcp socket meta
 						if not self.OnClientClose or self:OnClientClose(client) ~= false then
 							if client.OnClose then
 								client:OnClose()
-							else
-								client:Remove()
 							end
+							
+							client:Remove()
 						end
 					elseif err == "timeout" then
 						--client:Timeout() -- hmm

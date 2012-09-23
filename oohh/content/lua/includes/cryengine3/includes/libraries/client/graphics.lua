@@ -13,33 +13,102 @@ end
 
 local white
 
+local corner
+
+local draw_textured_rect = function(x,y,w,h, ...)
+	--[[x = x-0.1
+	y = y-0.1
+	w = w-0.1
+	h = h-0.1]]
+	surface.DrawTexturedRect(x,y,w,h, ...)
+end
+
+local fonts = {}
+
+TEXT_ALIGN_CENTER = Vec2(0.5,0.5)
+
+local function DrawText(text, pos, font, size, color, align_normal)
+	fonts = fonts or {default = Font("tahoma.ttf")} -- ugh
+
+	font = font or "default"
+	size = size or Vec2() + 12
+	color = color or Color(1,1,1,1)
+	align_normal = align_normal or Vec2(0,0)
+	
+	fonts[font] = fonts[font] or Font(font)
+
+	surface.SetFont(fonts[font])
+	surface.SetColor(color)
+
+	if type(size) == "number" then
+		size = Vec2() + size
+	end
+	
+	local scale = graphics.GetTextSize(font, text) * size
+	local w, h = surface.GetTextSize(fonts[font], text)
+	
+	pos = pos:Copy()
+	
+	pos.y = pos.y - h*size.h*0.25
+	
+	pos = pos + (align_normal * scale)
+			
+	surface.DrawText(text, pos.x, pos.y, size / Vec2(render.GetScreenScale()) * 1.75, nil, nil, 2)
+	
+	return pos
+end
+
+function graphics.DrawText(text, pos, font, scale, color, align_normal, shadow_dir, shadow_color, shadow_size, shadow_blur)
+	graphics.Set2DFlags()
+
+	if shadow_dir then
+		shadow_color = shadow_color or Color(0,0,0, color.a)
+		shadow_size = shadow_size or scale
+		if shadow_blur and shadow_blur > 0 then
+			
+			for i = 1, shadow_blur do
+				 
+				local alpha_0_1 = (i/shadow_blur)
+				local alpha_1_0 = -(i/shadow_blur)+1
+				
+				local col = shadow_color:Copy()
+				col.a = math.clamp(col.a * alpha_1_0 ^ 2.5, 0.004, 1) -- when the alpha is below 0.004 the text becomes white. fix this!
+						
+				local scale = ((Vec2() + scale) * shadow_size) / graphics.GetTextSize(font, text).h * (alpha_0_1 + 1) ^ 2
+						
+				DrawText(
+					text, 
+					pos, 
+					font, 
+					scale,
+					col, 
+					align_normal + ((shadow_dir / scale) * alpha_0_1)
+				)
+			end
+		else
+			DrawText(text, shadow_dir + pos, font, shadow_size, shadow_color, align_normal)
+		end
+	end
+	return DrawText(text, pos, font, scale, color, align_normal)
+end
+
 function graphics.DrawFilledRect(rect, color, ...)
 	white = white or Texture("defaults/white.dds"):GetId() -- ugh
 
 	color = color or Color(1,1,1,1)
-	if color.a <= 0 then return end
+	if color.a == 0 then return end
 
 	graphics.Set2DFlags()
 	
 	surface.SetColor(color)
 	surface.SetTexture(white)
-	surface.DrawTexturedRect(rect.x, rect.y, rect.w, rect.h, ...)
-end
-
-local corner
-
-local draw_textured_rect = function(x,y,w,h)
-	x = x-0.1
-	y = y-0.1
-	w = w-0.1
-	h = h-0.1
-	surface.DrawTexturedRect(x,y,w,h)
+	draw_textured_rect(rect.x, rect.y, rect.w, rect.h, ...)
 end
 
 function graphics.DrawRoundedOutlinedRect(rect, size, color, tl, tr, bl, br)
 	corner = corner or Texture("gui/corner.dds"):GetId()
 	
-	if color.a <= 0 then return end
+	if color.a == 0 then return end
 
 	tl = tl == nil and true or tp
 	tr = tr == nil and true or tr
@@ -94,7 +163,7 @@ function graphics.DrawRoundedOutlinedRect(rect, size, color, tl, tr, bl, br)
 end
 
 function graphics.DrawOutlinedRect(rect, size, color)
-	if color.a <= 0 then return end
+	if color.a == 0 then return end
 
 	graphics.DrawFilledRect(Rect(rect.x, rect.y, rect.w, size), color)
 	graphics.DrawFilledRect(Rect(rect.x, rect.y + rect.h, rect.w, -size), color)
@@ -103,9 +172,8 @@ function graphics.DrawOutlinedRect(rect, size, color)
 	graphics.DrawFilledRect(Rect(rect.x + rect.w, rect.y + size, -size, rect.h - size * 2), color)
 end
 
-
 function graphics.DrawRoundedRect(rect, size, color, tl, tr, bl, br)
-	if color.a <= 0 then return end
+	if color.a == 0 then return end
 	graphics.DrawFilledRect(rect:Copy():Shrink(size), color)
 	graphics.DrawRoundedOutlinedRect(rect, size, color, tl, tr, bl, br)
 end
@@ -141,39 +209,6 @@ function graphics.DrawRect(rect, color, roundness, border_size, border_color, sh
 	end
 end
 
-local fonts = {}
-
-TEXT_ALIGN_CENTER = Vec2(0.5,0.5)
-
-local function DrawText(text, pos, font, size, color, align_normal)
-	fonts = fonts or {default = Font("tahoma.ttf")} -- ugh
-
-	font = font or "default"
-	size = size or Vec2() + 12
-	color = color or Color(1,1,1,1)
-	align_normal = align_normal or Vec2(0,0)
-	
-	fonts[font] = fonts[font] or Font(font)
-
-	surface.SetFont(fonts[font])
-	surface.SetColor(color)
-
-	if type(size) == "number" then
-		size = Vec2() + size
-	end
-	
-	local scale = graphics.GetTextSize(font, text) * size
-	local w, h = surface.GetTextSize(fonts[font], text)
-	
-	pos = pos:Copy()
-	
-	pos.y = pos.y - h*size.h*0.25
-	
-	pos = pos + (align_normal * scale)
-			
-	surface.DrawText(text, pos.x, pos.y, size / Vec2(render.GetScreenScale()) * 1.75, nil, nil, 2)
-end
-
 function graphics.GetTextSize(font, text)
 	font = font or "default"
 	text = text or "W"
@@ -190,41 +225,7 @@ function graphics.GetTextSize(font, text)
 		fnt.scale[text] = Vec2(surface.GetTextSize(fonts[font], text, 0)) * Vec2(1, 0.75)
 	end
 
-	return fonts[font].scale[text] / Vec2(render.GetScreenScale()) * 1.75
-end
-
-function graphics.DrawText(text, pos, font, scale, color, align_normal, shadow_dir, shadow_color, shadow_blur, shadow_size)
-	graphics.Set2DFlags()
-
-	if shadow_dir then
-		if shadow_blur and shadow_blur ~= 0 then
-			shadow_size = shadow_size or Vec2(1,1) 
-			
-			for i = 1, shadow_blur do
-				 
-				local alpha_0_1 = (i/shadow_blur)
-				local alpha_1_0 = -(i/shadow_blur)+1
-				
-				local col = shadow_color:Copy()
-				col.a = math.clamp(col.a * alpha_1_0 ^ 2.5, 0.004, 1) -- when the alpha is below 0.004 the text becomes white. fix this!
-						
-				local scale = ((Vec2() + scale) * shadow_size) / graphics.GetTextSize(font, text).h * (alpha_0_1 + 1) ^ 2
-						
-				DrawText(
-					text, 
-					pos, 
-					font, 
-					scale,
-					col, 
-					align_normal + ((shadow_dir / scale) * alpha_0_1)
-				)
-			end
-		else
-			DrawText(text, pos + shadow_dir, font, scale, shadow_color, align_normal)
-		end
-	end
-	
-	DrawText(text, pos, font, scale, color, align_normal)
+	return fonts[font].scale[text] / Vec2(render.GetScreenScale()) * Vec2(1.75, 1.25)
 end
 
 function graphics.CreateTexture(path, rect)

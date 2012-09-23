@@ -15,29 +15,39 @@ if menu.Close then
 end
 
 function menu.RenderBackground()	
-	if entities.GetLocalPlayer():IsValid() then return end
+
 	mouse.ShowCursor(true)
 	local scrw, scrh = render.GetScreenSize()
 	
+	local alpha = 1
+	
+	if entities.GetLocalPlayer():IsValid() then 
+		alpha = 0.75
+	end	
 	--graphics.DrawFilledRect(Rect(0, 0, scrw, scrh), aahh.GetSkinColor("light"))
 	
 	--do return end
 	
-	local steps = 50			-- Amount of detail
-	local wavelength = 50		-- Distance between dark and light
+	local steps = 8			-- Amount of detail
+	local wavelength = 30		-- Distance between dark and light
 	local speed =  0.2 			-- Speed
-	local amplitude = 0.2 		-- Difference between light and dark
+	local amplitude = 0.6 		-- Difference between light and dark
 	local median = 0.8			-- Lightness (Min: 0 Max: 1) [WARNING: median + amplitude should be between 0 and 1]
 	
-	local t = CurTime() * 0.001
+	local x, y = mouse.GetPos()
+	local t = ((x / -scrw) * 2) + 1
+
+	local r, g, b = aahh.GetSkinColor("dark"):Unpack()
 	
-	
-	local r, g, b = aahh.GetSkinColor("light"):Unpack()
+	y =  -(y / scrh) + 2
+	r = r * y
+	g = g * y
+	b = b * y
 	
 	for i=0, steps-1 do
 		local fract = i/steps
-		local f = math.sin(fract*100/wavelength+CurTime()*speed)*amplitude+median
-		graphics.DrawFilledRect(Rect(0, scrh*fract, scrw, scrh/steps), Color(r*f, g*f, b*f, 1))
+		local f = math.sin(fract*100/wavelength+t)*amplitude+median
+		graphics.DrawFilledRect(Rect(scrw*fract, 0, scrw/steps, scrh), Color(r*f, g*f, b*f, alpha))
 	end
 end
 
@@ -93,7 +103,7 @@ function menu.AddButton(name, func)
 		pnl:SetText(name) 		
 		
 		pnl:SetShadowDir(Vec2()+2)
-		pnl:SetShadowSize(1.01)
+		pnl:SetShadowSize(18)
 		
 		pnl:SetIgnoreMouse(false)
 		pnl:SetSize(Vec2(100, 18))	
@@ -117,16 +127,18 @@ function menu.SetupButtons()
 	
 	local margin = 50
 	
-	local x = margin
+	local x = sw/2
 	local y = sh/1.4
 	
 	for i=1, #menu.buttons do
 		local b = menu.buttons[#menu.buttons-i+1]
 		
+		 
 		if b == true then
 			y = y - (margin / 2)
 		else
-			b:SetPos(Vec2(x, y-b:GetHeight() * 2)) 
+			b:RequestLayout(true)
+			b:SetPos(Vec2(x - b:GetWidth() / 2, y-b:GetHeight() * 2)) 
 			y = y - (margin / 1.25)
 		end
 	end
@@ -136,15 +148,20 @@ end
 function menu.MakeButtons()
 	if entities.GetLocalPlayer():IsValid() then
 		menu.AddButton("Resume", function() timer.Simple(0.1, function() menu.Close() end) end)
+		menu.AddButtonSpace()
 	end
-	
+
 	menu.AddButton("Connect", function()
 		aahh.StringInput("Enter the server IP", cookies.Get("lastip", "localhost"), function(str)
 			cookies.Set("lastip", str)
 			console.RunString("connect "..str)
-			menu.Close()
 		end)
 	end)
+	if entities.GetLocalPlayer():IsValid() then
+		menu.AddButton("Disconnect", function()
+			console.RunString("disconnect")
+		end)
+	end
 	menu.AddButton("Host", function() 
 		aahh.StringInput("Enter the map name", cookies.Get("lastmap", "oh_island"), function(str)
 			cookies.Set("lastmap", str)
@@ -244,6 +261,11 @@ function menu.MakeButtons()
 	
 	menu.SetupButtons()
 	hook.Add("ResolutionChanged", "startup", menu.SetupButtons)
+	
+	hook.Add("LocalPlayerEntered", "startup", function()
+		menu.Toggle()
+		menu.Toggle()
+	end)
 end
 
 if not MULTIPLAYER then

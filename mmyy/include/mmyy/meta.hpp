@@ -144,3 +144,19 @@ inline bool my_istype(lua_State *L, int idx, const char *type)
 { 
 	return lua_type(L, idx) == 10 || strcmp(my_getmetaname(L, idx), type) == 0;
 }
+
+inline void my_makenull(lua_State *L, void *ptr)
+{
+	if (my_getuidtable(L, ptr))
+	{
+		luaL_getmetatable(L, "null_meta");
+		lua_setmetatable(L, -2);	
+
+		my_getptrtable(L);
+		lua_pushlightuserdata(L, ptr);
+		lua_pushnil(L);
+		lua_rawset(L, -3);					
+					
+		lua_remove(L, -1);
+	}
+}

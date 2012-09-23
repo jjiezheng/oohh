@@ -142,11 +142,9 @@ local unique
 function hook.Call(event, ...)
 	if hook.active[event] then
 		for key, data in ipairs(hook.active[event]) do
-			unique = data.unique
-
 			if hook.profiler_enabled == true then
 				hook.profil[event] = hook.profil[event] or {}
-				hook.profil[event][unique] = hook.profil[event][unique] or {}
+				hook.profil[event][data.unique] = hook.profil[event][data.unique] or {}
 
 				time = SysTime()
 			end
@@ -154,25 +152,25 @@ function hook.Call(event, ...)
 			status, a,b,c,d,e,f,g,h = xpcall(data.func, data.on_error or OnError, ...)
 
 			if a == hook.destroy_tag then
-				hook.Remove(event, unique)
+				hook.Remove(event, data.unique)
 				break
 			end
 
 			if hook.profiler_enabled == true then
-				hook.profil[event][unique].time = (hook.profil[event][unique].time or 0) + (SysTime() - time)
-				hook.profil[event][unique].count = (hook.profil[event][unique].count or 0) + 1
+				hook.profil[event][data.unique].time = (hook.profil[event][data.unique].time or 0) + (SysTime() - time)
+				hook.profil[event][data.unique].count = (hook.profil[event][data.unique].count or 0) + 1
 			end
 
 			if status == false then		
 				if type(data.on_error) == "function" then
-					data.on_error(a, event, unique)
+					data.on_error(a, event, data.unique)
 				else
-					hook.Remove(event, unique)
-					printf("hook [%q][%q] removed", event, unique)
+					hook.Remove(event, data.unique)
+					printf("hook [%q][%q] removed", event, data.unique)
 				end
 
 				hook.errors[event] = hook.errors[event] or {}
-				table.insert(hook.errors[event], {unique = unique, error = a, time = os.date("*t")})
+				table.insert(hook.errors[event], {unique = data.unique, error = a, time = os.date("*t")})
 			end
 
 			if a ~= nil then

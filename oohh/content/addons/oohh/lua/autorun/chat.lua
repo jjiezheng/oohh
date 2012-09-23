@@ -33,6 +33,10 @@ if CLIENT then
 					end
 				end
 				
+				panel.OnTextChanged = function(self, str)
+					hook.Call("OnChatTextChanged", str)
+				end
+				
 				panel.OnEnter = function(_, str)
 					i = 0
 					if #str > 0 then
@@ -46,6 +50,8 @@ if CLIENT then
 					showing = false
 					
 					panel:Remove()
+					
+					hook.Call("OnChatTextChanged", "")
 				end
 			
 			mouse.ShowCursor(true)

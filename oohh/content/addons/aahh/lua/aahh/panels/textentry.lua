@@ -52,7 +52,6 @@ function PANEL:OnMouseInput(key, press, pos)
 end
 
 function PANEL:HandleKey(key)
-
 	if key == "v" and input.IsKeyDown("lctrl") then
 		local str = window.GetClipboard()
 		if #str > 0 then
@@ -188,7 +187,10 @@ function PANEL:OnDraw()
 end
 
 function PANEL:OnThink()
-
+	if self.Text ~= self.last_text then
+		self:OnTextChanged(self.Text, self.last_text)		
+		self.last_text = self.Text
+	end
 end
 
 function PANEL:OnEnter(str)
@@ -199,8 +201,12 @@ function PANEL:OnUnhandledKey(key)
 	
 end
 
+function PANEL:OnTextChanged()
+
+end
+
 function PANEL:OnUnhandledChar(char)
-	print(char:byte())
+
 end
 
 aahh.RegisterPanel(PANEL)

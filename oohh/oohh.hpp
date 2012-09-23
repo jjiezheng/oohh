@@ -61,6 +61,7 @@ public:
 	MMYY_WRAP_STRUCT(Matrix34, Matrix34, matrix34)
 	MMYY_WRAP_STRUCT(ColorF, Color, color)
 	MMYY_WRAP_STRUCT(Rect, Rect, rect)
+	MMYY_WRAP_STRUCT(CCamera, Camera, camera)
 
 	MMYY_WRAP_CLASS(ISound, Sound, sound)
 	MMYY_WRAP_CLASS(ITexture, Texture, texture)
@@ -70,7 +71,6 @@ public:
 	//MMYY_WRAP_CLASS(CPlayer, Player, player)
 	//MMYY_WRAP_CLASS_NO_PUSH(CActor, Actor, actor)
 	MMYY_WRAP_CLASS(IPhysicalEntity, Physics, physics)
-	MMYY_WRAP_CLASS(CCamera, Camera, camera)
 	MMYY_WRAP_CLASS(IParticleEmitter, ParticleEmitter, particle_emitter)
 
 
