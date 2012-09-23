@@ -6,6 +6,7 @@ aahh = {}
 
 aahh.ActivePanels = aahh.ActivePanels or {}
 aahh.ActivePanel = NULL
+aahh.HoveringPanel = NULL
 aahh.World = NULL
 aahh.Stats = 
 {
@@ -25,6 +26,8 @@ function aahh.Initialize()
 		function WORLD:GetPos()
 			return Vec2(0, 0)
 		end
+
+		WORLD:SetCursor(1)
 		
 	aahh.World = WORLD
 

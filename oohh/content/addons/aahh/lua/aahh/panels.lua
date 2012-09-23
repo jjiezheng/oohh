@@ -919,20 +919,16 @@ do -- meta
 		if self.LayMeOut then
 			self:RequestLayout(true)
 		end
-		
-		self:CalcCursor(Vec2(mouse.GetPos()))
-		if self:IsActivePanel() then
-			mouse.SetCursor(self:GetCursor())
-		end
-		
+
 		local mousepos = Vec2(mouse.GetPos())
-		-- No need calculating if the panel doesn't use it
-		if self.OnMouseMove then
+				
+--		if self.OnMouseMove then
 			-- Check if the mouse has moved
 			if not self.lastmousepos or self.lastmousepos ~= mousepos then
 				self.lastmousepos = mousepos
 				-- Get local position
 				local localpos = mousepos - self:GetWorldPos()
+				
 				-- Check if it is in panel
 				if
 					localpos.x > 0 and localpos.y > 0 and
@@ -940,12 +936,19 @@ do -- meta
 					localpos.y < self:GetHeight() then
 					-- Make a call
 					self:SafeCall("OnMouseMove", localpos, true)
+					
+					if self:GetCursor() ~= 1 then
+						aahh.HoveringPanel = self
+					end
 				else
+					if aahh.HoveringPanel == self then
+						aahh.HoveringPanel = NULL
+					end
 					self:SafeCall("OnMouseMove", localpos, false)
 				end
 			end
-		end
-		
+		--end
+				
 		self:SafeCall("OnThink")
 	end
 	

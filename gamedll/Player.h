@@ -875,6 +875,8 @@ public:
 
 	bool GetForceNoIK() const;
 
+	SPlayerStats GetPlayerStats() { return m_stats; }
+
 private:
 	void UpdateCharacterLean( const float frameTime );
 

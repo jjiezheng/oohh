@@ -103,7 +103,7 @@ LUAMTA_FUNCTION(physics, SetAngleVelocity)
 LUAMTA_FUNCTION(physics, SetVelocity)
 {
 	pe_action_set_velocity params;
-		params.v = my->ToVec3(2);
+ 		params.v = my->ToVec3(2);
 		params.w = my->ToVec3(3, params.w);
 		params.ipart = my->ToNumber(4, params.ipart);
 		params.bRotationAroundPivot = 0;

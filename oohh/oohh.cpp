@@ -116,6 +116,7 @@ namespace oohh
 
 		//my->RunString("awesomium.Close()");
 		my->RunString("awesomium.Open()");
+		my->RunString("bass.Open()");
 	}
 
 	void Close()
@@ -123,6 +124,8 @@ namespace oohh
 		my->CallHook("LuaClose");
 
 		listener->Stop();
+
+		my->RunString("bass.Close()");
 
 		delete my;
 		my = NULL;

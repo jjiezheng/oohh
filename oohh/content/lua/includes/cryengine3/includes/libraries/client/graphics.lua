@@ -24,18 +24,22 @@ local draw_textured_rect = function(x,y,w,h, ...)
 end
 
 local fonts = {}
+local size = 512
+local font_flags = {size, size, 0x20000000}
 
 TEXT_ALIGN_CENTER = Vec2(0.5,0.5)
 
 local function DrawText(text, pos, font, size, color, align_normal)
-	fonts = fonts or {default = Font("tahoma.ttf")} -- ugh
+	fonts = fonts or {default = Font("tahoma.ttf", unpack(font_flags))} -- ugh
 
 	font = font or "default"
 	size = size or Vec2() + 12
 	color = color or Color(1,1,1,1)
 	align_normal = align_normal or Vec2(0,0)
 	
-	fonts[font] = fonts[font] or Font(font)
+	if color.a == 0 then return end
+	
+	fonts[font] = fonts[font] or Font(font, unpack(font_flags))
 
 	surface.SetFont(fonts[font])
 	surface.SetColor(color)
@@ -213,7 +217,7 @@ function graphics.GetTextSize(font, text)
 	font = font or "default"
 	text = text or "W"
 
-	fonts[font] = fonts[font] or Font(font)
+	fonts[font] = fonts[font] or Font(font, unpack(font_flags))
 	local fnt = fonts[font]
 
 	if not fnt then
@@ -259,7 +263,7 @@ function graphics.DrawTexture(tex, rect, color, uv, nofilter)
 	
 	surface.SetColor(color or Color(1,1,1,1))
 	surface.SetTexture(tex)
-
+	
 	surface.DrawTexturedRectEx(
 		rect.x,
 		rect.y,

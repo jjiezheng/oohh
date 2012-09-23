@@ -26,7 +26,7 @@ function PANEL:SetResizing(loc)
 end
 
 function PANEL:OnMouseInput(button, press, pos)
-	local loc = self:DockHelper(pos, self:GetSkinVar("Padding", 4))
+	local loc = self:DockHelper(pos, self:GetSkinVar("Padding", 2))
 	if self:IsResizingAllowed() and self:CanResize(button, press, pos) and loc ~= "Center" then
 		self:SetResizing(loc)
 	end
@@ -37,8 +37,10 @@ function PANEL:OnMouseInput(button, press, pos)
 end
 
 function PANEL:CalcCursor(pos)		
-	local loc = self:DockHelper(pos-self:GetPos(), -self:GetSkinVar("Padding", 2))
-
+	local loc = self:DockHelper(pos-self:GetPos(), self:GetSkinVar("Padding", 2))
+	
+	if not self:CanResize("mouse1", true, pos) then return end
+	
 	if loc == "Center" then
 		self:SetCursor(IDC_ARROW)
 	elseif loc == "Top" or loc == "bottom" then
@@ -58,6 +60,8 @@ end
 
 function PANEL:OnThink()
 	local pos = Vec2(mouse.GetPos())
+	
+	self:CalcCursor(pos)
 	
 	-- ugh
 	if input.IsKeyDown("mouse1") then

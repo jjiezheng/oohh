@@ -6,44 +6,69 @@ FOLDER = FOLDER:gsub("\\", "/"):gsub("(/)$", "")
 if not os.isdir(FOLDER) then
 	error("cannot find the cryengine3 '" .. cryengine3 .. "' is not a valid directory")
 end
-
+	
 local function bslash(str)
 	return str:gsub("/", "\\")
 end
 
-if _ACTION == "link" then
-	local function exists(cmd)
-		os.execute("@echo off")
-		local exists = os.execute("help " .. cmd) == 1 -- lol
-		os.execute("@echo on")
+local f = string.format
+local cmd = {}
+local paths
 
-		return exists
-	end
+local link_dir = function(a,b)
+	table.insert(cmd, f([[rmdir /S /Q "TARGET_DIR\%s"]], bslash(a)))
+	table.insert(cmd, f([[LINK_DIR "TARGET_DIR\%s" "WORKING_DIR\%s"]], bslash(a), bslash(b)))
+end
 
-	local LINK_DIR
-	local LINK_FIL
+local link_fil = function(a,b)
+	table.insert(cmd, f([[del /S /F "TARGET_DIR\%s"]], bslash(a)))
+	table.insert(cmd, f([[LINK_FIL "TARGET_DIR\%s" "WORKING_DIR\%s"]], bslash(a), bslash(b)))
+end
 
-	if exists("mklink") then
-		LINK_DIR = "mklink /d"
-		LINK_FIL = "mklink"
+local function copy(a, b) 
+	table.insert(cmd, f([[copy "WORKING_DIR\%s" "TARGET_DIR\%s"]], bslash(a), bslash(b))) 
+end
+
+
+local function include_external(libname)
+	if _ACTION == "link" then
+		copy(libname .. "/bin32/*", "bin32")
 	else
-		LINK_DIR = "linkd"
-		LINK_FIL = "FSUTIL hardlink create"
+		includedirs("../" .. libname .. "/src")
+		includedirs("../" .. libname .. "/include")
+		
+		libdirs("../" .. libname .. "/lib/")
+		links("" .. libname .. "")
+		
+		files("../" .. libname .. "/src/**.h")
+		files("../" .. libname .. "/src/**.hpp")
+		files("../" .. libname .. "/src/**.cpp")
+		
+		paths[libname .. "/*"] = path.getabsolute("../" .. libname .. "/src")
 	end
+end
 
-	local f = string.format
+local function exists(cmd)
+	os.execute("@echo off")
+	local exists = os.execute("help " .. cmd) == 1 -- lol
+	os.execute("@echo on")
 
-	local cmd = {}
+	return exists
+end
 
-	local link_dir = function(a,b)
-		table.insert(cmd, f([[rmdir /S /Q "TARGET_DIR\%s"]], bslash(a)))
-		table.insert(cmd, f([[LINK_DIR "TARGET_DIR\%s" "WORKING_DIR\%s"]], bslash(a), bslash(b)))
-	end
+local LINK_DIR
+local LINK_FIL
 
-	local link_fil = function(a,b)
-		table.insert(cmd, f([[del /S /F "TARGET_DIR\%s"]], bslash(a)))
-		table.insert(cmd, f([[LINK_FIL "TARGET_DIR\%s" "WORKING_DIR\%s"]], bslash(a), bslash(b)))
-	end
+if exists("mklink") then
+	LINK_DIR = "mklink /d"
+	LINK_FIL = "mklink"
+else
+	LINK_DIR = "linkd"
+	LINK_FIL = "FSUTIL hardlink create"
+end
+
+if _ACTION == "link" then
+	cmd = {}
 
 	table.insert(cmd, [[rmdir "TARGET_DIR\data"]])
 	table.insert(cmd, [[mkdir "TARGET_DIR\data"]])
@@ -62,9 +87,7 @@ if _ACTION == "link" then
 	link_dir("addons", "oohh/content/addons")
 	link_dir("Game/Scripts", "oohh/content/Game/Scripts")
 	link_dir("Game/Entities", "oohh/content/Game/Entities")	
-		
-	local function copy(a, b) table.insert(cmd, f([[copy "WORKING_DIR\%s" "TARGET_DIR\%s"]], bslash(a), bslash(b))) end
-	
+			
 	copy("mmyy/lib/lua51.dll", "bin32")
 	copy("oohh/content/bin32/auto_dev_login.exe", "bin32")
 	
@@ -74,7 +97,8 @@ if _ACTION == "link" then
 	copy("oohh/content/bin32/msvcr110.dll", "bin32")
 	copy("oohh/content/bin32/msvcp110.dll", "bin32")
 	
-	copy("awesomium/build/bin/*", "bin32")
+	include_external("awesomium")
+	include_external("bass")
 
 	link_fil("bin32/CryGame.dll", "oohh/content/bin32/CryGame.dll")
 
@@ -93,6 +117,12 @@ if _ACTION == "link" then
 	end
 
 return end
+
+paths = {
+	["gamedll/*"] = path.getabsolute("../gamedll"),
+	["oohh/*"] = path.getabsolute("../oohh"),
+	["mmyy/*"] = path.getabsolute("../mmyy/include"),
+}
 
 solution("oohh")
 	location(FOLDER .. "/oohh_project_files/" .. _ACTION)
@@ -124,9 +154,11 @@ solution("oohh")
 		
 		includedirs("../oohh/")
 		includedirs("../mmyy/include/")
-		includedirs("../awesomium/")
-		includedirs("../awesomium/include")
-
+		
+		include_external("awesomium")
+		include_external("cairo")
+		include_external("bass")
+		
 		includedirs(FOLDER .. "/Code/CryEngine/CryAction/")
 		includedirs(FOLDER .. "/Code/CryEngine/CryCommon/")		
 	
@@ -143,24 +175,12 @@ solution("oohh")
 		files("../oohh/**.hpp")
 		files("../oohh/**.cpp")
 				
-		files("../awesomium/**.h")
-		files("../awesomium/**.hpp")
-		files("../awesomium/**.cpp")
-
 		excludes("../oohh/content/*")
 
-		vpaths
-		{
-			["gamedll/*"] = path.getabsolute("../gamedll"),
-			["oohh/*"] = path.getabsolute("../oohh"),
-			["mmyy/*"] = path.getabsolute("../mmyy/include"),
-			["awesomium/*"] = path.getabsolute("../awesomium"),
-		}
+		vpaths(paths)
 		
 		libdirs("../mmyy/lib/")
-		libdirs("../awesomium/build/lib/")
 		links("lua51")
-		links("awesomium")
 		
 		local bin32dir = bslash(path.getabsolute("../oohh/content/bin32/"))
 		local dllpath = bslash(FOLDER .. "/bin32/CryGame.dll")

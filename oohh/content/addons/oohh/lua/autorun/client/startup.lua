@@ -10,8 +10,11 @@ util.MonitorFileInclude()
 
 menu = menu or {}
 
-if menu.Close then
-	menu.Close()
+menu.visible = false
+
+if menu.Toggle then
+	menu.Toggle()
+	menu.Toggle()
 end
 
 function menu.RenderBackground()	
@@ -41,7 +44,7 @@ function menu.RenderBackground()
 	
 	y =  -(y / scrh) + 2
 	r = r * y
-	g = g * y
+	g = g * y 
 	b = b * y
 	
 	for i=0, steps-1 do
@@ -99,11 +102,12 @@ function menu.AddButton(name, func)
 		pnl:SetSkinColor("text", "light")
 		pnl:SetSkinColor("shadow", Color(0,0,0,0.1)) 
 		pnl:SetFont("impact.ttf")
-		pnl:SetTextSize(18)	
-		pnl:SetText(name) 		
+		pnl:SetTextSize(16)
+		pnl:SetText(name)
+		pnl:SetCursor(IDC_HAND)
 		
-		pnl:SetShadowDir(Vec2()+2)
-		pnl:SetShadowSize(18)
+		--pnl:SetShadowDir(Vec2())
+		--|pnl:SetShadowSize(18)
 		
 		pnl:SetIgnoreMouse(false)
 		pnl:SetSize(Vec2(100, 18))	
@@ -114,7 +118,6 @@ function menu.AddButton(name, func)
 		end
 	
 	menu.buttons[#menu.buttons+1] = pnl
-	
 end 
 
 function menu.AddButtonSpace()
@@ -122,18 +125,15 @@ function menu.AddButtonSpace()
 end
 
 function menu.SetupButtons()
-	
 	local sw, sh = render.GetScreenSize()
 	
 	local margin = 50
-	
 	local x = sw/2
-	local y = sh/1.4
+	local y = sh/1.5
 	
 	for i=1, #menu.buttons do
 		local b = menu.buttons[#menu.buttons-i+1]
-		
-		 
+
 		if b == true then
 			y = y - (margin / 2)
 		else
@@ -269,5 +269,11 @@ function menu.MakeButtons()
 end
 
 if not MULTIPLAYER then
+	hook.Add("SystemEvent", "mainmenu", function(event) 
+		if event == ESYSTEM_EVENT_GAME_POST_INIT then
+			menu.Open()
+			return HOOK_DESTROY
+		end
+	end)
 	menu.Open()
 end

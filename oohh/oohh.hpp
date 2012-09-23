@@ -34,6 +34,39 @@ struct Rect
   }
 };
 
+typedef struct _cairo_surface cairo_surface_t;
+typedef struct _cairo cairo_t;
+
+typedef DWORD HSTREAM;
+
+class Channel
+{
+public:
+	HSTREAM handle;
+	Channel(HSTREAM _handle)
+	{
+		handle = _handle;
+	}
+};
+
+class Cairo
+{
+public:
+	cairo_surface_t *m_surface;
+	cairo_t *m_cairo;
+
+	unsigned char *m_buffer;
+
+	int m_w;
+	int m_h;
+
+	Cairo(int w, int h)
+	{
+		m_w = w;
+		m_h = h;
+	}
+};
+
 class oohhState
 {
 public:
@@ -72,6 +105,8 @@ public:
 	//MMYY_WRAP_CLASS_NO_PUSH(CActor, Actor, actor)
 	MMYY_WRAP_CLASS(IPhysicalEntity, Physics, physics)
 	MMYY_WRAP_CLASS(IParticleEmitter, ParticleEmitter, particle_emitter)
+	MMYY_WRAP_CLASS(Cairo, Cairo, cairo)
+	MMYY_WRAP_CLASS(Channel, Channel, channel)
 
 
 	MMYY_WRAP_CLASS(Awesomium::WebView, WebView, webview)

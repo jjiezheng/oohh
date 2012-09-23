@@ -19,20 +19,20 @@ hook.Add("DrawHUD", "nametags", function()
             
             local pos, vis = (ent:GetPos() + Vec3(0, 0, ZOFFSET)):ToScreen()
             
-            local text = ent:GetNickname()-- .. " [" .. math.floor(dist) .. "m]"
-            
-            local healthcol = Color(1, 0, 0, alpha)
-            healthcol:SetHue(ent:GetHealth() / ent:GetMaxHealth() * 100)
-            local healthtext = math.floor(ent:GetHealth() / ent:GetMaxHealth() * 100) .. "%"
-            
             if vis > 0 then
-                graphics.DrawText(text, pos, "impact.ttf", Vec2()+15, Color(1, 1, 1, alpha), TEXT_OFFSET, Vec2()+2)
+                local text = ent:GetNickname()-- .. " [" .. math.floor(dist) .. "m]"
+                
+                local healthcol = Color(1, 0, 0, alpha)
+                healthcol:SetHue(ent:GetHealth() / ent:GetMaxHealth() * 100)
+                local healthtext = math.round(ent:GetHealth() / ent:GetMaxHealth() * 100) .. "%"
+                
+                graphics.DrawText(text, pos, "impact.ttf", Vec2()+15, Color(1, 1, 1, alpha), TEXT_OFFSET, Vec2() + 2)
 				
                 if ent:GetHealth() > 0 and ent:GetHealth() < ent:GetMaxHealth() then					
-					graphics.DrawRect(Rect(pos.x - 52, pos.y + 25, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT), Color(1, 1, 1, alpha), 4, 1, Color(0,0,0,alpha))
+					graphics.DrawRect(Rect(pos.x - 52, pos.y + 25, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT), Color(1, 1, 1, alpha), nil, 1, Color(0, 0, 0, alpha))
                     
                     local w = HEALTH_BAR_WIDTH * (ent:GetHealth() / ent:GetMaxHealth())
-                    graphics.DrawRect(Rect(pos.x - 52, pos.y + 25, w, HEALTH_BAR_HEIGHT):Shrink(0.9), healthcol, 4)
+                    graphics.DrawRect(Rect(pos.x - 52, pos.y + 25, w, HEALTH_BAR_HEIGHT):Shrink(0.9), healthcol)
                  
                     graphics.DrawText(healthtext, pos, "arial.ttf", Vec2(10, 10), Color(0, 0, 0, alpha), HEALTH_TEXT_OFFSET)
                 end

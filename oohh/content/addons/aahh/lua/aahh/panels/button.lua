@@ -3,7 +3,7 @@ local PANEL = {}
 PANEL.ClassName = "button"
 
 function PANEL:Initialize()
-	self:SetCursor(IDC_HELP)
+	self:SetCursor(IDC_HAND)
 end
 
 function PANEL:OnMouseInput(key, press)

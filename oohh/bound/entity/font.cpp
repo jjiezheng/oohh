@@ -4,8 +4,8 @@
 
 LUALIB_FUNCTION(_G, Font)
 {
-	auto w = my->ToNumber(2, 288);
-	auto h = my->ToNumber(3, 416);
+	auto w = my->ToNumber(2, 512);
+	auto h = my->ToNumber(3, 512);
 	auto flags = my->ToNumber(4, TTFFLAG_CREATE(4, 2));
 
 	auto path = (string)my->ToPath(1, "fonts");

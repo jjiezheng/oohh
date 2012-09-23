@@ -798,6 +798,27 @@ void CPlayerMovement::ProcessOnGroundOrJumping(CPlayer& player)
 			m_request.velocity = my->ToVec3(1);
 			m_request.type = my->ToEnum<ECharacterMoveType>(2, eCMT_Normal);
 			m_velocity.Set(0,0,0);
+
+			if (m_request.type == eCMT_JumpInstant || m_request.type == eCMT_JumpAccumulate)
+			{
+				m_jumped = true;
+
+				player.GetAnimationGraphState()->SetInput(player.m_inputAction, "jumpMP" );			
+
+				CPlayer* pPlayer = const_cast<CPlayer*>(&m_player);
+				pPlayer->PlaySound(CPlayer::ESound_Jump);
+				CALL_PLAYER_EVENT_LISTENERS(OnSpecialMove(pPlayer, IPlayerEventListener::eSM_Jump));
+
+				if (m_jumped)
+					m_hasJumped = true;
+
+				// PLAYERPREDICTION
+				if (m_player.IsClient())
+				{
+					m_player.HasJumped(m_request.velocity);
+      			}
+				// ~PLAYERPREDICTION
+			}
 			return;
 		}
 	}

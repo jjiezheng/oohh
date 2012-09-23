@@ -18,6 +18,12 @@ function aahh.Draw(delta)
 	if aahh.World:IsValid() then
 		aahh.World:Draw()
 	end
+	
+	if aahh.HoveringPanel:IsValid() then
+		mouse.SetCursor(aahh.HoveringPanel:GetCursor())
+	else
+		mouse.SetCursor(1)
+	end
 end
 
 function aahh.EndDraw()

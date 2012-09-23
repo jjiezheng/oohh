@@ -291,6 +291,15 @@ LUAMTA_FUNCTION(player, IsInWater)
 	return 1;
 }
 
+LUAMTA_FUNCTION(player, HasJumped)
+{
+	auto self = my->ToPlayer(1);
+
+	my->Push(self->GetPlayerStats().jumped);
+
+	return 1;
+}
+
 LUAMTA_FUNCTION(player, IsOnGround)
 {
 	auto self = my->ToPlayer(1);
@@ -408,4 +417,78 @@ LUAMTA_FUNCTION(player, AddVelocity)
 	phys->Action(&params);
 
 	return 1;
+}
+
+LUAMTA_FUNCTION(player, SetPlayerDynamics)
+{
+	auto phys = my->ToPlayer(1)->GetEntity()->GetPhysics();
+	luaL_checktype(L, 2, LUA_TTABLE);
+
+	pe_player_dynamics params;
+
+		// auto gen'd
+		if (my->GetMember(2, "kInertia"))
+			params.kInertia = my->ToNumber(-1, params.kInertia);
+	
+		if (my->GetMember(2, "kInertiaAccel"))	
+			params.kInertiaAccel = my->ToNumber(-1, params.kInertiaAccel);
+
+		if (my->GetMember(2, "kAirControl"))
+			params.kAirControl = my->ToNumber(-1, params.kAirControl);
+
+		if (my->GetMember(2, "kAirResistance"))
+			params.kAirResistance = my->ToNumber(-1, params.kAirResistance);
+	
+		if (my->GetMember(2, "gravity"))
+			params.gravity = my->ToVec3(-1, params.gravity);
+	
+		if (my->GetMember(2, "nodSpeed"))
+			params.nodSpeed = my->ToNumber(-1, params.nodSpeed);
+	
+		if (my->GetMember(2, "bSwimming"))
+			params.bSwimming = my->IsNil(-1) ? params.bSwimming : my->ToBoolean(-1) ? 1 : 0;
+	
+		if (my->GetMember(2, "mass"))
+			params.mass = my->ToNumber(-1, params.mass);
+	
+		if (my->GetMember(2, "surface_idx"))
+			params.surface_idx = my->ToNumber(-1, params.surface_idx);
+	
+		if (my->GetMember(2, "minSlideAngle"))
+			params.minSlideAngle = my->ToNumber(-1, params.minSlideAngle);
+	
+		if (my->GetMember(2, "maxClimbAngle"))
+			params.maxClimbAngle = my->ToNumber(-1, params.maxClimbAngle);
+	
+		if (my->GetMember(2, "maxJumpAngle"))
+			params.maxJumpAngle = my->ToNumber(-1, params.maxJumpAngle);
+	
+		if (my->GetMember(2, "minFallAngle"))
+			params.minFallAngle = my->ToNumber(-1, params.minFallAngle);
+	
+		if (my->GetMember(2, "maxVelGround"))
+			params.maxVelGround = my->ToNumber(-1, params.maxVelGround);
+	
+		if (my->GetMember(2, "timeImpulseRecover"))
+			params.timeImpulseRecover = my->ToNumber(-1, params.timeImpulseRecover);
+	
+		if (my->GetMember(2, "collTypes"))
+			params.collTypes = my->ToNumber(-1, params.collTypes);
+	
+		if (my->GetMember(2, "pLivingEntToIgnore"))
+			params.pLivingEntToIgnore = my->ToPhysics(-1, params.pLivingEntToIgnore);
+	
+		if (my->GetMember(2, "bNetwork"))
+			params.bNetwork = my->IsNil(-1) ? params.bNetwork : my->ToBoolean(-1) ? 1 : 0; 
+	
+		if (my->GetMember(2, "bActive"))
+			params.bActive = my->IsNil(-1) ? params.bActive : my->ToBoolean(-1) ? 1 : 0;
+	
+		if (my->GetMember(2, "iRequestedTime"))
+			params.iRequestedTime = my->ToNumber(-1, params.iRequestedTime);
+	
+
+	phys->SetParams(&params);
+
+	return 0;
 }

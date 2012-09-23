@@ -3,8 +3,8 @@ if CLIENT then return end
 gmod = gmod or {}
 
 gmod.Ip = "88.191.111.120"
-gmod.ServerPort = 27020
-gmod.ClientPort = 27016
+gmod.ClientPort = 27011
+gmod.ServerPort = 27010
 
 gmod.Hooks = gmod.Hooks or {}
 

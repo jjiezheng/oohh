@@ -225,6 +225,7 @@ inline void Print(const char *str)
 	WRAP_NUM(unsigned short)
 	WRAP_NUM(unsigned int)
 	WRAP_NUM(unsigned long)
+	WRAP_NUM(unsigned long long)
 #undef WRAP_NUM
 
 	inline void Push(const char *str)

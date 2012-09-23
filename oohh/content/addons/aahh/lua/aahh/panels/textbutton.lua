@@ -8,6 +8,8 @@ function PANEL:Initialize()
 	self.lbl:SetIgnoreMouse(true)
 	
 	self:AlignLabel(ALIGN_CENTERLEFT)
+	
+	self:SetCursor(IDC_HAND)
 end
 
 function PANEL:GetLabel()
