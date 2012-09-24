@@ -89,7 +89,7 @@ if CRYENGINE3 then
 
 	function aahh.KeyInput(key, press)
 		if key:find("mouse") or key == "mwheel_down" or key == "mwheel_up" then
-			return aahh.MouseInput(key, press, Vec2(mouse.GetPos()))
+			aahh.MouseInput(key, press, Vec2(mouse.GetPos()))
 		else
 			return aahh.CallEvent(aahh.World, "KeyInput", key, press)
 		end

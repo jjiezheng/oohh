@@ -12,7 +12,7 @@ if CLIENT then
 		if not MULTIPLAYER then return end
 		
 		if not showing then
-			chatgui.show = true
+			if chatgui then chatgui.Show(1) end
 			panel = aahh.Create("textentry")
 				panel:SetPos(Vec2(20, Vec2(render.GetScreenSize()).h-300))
 				panel:SetSize(Vec2(512, 16))

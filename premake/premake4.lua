@@ -4,7 +4,7 @@ local FOLDER = os.getenv("CRYENGINETHREEFOLDER") or "NOTFOUND"
 FOLDER = FOLDER:gsub("\\", "/"):gsub("(/)$", "")
 
 if not os.isdir(FOLDER) then
-	error("cannot find the cryengine3 '" .. cryengine3 .. "' is not a valid directory")
+	error(cryengine3 .. " is not a valid directory")
 end
 	
 local function bslash(str)
@@ -77,33 +77,46 @@ if _ACTION == "link" then
 	table.insert(cmd, [[rmdir /S /Q "TARGET_DIR\lua\includes"]])
 	table.insert(cmd, [[mkdir "TARGET_DIR\lua\includes"]])
 
-	link_fil("lua/init.lua", "mmyy/lua/init.lua")
-	link_fil("lua/init.lua", "mmyy/lua/init.lua")
+	-- main dll
+	link_fil("bin32/CryGame.dll", "oohh/content/bin32/CryGame.dll")
+	
+	-- init
+	link_fil("lua/init.lua", "mmyy/lua/init.lua")	
+	
+	-- main lua folder links
 	link_dir("lua/includes/modules", "mmyy/lua/includes/modules")
 	link_dir("lua/includes/nil", "mmyy/lua/includes/nil")
 	link_dir("lua/includes/standard", "mmyy/lua/includes/standard")
 	
-	link_dir("lua/includes/cryengine3", "oohh/content/lua/includes/cryengine3")
+	-- the addon folder
 	link_dir("addons", "oohh/content/addons")
+	
+	link_dir("lua/includes/cryengine3", "oohh/content/lua/includes/cryengine3")
+	
+	-- extra overrides
 	link_dir("Game/Scripts", "oohh/content/Game/Scripts")
 	link_dir("Game/Entities", "oohh/content/Game/Entities")	
-			
-	copy("mmyy/lib/lua51.dll", "bin32")
-	copy("oohh/content/bin32/auto_dev_login.exe", "bin32")
-	
-	copy("oohh/content/bin32/msvcr110d.dll", "bin32")
-	copy("oohh/content/bin32/msvcp110d.dll", "bin32")
-	
-	copy("oohh/content/bin32/msvcr110.dll", "bin32")
-	copy("oohh/content/bin32/msvcp110.dll", "bin32")
-	
-	include_external("awesomium")
-	include_external("bass")
-
-	link_fil("bin32/CryGame.dll", "oohh/content/bin32/CryGame.dll")
 
 	link_dir("Game/Levels/oh_island", "oohh/content/Game/Levels/oh_island")
 	link_dir("Game/Levels/oh_grass", "oohh/content/Game/Levels/oh_grass")
+	
+	-- lua dependencies
+	copy("mmyy/lib/lua51.dll", "bin32")
+	
+	-- vs2012 dependencies
+	-- debug
+	copy("oohh/content/bin32/msvcr110d.dll", "bin32")
+	copy("oohh/content/bin32/msvcp110d.dll", "bin32")
+	-- release
+	copy("oohh/content/bin32/msvcr110.dll", "bin32")
+	copy("oohh/content/bin32/msvcp110.dll", "bin32")
+	
+	-- not really used
+	copy("oohh/content/bin32/auto_dev_login.exe", "bin32")
+	
+	include_external("awesomium")
+	include_external("cairo")
+	include_external("bass")
 
 	for i, line in ipairs(cmd) do
 		line = line:gsub("LINK_DIR", LINK_DIR)

@@ -1,7 +1,7 @@
 chatgui = chatgui or {}
 
-chatgui.font = "arial.ttf"
-chatgui.font_size = 12
+chatgui.font = "tahoma.ttf"
+chatgui.font_size = 13
 chatgui.max_history = 20
 chatgui.spacing = 1.2
 
@@ -13,14 +13,15 @@ end
 
 function chatgui.Show(fade) 
 	for key, data in ipairs(chatgui.history) do
-		data.alpha = 0 - (key / chatgui.max_history)
-		data.fade = fade
+		data.alpha = -(key / chatgui.max_history) + 1
+		--data.fade = fade or 1
 	end
+	chatgui.show = true
 end
 
 function chatgui.Hide()
 	for key, data in ipairs(chatgui.history) do 
-		data.alpha = 0 - (key / chatgui.max_history)
+		data.alpha = -(key / chatgui.max_history) + 1
 	end
 	chatgui.show = false
 end
@@ -30,15 +31,15 @@ function chatgui.GetTimeStamp()
 	return string.format("%s:%s", add_0(time.hour), add_0(time.min)) .. " - "
 end
  
-function chatgui.AddLine(str)
+function chatgui.AddLine(str)	
 	if #chatgui.history > chatgui.max_history then
 		table.remove(chatgui.history, 1)
 	end
 	table.insert(chatgui.history, {str = str, alpha = 0})
-	
-	chatgui.show = true
-	
-	--timer.Simple(10, function() chatgui.show = false end)
+		
+	chatgui.Show()
+		
+	timer.Create("hide_chatgui", 15, 1, function() chatgui.Hide() end)
 end
 
 function chatgui.PlayerSay(ply, str)
@@ -55,10 +56,13 @@ hook.Add("PlayerSay", "chatgui", chatgui.PlayerSay)
 function chatgui.Draw()
 	if not chatgui.show then return end
 	for key, data in ipairs(chatgui.history) do
-		if not data.fade then data.alpha = math.min(data.alpha + FrameTime() * 8, 1) end
+		if not data.fade then 
+			data.alpha = math.min(data.alpha + FrameTime() * 8, 1) 
+		end		
+		
 		graphics.DrawText(
 			data.str,
-			Vec2(0, (data.alpha * chatgui.font_size) + graphics.GetScreenSize().h * 0.5) + Vec2(chatgui.font_size, ((key - #chatgui.history) * chatgui.font_size * chatgui.spacing)),  
+			Vec2(0, (data.alpha * chatgui.font_size) + graphics.GetScreenSize().h * 0.5) + Vec2(chatgui.font_size, ((key - #chatgui.history) * chatgui.font_size * chatgui.spacing)), 
 			chatgui.font, 
 			chatgui.font_size, 
 			Color(1, 1, 1, data.alpha),

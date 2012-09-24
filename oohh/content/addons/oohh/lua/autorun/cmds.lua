@@ -43,6 +43,6 @@ console.RunString(
 	]==], 
 	true -- this silence oh i will shut down the sounds
 )
-console.RunString("log_verbosity 5", true)
+console.RunString("log_verbosity 0", true)
 
 engine3d.PauseTOD(true)

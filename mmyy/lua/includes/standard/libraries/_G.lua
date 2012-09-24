@@ -98,8 +98,8 @@ function table.lastkeyvalue(tbl)
 	local key, val
 
 	for k, v in pairs(tbl) do
-		key = k and k or key
-		val = v and v or val
+		key = k ~= nil and k or key
+		val = v ~= nil and v or val
 	end
 
 	return key, val
