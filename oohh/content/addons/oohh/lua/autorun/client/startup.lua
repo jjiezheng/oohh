@@ -262,7 +262,7 @@ function menu.MakeButtons()
 	menu.SetupButtons()
 	hook.Add("ResolutionChanged", "startup", menu.SetupButtons)
 	
-	hook.Add("LocalPlayerEntered", "startup", function()
+	hook.Add("MenuInitialized", "startup", function()
 		menu.Toggle()
 		menu.Toggle()
 	end)

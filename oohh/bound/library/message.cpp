@@ -17,7 +17,13 @@ LUALIB_FUNCTION(message, RawSendToClient)
 	// null fix hmm
 	msg = "" + msg; 
 
-	INVOKE(CGameRules::oohhFromServer(), CGameRules::oohhNetMsg(msg), eRMI_ToClientChannel, my->ToPlayer(1)->GetChannelId());
+	if(my->ToBoolean(3))
+	{
+		INVOKE(CGameRules::oohhFromServerUDP(), CGameRules::oohhNetMsgUDP(msg), eRMI_ToClientChannel, my->ToPlayer(1)->GetChannelId());
+	}
+	{
+		INVOKE(CGameRules::oohhFromServerTCP(), CGameRules::oohhNetMsgTCP(msg), eRMI_ToClientChannel, my->ToPlayer(1)->GetChannelId());
+	}
 
 	return 0;
 }
@@ -39,12 +45,19 @@ LUALIB_FUNCTION(message, RawSendToServer)
 	// null fix hmm
 	msg = "" + msg; 
 
-	INVOKE(CGameRules::oohhFromClient(), CGameRules::oohhNetMsg(msg), eRMI_ToServer);
+	if(my->ToBoolean(2))
+	{
+		INVOKE(CGameRules::oohhFromClientUDP(), CGameRules::oohhNetMsgUDP(msg), eRMI_ToServer);
+	}
+	else
+	{
+		INVOKE(CGameRules::oohhFromClientTCP(), CGameRules::oohhNetMsgTCP(msg), eRMI_ToServer);
+	}
 
 	return 0;
 }
 
-IMPLEMENT_RMI(CGameRules, oohhFromClient)
+IMPLEMENT_RMI(CGameRules, oohhFromClientTCP)
 {
 	if (my)
 	{
@@ -61,7 +74,37 @@ IMPLEMENT_RMI(CGameRules, oohhFromClient)
 	return false;
 }
 
-IMPLEMENT_RMI(CGameRules, oohhFromServer)
+IMPLEMENT_RMI(CGameRules, oohhFromServerTCP)
+{
+	if (my)
+	{
+		my->CallHook("NetMsgReceiveFromServer", params.str);
+
+		return true;
+	}
+
+	return false;
+}
+
+
+IMPLEMENT_RMI(CGameRules, oohhFromClientUDP)
+{
+	if (my)
+	{
+		auto ply = (CPlayer *)GetActorByChannelId(gEnv->pGame->GetIGameFramework()->GetGameChannelId(pNetChannel));
+		
+		if (ply)
+		{
+			my->CallHook("NetMsgReceiveFromClient", ply, params.str);
+
+			return true;
+		}		
+	}
+
+	return false;
+}
+
+IMPLEMENT_RMI(CGameRules, oohhFromServerUDP)
 {
 	if (my)
 	{

@@ -99,8 +99,8 @@ namespace oohh
 					gEnv->pEntitySystem->AddEntityEventListener(ent->GetId(), (EEntityEvent)flag, this);
 				}
 
-				my->CallHook("EntitySpawned", ent, params.sName);
-				my->CallEntityHook(ent, "Initialize", params.sName);
+				//my->CallHook("EntitySpawned", ent, params.sName);
+				//my->CallEntityHook(ent, "Initialize", params.sName);
 			}
 
 			virtual bool OnRemove(IEntity *ent)

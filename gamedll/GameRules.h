@@ -101,17 +101,15 @@ class CGameRules :	public CGameObjectExtensionHelper<CGameRules, IGameRules, 64>
 public:
 	//oohh netmsg
 
-	struct oohhNetMsg
+	struct oohhNetMsgTCP
 	{
-		oohhNetMsg() {};
-		oohhNetMsg
-		(
-			string STR
-		): 
-			str(STR) 
-		{};
-
 		string str;
+
+		oohhNetMsgTCP(){}
+		oohhNetMsgTCP(string _str)
+		{
+			str = _str;
+		};
 
 		void SerializeWith(TSerialize ser)
 		{
@@ -119,8 +117,28 @@ public:
 		}
 	};
 
-	DECLARE_SERVER_RMI_NOATTACH_FAST(oohhFromClient, oohhNetMsg, eNRT_ReliableUnordered);
-	DECLARE_CLIENT_RMI_NOATTACH_FAST(oohhFromServer, oohhNetMsg, eNRT_ReliableUnordered);
+	struct oohhNetMsgUDP
+	{
+		string str;
+
+		oohhNetMsgUDP(){}
+		oohhNetMsgUDP(string _str)
+		{
+			str = _str;
+		};
+
+		void SerializeWith(TSerialize ser)
+		{
+			ser.Value("s", str);
+		}
+	};
+
+
+	DECLARE_SERVER_RMI_NOATTACH_FAST(oohhFromClientTCP, oohhNetMsgTCP, eNRT_ReliableUnordered);
+	DECLARE_CLIENT_RMI_NOATTACH_FAST(oohhFromServerTCP, oohhNetMsgTCP, eNRT_ReliableUnordered);
+
+	DECLARE_SERVER_RMI_NOATTACH_FAST(oohhFromClientUDP, oohhNetMsgUDP, eNRT_UnreliableUnordered);
+	DECLARE_CLIENT_RMI_NOATTACH_FAST(oohhFromServerUDP, oohhNetMsgUDP, eNRT_UnreliableUnordered);
 
 	//DECLARE_SERVER_RMI_NOATTACH
 	//DECLARE_CLIENT_RMI_NOATTACH

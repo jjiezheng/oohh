@@ -183,13 +183,6 @@ LUAMTA_FUNCTION(entity, GetModel)
 	return 1;
 }
 
-LUAMTA_FUNCTION(entity, GetRotation)
-{
-	my->Push(my->ToEntity(1)->GetRotation());
-
-	return 1;
-}
-
 LUAMTA_FUNCTION(entity, GetLocalTM)
 {
 	my->Push(my->ToEntity(1)->GetLocalTM());
@@ -220,9 +213,30 @@ LUAMTA_FUNCTION(entity, GetWorldPos)
 
 LUAMTA_FUNCTION(entity, SetRotation)
 {
+	my->ToEntity(1)->SetRotation(my->ToQuat(2));
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(entity, GetRotation)
+{
+	my->Push(my->ToEntity(1)->GetRotation());
+
+	return 1;
+}
+
+LUAMTA_FUNCTION(entity, SetAngles)
+{
 	my->ToEntity(1)->SetRotation(Quat(my->ToAng3(2)));
 
 	return 0;
+}
+
+LUAMTA_FUNCTION(entity, GetAngles)
+{
+	my->Push(Ang3(my->ToEntity(1)->GetRotation()));
+
+	return 1;
 }
 
 LUAMTA_FUNCTION(entity, GetScale)
@@ -787,5 +801,56 @@ LUAMTA_FUNCTION(entity, GetMeshTable)
 	return 1;
 }
 
+LUAMTA_FUNCTION(entity, NetSpawn)
+{
+	auto self = my->ToEntity(1);
 
+	gEnv->pGame->GetIGameFramework()->GetNetContext()->SpawnedObject(self->GetId());
 
+	return 0;
+}
+
+LUAMTA_FUNCTION(entity, NetTransform)
+{
+	auto self = my->ToEntity(1);
+
+	gEnv->pGame->GetIGameFramework()->GetNetContext()->ChangedTransform(self->GetId(), my->ToVec3(2), my->ToQuat(3), my->ToNumber(4));
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(entity, NetAspect)
+{
+	auto self = my->ToEntity(1);
+
+	gEnv->pGame->GetIGameFramework()->GetNetContext()->ChangedAspects(self->GetId(), my->ToNumber(2, NET_ASPECT_ALL));
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(entity, NetBind)
+{
+	auto self = my->ToEntity(1);
+
+	gEnv->pGame->GetIGameFramework()->GetNetContext()->BindObject(self->GetId(), my->ToNumber(2, NET_ASPECT_ALL), my->ToBoolean(3));
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(entity, NetPuse)
+{
+	auto self = my->ToEntity(1);
+
+	gEnv->pGame->GetIGameFramework()->GetNetContext()->PulseObject(self->GetId(), my->ToNumber(2));
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(entity, SetNetParent)
+{
+	auto self = my->ToEntity(1);
+
+	gEnv->pGame->GetIGameFramework()->GetNetContext()->SetParentObject(self->GetId(), my->ToEntity(2)->GetId());
+
+	return 0;
+}

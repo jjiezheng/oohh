@@ -12,18 +12,21 @@ end
 
 function META:GetLength()
 	local w,h = self:GetSize()
-	return w*h
+	return (w*h) * 4
 end
 
 function META:Clear(color)
-	local length = self:GetLength()
+	color = color or Color(0,0,0,0)
 	local r,g,b,a = (color*255):Unpack()
+		
+	local img = self:GetPixelTable(true)
 	
-	local img = ffi.new("rgba_pixel[?]", length)
-	for i = 0, length-1 do
+	for i = 0, self:GetLength()-1 do
 		img[i].r = r or 0
 		img[i].g = g or 0
 		img[i].b = b or 0
 		img[i].a = a or 0
 	end
+	
+	self:SetPixelTable(img)
 end

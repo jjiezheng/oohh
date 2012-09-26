@@ -70,6 +70,34 @@ LUAMTA_FUNCTION(cairo, MarkDirty)
 	return 0;
 }
 
+LUAMTA_FUNCTION(cairo, SetOperator)
+{
+	auto self = my->ToCairo(1);
+	
+	cairo_set_operator(self->m_cairo, my->ToEnum<cairo_operator_t>(2));
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(cairo, Paint)
+{
+	auto self = my->ToCairo(1);
+	
+	cairo_paint(self->m_cairo);
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(cairo, PaintWithAlpha)
+{
+	auto self = my->ToCairo(1);
+	
+	cairo_paint_with_alpha(self->m_cairo, my->ToNumber(2, 0));
+
+	return 0;
+}
+
+
 LUAMTA_FUNCTION(cairo, UpdateTexture)
 {
 	auto self = my->ToCairo(1);

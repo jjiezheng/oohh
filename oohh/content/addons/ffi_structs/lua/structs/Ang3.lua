@@ -36,10 +36,14 @@ end
 
 local PI1 = math.pi
 local PI2 = math.pi * 2
+local function normalize(a, b)
+	return (a + PI1) % PI2 - PI1
+end
+
 function META:Normalize()
-	self.p = (self.p + PI1) % PI2 - PI1
-	self.y = (self.y + PI1) % PI2 - PI1
-	self.r = (self.r + PI1) % PI2 - PI1
+	self.p = normalize(self.p)
+	self.y = normalize(self.y)
+	self.r = normalize(self.r)
 	
 	return self
 end
@@ -47,7 +51,9 @@ end
 structs.AddGetFunc(META, "Normalize", "Normalized")
 
 function META.AngleDifference(a, b)
-	a:Normalize(b)
+	a.p = normalize(a.p - b.p)
+	a.y = normalize(a.y - b.y)
+	a.r = normalize(a.r - b.r)
 	
 	a.p = a.p < PI2 and a.p or a.p - PI2
 	a.y = a.y < PI2 and a.y or a.y - PI2
@@ -57,6 +63,19 @@ function META.AngleDifference(a, b)
 end
 
 structs.AddGetFunc(META, "AngleDifference")
+
+function META.Lerp(a, mult, b)
+
+	a.x = (b.x - a.x) * mult + a.x
+	a.y = (b.y - a.y) * mult + a.y
+	a.z = (b.z - a.z) * mult + a.z
+	
+	a:Normalize()
+	
+	return a
+end
+
+structs.AddGetFunc(META, "Lerp", "Lerped")
 
 function META:Rad()
 	self.p = math.rad(self.p)

@@ -125,7 +125,7 @@ namespace oohh
 
 		listener->Stop();
 
-		my->RunString("bass.Close()");
+		my->RunString("bass.Close()"); 
 
 		delete my;
 		my = NULL;

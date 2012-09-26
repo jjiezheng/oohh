@@ -2,27 +2,29 @@ if IsEditor() then return end
 
 CRYENGINE3 = true
 
-local function refresh_states()
+function RefreshStates()
 	HOST = IsMultiPlayer() and IsServer()
 
 	MULTIPLAYER = IsMultiPlayer()
 	EDITOR = IsEditor()
 	DEDICATED = IsDedicated()
-end
 
-refresh_states()
-
-if system.GetCommandLine().server then
-	SERVER = true
-	CLIENT = false
-else
-	SERVER = IsServer()
-	CLIENT = not SERVER
-
-	if MULTIPLAYER == false then
+	if system.GetCommandLine().server then
+		SERVER = true
+		CLIENT = false
+	else
+		SERVER = false
 		CLIENT = true
+		
+		if entities.GetLocalPlayer():IsValid() then
+			MULTIPLAYER = true
+		else
+			MULTIPLAYER = false
+		end
 	end
 end
+
+RefreshStates()
 
 include("includes/libraries/message.lua")
 include("includes/libraries/*")
@@ -78,13 +80,18 @@ nvars.FullUpdate()
 
 hook.Add("PostGameUpdate", "timer_update", timer.Update)
 
--- UGH
-hook.Add("PostGameUpdate", "confine_cursor", function()
+local function confine_cursor()
 	if not mouse.IsVisible() and not console.IsVisible() and entities.GetLocalPlayer():IsValid() and window.IsFocused() then
 		local w, h = render.GetScreenSize()
 		mouse.SetPos(w/2, h/2)
 	end
-end)
+end
+
+hook.Add("PostGameUpdate", "CRYENGINE3", function()
+	RefreshStates()
+
+	confine_cursor()
+end, math.huge)
 
 local test = {}
 for key, val in pairs(_G) do
@@ -97,12 +104,16 @@ hook.Add("SystemEvent", "reoh", function(event, low, high)
 	if event == ESYSTEM_EVENT_LEVEL_UNLOAD then
 		timer.Simple(0, function() console.RunString("reoh") end)
 	elseif event == ESYSTEM_EVENT_LEVEL_PRECACHE_END then	
-		refresh_states()
+		RefreshStates()
 		hook.Call("LocalPlayerEntered", entities.GetLocalPlayer())
+		hook.Call("MenuInitialized", true)
+		hook.Call("GameInitialized", true)
 	end
 end)
 
 hook.Add("LuaOpen", "reoh", function()
+	RefreshStates()
+	
 	addons.AutorunAll()
 
 	if CLIENT then
@@ -114,4 +125,13 @@ hook.Add("LuaOpen", "reoh", function()
 	end
 	
 	hook.Call("LocalPlayerEntered", entities.GetLocalPlayer())
+		
+	if entities.GetLocalPlayer():IsValid() then
+		hook.Call("MenuInitialized", true)
+		hook.Call("GameInitialized", true)
+	else
+		hook.Call("MenuInitialized", true)
+	end
+	
+	GAME_INIT = true
 end)

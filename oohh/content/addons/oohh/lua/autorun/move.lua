@@ -44,7 +44,7 @@ local params =
 }
 
 hook.Add("ProcessPlayerGroundMove", "move", function(ply)
-    if typex(ply) ~= "player" then
+    if typex(ply) ~= "player" or not ply:IsAlive() then
 	return end
 	
 	local phys = ply:GetPhysics()
@@ -94,7 +94,7 @@ hook.Add("ProcessPlayerGroundMove", "move", function(ply)
 			return ply.move_vel + ang:GetUp() * 4, 6
 		end
 		 
-		ply.move_vel = ply.move_vel * 0.95
+		ply.move_vel = ply.move_vel * math.clamp(FrameTime() * 100, 0.5, 0.925)
 	
 		return ply.move_vel
 	end

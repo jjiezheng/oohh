@@ -114,7 +114,7 @@ function graphics.DrawRoundedOutlinedRect(rect, size, color, tl, tr, bl, br)
 	
 	if color.a == 0 then return end
 
-	tl = tl == nil and true or tp
+	tl = tl == nil and true or tl
 	tr = tr == nil and true or tr
 	bl = bl == nil and true or bl
 	br = br == nil and true or br
@@ -129,7 +129,7 @@ function graphics.DrawRoundedOutlinedRect(rect, size, color, tl, tr, bl, br)
 
 	surface.SetColor(color)
 	surface.SetTexture(tl and corner or white)
-	
+
 	draw_textured_rect(
 		rect.x - size * 0.5,
 		rect.y - size * 0.5,
@@ -211,6 +211,10 @@ function graphics.DrawRect(rect, color, roundness, border_size, border_color, sh
 			graphics.DrawFilledRect(rect, color)
 		end
 	end
+end
+
+function graphics.GetFont(name)
+	return fonts[name]
 end
 
 function graphics.GetTextSize(font, text)

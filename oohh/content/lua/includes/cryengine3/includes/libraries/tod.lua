@@ -131,14 +131,18 @@ tod.Enums.tod =
 	get = engine3d.GetTOD,
 }
 
+function tod.SetParam(key, val)
+	local var = tod.Enums[key]
+	if type(var) == "table" then
+		var.set(val)
+	elseif var then	
+		engine3d.SetGlobalParameter(var, val)
+	end
+end
+
 function tod.SetConfig(data, force_update)
 	for key, val in pairs(data) do
-		local var = tod.Enums[key]
-		if type(var) == "table" then
-			var.set(val)
-		elseif var then	
-			engine3d.SetGlobalParameter(var, val)
-		end
+		tod.SetParam(key, val)
 	end
 	if force_update then
 		engine3d.UpdateSky()

@@ -27,6 +27,11 @@ console.RunString(
 	p_max_velocity 100000
 	
 	s_MusicVolume 0
+	
+	ai_MNMEditorBackgroundUpdate 0
+	
+	sv_gamerules DeathMatch
+	sv_gamerulesdefault DeathMatch
 	]]
 	--[==[	
 	

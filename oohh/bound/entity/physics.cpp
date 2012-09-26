@@ -115,8 +115,8 @@ LUAMTA_FUNCTION(physics, SetVelocity)
 LUAMTA_FUNCTION(physics, GetAngleVelocity)
 {
 	pe_status_dynamics params;
-		my->ToPhysics(1)->GetStatus(&params);
-	my->Push(params.w);
+		int err = my->ToPhysics(1)->GetStatus(&params);
+	my->Push(err ? Vec3(0,0,0) : params.w);
 
 	return 1;
 }
@@ -124,8 +124,8 @@ LUAMTA_FUNCTION(physics, GetAngleVelocity)
 LUAMTA_FUNCTION(physics, GetVelocity)
 {
 	pe_status_dynamics params;
-		my->ToPhysics(1)->GetStatus(&params);
-	my->Push(params.v);
+		int err = my->ToPhysics(1)->GetStatus(&params);
+	my->Push(err ? Vec3(0,0,0) : params.v);
 
 	return 1;
 }
@@ -187,8 +187,8 @@ LUAMTA_FUNCTION(physics, SetDensity)
 LUAMTA_FUNCTION(physics, GetDensity)
 {
 	pe_simulation_params params;
-		my->ToPhysics(1)->GetParams(&params);
-	my->Push(params.density);
+		int err = my->ToPhysics(1)->GetParams(&params);
+	my->Push(err ? 0 : params.density);
 
 	return 1;
 }
@@ -205,8 +205,8 @@ LUAMTA_FUNCTION(physics, SetDamping)
 LUAMTA_FUNCTION(physics, GetDamping)
 {
 	pe_simulation_params params;
-		my->ToPhysics(1)->GetParams(&params);
-	my->Push(params.damping);
+		int err = my->ToPhysics(1)->GetParams(&params);
+	my->Push(err ? 0 : params.damping);
 
 	return 1;
 }
@@ -223,8 +223,8 @@ LUAMTA_FUNCTION(physics, SetMass)
 LUAMTA_FUNCTION(physics, GetMass)
 {
 	pe_simulation_params params;
-		my->ToPhysics(1)->GetParams(&params);
-	my->Push(params.mass);
+		int err = my->ToPhysics(1)->GetParams(&params);
+	my->Push(err ? 1 : params.mass);
 
 	return 1;
 }
@@ -241,8 +241,8 @@ LUAMTA_FUNCTION(physics, SetPos)
 LUAMTA_FUNCTION(physics, GetPos)
 {
 	pe_status_pos params;
-		my->ToPhysics(1)->GetStatus(&params);
-	my->Push(params.pos);
+		int err = my->ToPhysics(1)->GetStatus(&params);
+	my->Push(err ? Vec3(0,0,0) : params.pos);
 
 	return 1;
 }
@@ -266,8 +266,26 @@ LUAMTA_FUNCTION(physics, SetRotation)
 LUAMTA_FUNCTION(physics, GetRotation)
 {
 	pe_status_pos params;
-		my->ToPhysics(1)->GetStatus(&params);
-	my->Push(params.q);
+		int err = my->ToPhysics(1)->GetStatus(&params);
+	my->Push(err ? Quat(0,0,0,0) : params.q);
+
+	return 1;
+}
+
+LUAMTA_FUNCTION(physics, SetAngles)
+{
+	pe_params_pos params;
+		params.q = Quat(my->ToAng3(2));
+	my->ToPhysics(1)->SetParams(&params);
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(physics, GetAngles)
+{
+	pe_status_pos params;
+		int err = my->ToPhysics(1)->GetStatus(&params);
+	my->Push(err ? Ang3(0,0,0) : Ang3(params.q));
 
 	return 1;
 }

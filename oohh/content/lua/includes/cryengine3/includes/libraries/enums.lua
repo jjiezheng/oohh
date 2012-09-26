@@ -822,3 +822,154 @@ enum --EEfResTextures
 	EFTT_CUSTOM_SECONDARY,
 	EFTT_OPACITY,
 };
+
+enum
+{
+    CAIRO_OPERATOR_CLEAR = 0,
+
+    CAIRO_OPERATOR_SOURCE = 1,
+    CAIRO_OPERATOR_OVER = 2,
+    CAIRO_OPERATOR_IN = 3,
+    CAIRO_OPERATOR_OUT = 4,
+    CAIRO_OPERATOR_ATOP = 5,
+
+    CAIRO_OPERATOR_DEST = 6,
+    CAIRO_OPERATOR_DEST_OVER = 7,
+    CAIRO_OPERATOR_DEST_IN = 8,
+    CAIRO_OPERATOR_DEST_OUT = 9,
+    CAIRO_OPERATOR_DEST_ATOP = 10,
+
+    CAIRO_OPERATOR_XOR = 11,
+    CAIRO_OPERATOR_ADD = 12,
+    CAIRO_OPERATOR_SATURATE = 13
+}	--cairo operator
+
+
+BASS_SAMPLE_8BITS = 1 -- 8 bit
+BASS_SAMPLE_FLOAT = 256 -- 32-bit floating-point
+BASS_SAMPLE_MONO = 2 -- mono
+BASS_SAMPLE_LOOP = 4 -- looped
+BASS_SAMPLE_3D = 8 -- 3D functionality
+BASS_SAMPLE_SOFTWARE = 16 -- not using hardware mixing
+BASS_SAMPLE_MUTEMAX = 32 -- mute at max distance (3D only)
+BASS_SAMPLE_VAM = 64 -- DX7 voice allocation & management
+BASS_SAMPLE_FX = 128 -- old implementation of DX8 effects
+BASS_SAMPLE_OVER_VOL = 0x10000 -- override lowest volume
+BASS_SAMPLE_OVER_POS = 0x20000 -- override longest playing
+BASS_SAMPLE_OVER_DIST = 0x30000 -- override furthest from listener (3D only)
+
+BASS_STREAM_PRESCAN = 0x20000 -- enable pin-point seeking/length (MP3/MP2/MP1)
+BASS_MP3_SETPOS = BASS_STREAM_PRESCAN 
+BASS_STREAM_AUTOFREE = 0x40000 -- automatically free the stream when it stop/ends
+BASS_STREAM_RESTRATE = 0x80000 -- restrict the download rate of internet file streams
+BASS_STREAM_BLOCK = 0x100000 -- download/play internet file stream in small blocks
+BASS_STREAM_DECODE = 0x200000 -- don't play the stream, only decode (BASS_ChannelGetData)
+BASS_STREAM_STATUS = 0x800000 -- give server status info (HTTP/ICY tags) in DOWNLOADPROC
+
+BASS_MUSIC_FLOAT = BASS_SAMPLE_FLOAT 
+BASS_MUSIC_MONO = BASS_SAMPLE_MONO 
+BASS_MUSIC_LOOP = BASS_SAMPLE_LOOP 
+BASS_MUSIC_3D = BASS_SAMPLE_3D 
+BASS_MUSIC_FX = BASS_SAMPLE_FX 
+BASS_MUSIC_AUTOFREE = BASS_STREAM_AUTOFREE 
+BASS_MUSIC_DECODE = BASS_STREAM_DECODE 
+BASS_MUSIC_PRESCAN = BASS_STREAM_PRESCAN -- calculate playback length
+BASS_MUSIC_CALCLEN = BASS_MUSIC_PRESCAN 
+BASS_MUSIC_RAMP = 0x200 -- normal ramping
+BASS_MUSIC_RAMPS = 0x400 -- sensitive ramping
+BASS_MUSIC_SURROUND = 0x800 -- surround sound
+BASS_MUSIC_SURROUND2 = 0x1000 -- surround sound (mode 2)
+BASS_MUSIC_FT2MOD = 0x2000 -- play .MOD as FastTracker 2 does
+BASS_MUSIC_PT1MOD = 0x4000 -- play .MOD as ProTracker 1 does
+BASS_MUSIC_NONINTER = 0x10000 -- non-interpolated sample mixing
+BASS_MUSIC_SINCINTER = 0x800000 -- sinc interpolated sample mixing
+BASS_MUSIC_POSRESET = 0x8000 -- stop all notes when moving position
+BASS_MUSIC_POSRESETEX = 0x400000 -- stop all notes and reset bmp/etc when moving position
+BASS_MUSIC_STOPBACK = 0x80000 -- stop the music on a backwards jump effect
+BASS_MUSIC_NOSAMPLE = 0x100000 -- don't load the samples
+
+-- Speaker assignment flags
+BASS_SPEAKER_FRONT = 0x1000000 -- front speakers
+BASS_SPEAKER_REAR = 0x2000000 -- rear/side speakers
+BASS_SPEAKER_CENLFE = 0x3000000 -- center & LFE speakers (5.1)
+BASS_SPEAKER_REAR2 = 0x4000000 -- rear center speakers (7.1)
+BASS_SPEAKER_LEFT = 0x10000000 -- modifier: left
+BASS_SPEAKER_RIGHT = 0x20000000 -- modifier: right
+
+BASS_UNICODE = 0x80000000 
+
+BASS_RECORD_PAUSE = 0x8000 -- start recording paused
+
+-- DX7 voice allocation & management flags
+BASS_VAM_HARDWARE = 1 
+BASS_VAM_SOFTWARE = 2 
+BASS_VAM_TERM_TIME = 4 
+BASS_VAM_TERM_DIST = 8 
+BASS_VAM_TERM_PRIO = 16   
+
+BASS_MUSIC = 1
+BASS_FILE = 2
+BASS_URL = 3
+
+
+-- BASS_ChannelIsActive return values
+BASS_ACTIVE_STOPPED = 0 
+BASS_ACTIVE_PLAYING = 1 
+BASS_ACTIVE_STALLED = 2 
+BASS_ACTIVE_PAUSED = 3 
+
+-- Channel attributes
+BASS_ATTRIB_FREQ = 1 
+BASS_ATTRIB_VOL = 2 
+BASS_ATTRIB_PAN = 3 
+BASS_ATTRIB_EAXMIX = 4 
+BASS_ATTRIB_NOBUFFER = 5 
+BASS_ATTRIB_CPU = 7 
+BASS_ATTRIB_SRC = 8 
+BASS_ATTRIB_MUSIC_AMPLIFY = 0x100 
+BASS_ATTRIB_MUSIC_PANSEP = 0x101 
+BASS_ATTRIB_MUSIC_PSCALER = 0x102 
+BASS_ATTRIB_MUSIC_BPM = 0x103 
+BASS_ATTRIB_MUSIC_SPEED = 0x104 
+BASS_ATTRIB_MUSIC_VOL_GLOBAL = 0x105 
+BASS_ATTRIB_MUSIC_VOL_CHAN = 0x200 -- + channel #
+BASS_ATTRIB_MUSIC_VOL_INST = 0x300 -- + instrument #
+
+-- BASS_ChannelGetData flags
+BASS_DATA_AVAILABLE = 0 -- query how much data is buffered
+BASS_DATA_FLOAT = 0x40000000 -- flag: return floating-point sample data
+BASS_DATA_FFT256 = 0x80000000 -- 256 sample FFT
+BASS_DATA_FFT512 = 0x80000001 -- 512 FFT
+BASS_DATA_FFT1024 = 0x80000002 -- 1024 FFT
+BASS_DATA_FFT2048 = 0x80000003 -- 2048 FFT
+BASS_DATA_FFT4096 = 0x80000004 -- 4096 FFT
+BASS_DATA_FFT8192 = 0x80000005 -- 8192 FFT
+BASS_DATA_FFT16384 = 0x80000006 -- 16384 FFT
+BASS_DATA_FFT_INDIVIDUAL = 0x10 -- FFT flag: FFT for each channel, else all combined
+BASS_DATA_FFT_NOWINDOW = 0x20 -- FFT flag: no Hanning window
+BASS_DATA_FFT_REMOVEDC = 0x40 -- FFT flag: pre-remove DC bias
+
+-- BASS_ChannelGetTags types : what's returned
+BASS_TAG_ID3 = 0 -- ID3v1 tags : TAG_ID3 structure
+BASS_TAG_ID3V2 = 1 -- ID3v2 tags : variable length block
+BASS_TAG_OGG = 2 -- OGG comments : series of null-terminated UTF-8 strings
+BASS_TAG_HTTP = 3 -- HTTP headers : series of null-terminated ANSI strings
+BASS_TAG_ICY = 4 -- ICY headers : series of null-terminated ANSI strings
+BASS_TAG_META = 5 -- ICY metadata : ANSI string
+BASS_TAG_APE = 6 -- APE tags : series of null-terminated UTF-8 strings
+BASS_TAG_MP4 = 7 -- MP4/iTunes metadata : series of null-terminated UTF-8 strings
+BASS_TAG_VENDOR = 9 -- OGG encoder : UTF-8 string
+BASS_TAG_LYRICS3 = 10 -- Lyric3v2 tag : ASCII string
+BASS_TAG_CA_CODEC = 11 -- CoreAudio codec info : TAG_CA_CODEC structure
+BASS_TAG_MF = 13 -- Media Foundation tags : series of null-terminated UTF-8 strings
+BASS_TAG_WAVEFORMAT = 14 -- WAVE format : WAVEFORMATEEX structure
+BASS_TAG_RIFF_INFO = 0x100 -- RIFF "INFO" tags : series of null-terminated ANSI strings
+BASS_TAG_RIFF_BEXT = 0x101 -- RIFF/BWF "bext" tags : TAG_BEXT structure
+BASS_TAG_RIFF_CART = 0x102 -- RIFF/BWF "cart" tags : TAG_CART structure
+BASS_TAG_RIFF_DISP = 0x103 -- RIFF "DISP" text tag : ANSI string
+BASS_TAG_APE_BINARY = 0x1000 -- + index #, binary APE tag : TAG_APE_BINARY structure
+BASS_TAG_MUSIC_NAME = 0x10000 -- MOD music name : ANSI string
+BASS_TAG_MUSIC_MESSAGE = 0x10001 -- MOD message : ANSI string
+BASS_TAG_MUSIC_ORDERS = 0x10002 -- MOD order list : BYTE array of pattern numbers
+BASS_TAG_MUSIC_INST = 0x10100 -- + instrument #, MOD instrument name : ANSI string
+BASS_TAG_MUSIC_SAMPLE = 0x10300 -- + sample #, MOD sample name : ANSI string  

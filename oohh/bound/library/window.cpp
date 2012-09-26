@@ -12,7 +12,7 @@ LUALIB_FUNCTION(window, SetResolution)
 	gEnv->pRenderer->ChangeResolution(my->ToNumber(1), my->ToNumber(2), 0, 0, my->ToBoolean(3));
 #endif
 
-	return 0;
+	return 0; 
 }
 
 LUALIB_FUNCTION(window, SetNoBorder)
@@ -193,4 +193,28 @@ LUALIB_FUNCTION(window, SetClipboard)
 	my->Push(false);
 
 	return 1;
+}
+
+LUALIB_FUNCTION(window, SetPriority)
+{
+	auto window = (HWND)gEnv->pRenderer->GetHWND();
+	LPDWORD process = nullptr;
+
+	GetWindowThreadProcessId(window, process);
+
+	SetPriorityClass(process, my->ToNumber(1));
+
+	return 0;
+}
+
+LUALIB_FUNCTION(window, SetAffinity)
+{
+	auto window = (HWND)gEnv->pRenderer->GetHWND();
+	LPDWORD process = nullptr;
+
+	GetWindowThreadProcessId(window, process);
+
+	SetProcessAffinityMask(process, my->ToNumber(1));
+
+	return 0;
 }

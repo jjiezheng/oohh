@@ -1,40 +1,27 @@
 nvars = {}
 
-nvars.current = {}
-nvars.current.g = {}
+nvars.Environments = {}
 
 function nvars.Set(key, value, env, ply)
 	env = env or "g"
-
-	-- userdata!!!!
-
-	local hack
-	if getmetatable(env) and getmetatable(env).GetUniqueID then
-		hack = env:GetUniqueID()
-	end
-	
-	nvars.current[hack or env] = nvars.current[hack or env] or {}
-	nvars.current[hack or env][key] = value
+		
+	nvars.Environments[env] = nvars.Environments[env] or {}
+	nvars.Environments[env][key] = value
 
 	if SERVER then
-		message.SendToClient("nv", ply, env, key, value)
+		message.Send("nv", ply, env, key, value)
 	end
 end
 
 function nvars.Get(key, def, env)
 	env = env or "g"
 
-	local hack
-	if getmetatable(env) and getmetatable(env).GetUniqueID then
-		hack = env:GetUniqueID()
-	end
-
-	return nvars.current[hack or env] and nvars.current[hack or env][key] or def
+	return nvars.Environments[env] and nvars.Environments[env][key] or def
 end
 
 function nvars.Initialize()
 	console.AddCommand("fullupdate", function(ply, line, ...)
-		for env, vars in pairs(nvars.current) do
+		for env, vars in pairs(nvars.Environments) do
 			for key, value in pairs(vars) do
 				nvars.Set(key, value, env, ply)
 			end
@@ -48,16 +35,14 @@ function nvars.Initialize()
 	end
 
 	for key, ent in pairs(entities.GetAll()) do
-		nvars.AttachObject(ent)
+		nvars.AttachEntity(ent)
 	end
 
 	hook.Add("EntitySpawned", "nvars", function(ent)
-		timer.Simple(0.5, function()
-			if ent:IsValid() then
-				nvars.AttachObject(ent)
-			end
-		end)
+		nvars.AttachEntity(ent)
 	end)
+	
+	nv_G = nvars.CreateObject("_G")
 end
 
 function nvars.FullUpdate()
@@ -66,8 +51,6 @@ end
 
 do
 	local META = {}
-
-	META.Env = "g"
 
 	function META:__index(key)
 		return nvars.Get(key, nil, self.Env)
@@ -81,18 +64,15 @@ do
 end
 
 function nvars.CreateObject(env)
+	check(env, "string")
 	return setmetatable({Env = env}, nvars.ObjectMeta)
 end
 
-function nvars.AttachObject(ent)
-	ent.nv = nvars.CreateObject(ent)
+function nvars.AttachEntity(ent)
+	ent.nv = nvars.CreateObject(tostring(ent:GetId()))
 end
 
-hook.Add("LocalPlayerEntered", "nvars", function()
+hook.Add("GameInitialized", "nvars", function()
 	nvars.Initialize()
 	nvars.FullUpdate()
 end)
-
-local META = util.FindMetaTable("player")
-
-META.nv = {}

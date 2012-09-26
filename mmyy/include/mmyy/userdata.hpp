@@ -1,6 +1,12 @@
 template<typename T>
 inline T *my_topointer(lua_State *L, int idx, const char *meta_name, bool check = true)
 {
+	if (idx > 100)
+	{
+		lua_pushstring(L, "?!?!?!!??!?!?!!?!!?!?!?!?!!?!?!!!!!!!!!!???????????????????!?!!?!?!?!");
+		lua_error(L);
+	}
+
 	if (lua_istable(L, idx))
 	{
 		lua_getfield(L, idx, "Type"); //val
@@ -16,16 +22,20 @@ inline T *my_topointer(lua_State *L, int idx, const char *meta_name, bool check 
 				auto ptr = (T *)lua_touserdata(L, -1);
 				if (ptr)
 				{
-					lua_remove(L, -1);
+					lua_remove(L, -1); //
 
 					return ptr;
 				}
 			}
-
-			lua_remove(L, -1);
+			else
+			{
+				lua_remove(L, -1); // 
+			}
 		}
-
-		lua_remove(L, -1); //
+		else
+		{
+			lua_remove(L, -1); //
+		}
 	}
 
 	if (check)

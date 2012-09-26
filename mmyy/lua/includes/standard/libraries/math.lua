@@ -73,3 +73,15 @@ function math.tostring(num, base)
 	
 	return table.concat(t)
 end
+
+function math.approach(cur, target, inc)
+    inc = math.abs(inc)
+
+    if cur < target then
+        return math.clamp(cur + inc, cur, target)
+    elseif cur > target then
+        return math.clamp(cur - inc, target, cur)
+    end
+	
+    return target    
+end

@@ -73,7 +73,7 @@ do -- commands
 	end
 	
 	function console.RunCommand(cmd, ...)
-		console.CallCommand(cmd, line, nil, ...)
+		console.CallCommand(cmd, table.concat({...}, " "), nil, ...)
 	end
 
 	local function call(data, ply, line, ...)
@@ -194,7 +194,8 @@ end
 
 do -- console vars
 	console.cvar_file_name = "cvars.txt"
-
+	console.vars = nil
+	
 	function console.ReloadVariables()
 		console.vars = luadata.ReadFile(console.cvar_file_name)
 	end
@@ -229,6 +230,10 @@ do -- console vars
 		console.vars[name] = value
 		luadata.SetKeyValueInFile(console.cvar_file_name, name, value)
 	end
+	
+	hook.Add("MenuInitialized", "cvars", function()
+		console.ReloadVariables()
+	end, 10)
 end
 
 do -- filtering
@@ -312,9 +317,10 @@ do -- funsong
 					return tbl[var]
 				end
 				
-				-- engine commands
-				return function(...)
-					console.RunString(key, ...)
+				-- engine cvars
+				local val = console.GetCVarString(key)
+				if val then
+					return val
 				end
 			end,
 			
@@ -328,8 +334,9 @@ do -- funsong
 				end
 				
 				-- engine cvars (same as commands really)
-				return function(...)
-					console.RunString(key, val)
+				local val = console.GetCVarString(key)
+				if val then
+					console.SetCVarValue(key, val)
 				end
 			end
 		}

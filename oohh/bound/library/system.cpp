@@ -68,3 +68,10 @@ LUALIB_FUNCTION(system, ResetGame)
 
 	return 1;
 }
+
+LUALIB_FUNCTION(system, GetHostName)
+{
+	my->Push(gEnv->pNetwork->GetHostName());
+
+	return 1;
+}

@@ -36,12 +36,33 @@ function PANEL:GetChar(pos)
 	return self.Text:sub(pos, pos)
 end
 
-function PANEL:Append(char)
-	self.Text = self.Text:sub(1, self.CaretPos) .. char .. self.Text:sub(self.CaretPos+1)
+function PANEL:InsertNewline()
+
+end
+
+function PANEL:InsertChar(char)
+	if char == "\n" then
+		self:InsertNewline()
+		return
+	end
+	if self.CaretPos == #self.Text then
+		self.Text = self.Text .. char
+		self:SetCaretPos(self:GetCaretPos() + 1)
+	else
+		self.Text = self.Text:sub(1, self.CaretPos) .. char .. self.Text:sub(self.CaretPos+1)
+	end
+end
+
+function PANEL:SetCaretPos(pos)
+	self.CaretPos = math.clamp(pos, 0, #self.Text)
 end
 
 function PANEL:DoChoke(time)
-	self.Choke = CurTime() + (time or self.ChokeTime)
+	self.Choke = os.clock() + (time or self.ChokeTime)
+end
+
+function PANEL:IsChoked()
+	return self.Choke > os.clock()
 end
 
 function PANEL:OnMouseInput(key, press, pos)
@@ -55,8 +76,7 @@ function PANEL:HandleKey(key)
 	if key == "v" and input.IsKeyDown("lctrl") then
 		local str = window.GetClipboard()
 		if #str > 0 then
-			self.Text = self.Text:sub(1, self.CaretPos+1) .. str .. self.Text:sub(self.CaretPos+2)
-			self.CaretPos = self.CaretPos + #str
+			self:InsertChar(str)
 			self:SuppressNextChar()
 		end
 		return
@@ -65,59 +85,61 @@ function PANEL:HandleKey(key)
 	if key == "right" then
 		local pos = self.CaretPos + 1
 
-		--if input.IsKeyDown("lctrl") then
-		--	pos = (select(2, self.Text:find("[%s%p].-[%P%S]", self.CaretPos+1)) or 1) - 1
-		--	if pos < self.CaretPos then
-		--		pos = #self.Text
-		--	end
-		--end
+		if input.IsKeyDown("lctrl") then
+			pos = (select(2, self.Text:find("[%s%p].-[^%p%s]", self.CaretPos+1)) or 1) - 1
+			if pos < self.CaretPos then
+				pos = #self.Text
+			end
+		end
 		
-		self.CaretPos = math.clamp(pos, 0, #self.Text)
+		self:SetCaretPos(pos)
 		return
 	elseif key == "left" then
 		local pos = self.CaretPos - 1
 		
-		--if input.IsKeyDown("lctrl") then
-		--	pos = (select(2, self.Text:sub(1, self.CaretPos):find(".*[%s%p].-[%P%S]")) or 1) - 1
-		--end
+		if input.IsKeyDown("lctrl") then
+			pos = (select(2, self.Text:sub(1, self.CaretPos):find(".*[%s%p].-[^%p%s]")) or 1) - 1
+		end
 		
-		self.CaretPos = math.clamp(pos, 0, #self.Text)
+		self:SetCaretPos(pos)
 		return
 	elseif key == "end" then
-		self.CaretPos = #self.Text
+		self:SetCaretPos(#self.Text)
 		return
 	elseif key == "home" then
-		self.CaretPos = 0
+		self:SetCaretPos(0)
 		return
 	end
 
 	if key == "delete" then
-		--if input.IsKeyDown("lctrl") then
-		--	local min, max = self.Text:find("[%S%P]-[%s%p]", self.CaretPos+1)
-		--	if min and max then
-		--		self.Text = self.Text:sub(1, min+1)
-		--	end
-		--else
+		if input.IsKeyDown("lctrl") then
+			local pos = (select(2, self.Text:find("[%s%p].-[^%p%s]", self.CaretPos+1)) or #self.Text+1) - 1
+			self.Text = self.Text:sub(1, self.CaretPos) .. self.Text:sub(pos+1)
+		else
 			self.Text = self.Text:sub(1, self.CaretPos) .. self.Text:sub(self.CaretPos+2)
-		--end
+		end
 	elseif key == "backspace" then
 		if self.CaretPos == 0 then return end
-		self.Text = self.Text:sub(1, self.CaretPos-1) .. self.Text:sub(self.CaretPos+1)
-		self:HandleKey("left")
-	elseif key == "space" then
-		if self.CaretPos == #self.Text then
-			self.Text = self.Text .. " "
-			self.CaretPos = self.CaretPos + 1
+		if input.IsKeyDown("lctrl") then
+			local pos = (select(2, self.Text:sub(1, self.CaretPos):find(".*[%s%p].-[^%p%s]")) or 1) - 1
+			self.Text = self.Text:sub(1, pos) .. self.Text:sub(self.CaretPos+1)
+			self:SetCaretPos(pos-1)
 		else
-			self.Text = self.Text:sub(1, self.CaretPos) .. " " .. self.Text:sub(self.CaretPos+1)
+			self.Text = self.Text:sub(1, self.CaretPos-1) .. self.Text:sub(self.CaretPos+1)
+			self:HandleKey("left")
 		end
-		--self:HandleKey("right")
+	elseif key == "space" then
+		self:InsertChar(" ")
+		self:HandleKey("right")
 	--elseif key == "tab" then
-	--	self.Text = self.Text .. "\t"
-	--	self:HandleKey("right")
+		--self:InsertChar("\t")
+		--self:HandleKey("right")
+	elseif key == "pgdn" then
+		self:InsertChar("\n")
+		self:HandleKey("right")
 	elseif key == "enter" or key == "np_enter" then
 		if self.MultiLine then
-			self:Append("\n")
+			self:InsertChar("\n")
 		else
 			self:OnEnter(self.Text)
 		end
@@ -130,11 +152,10 @@ end
 
 function PANEL:HandleChar(char)
 	local byte = char:byte()
+
 	if byte > 32 then
-		self:Append(char)
+		self:InsertChar(char)
 		self:HandleKey("right")
-	elseif byte == 8 then
-		self:HandleKey("backspace")
 	elseif byte == 32 then
 		self:HandleKey("space")
 	else
@@ -144,7 +165,7 @@ end
 
 function PANEL:OnKeyInput(key, press)
 	
-	if key == "space" or key == "backspace" then return end
+	if key == "space" then return end
 	
 	if self.suppress_key then
 		self.suppress_key = false
@@ -176,8 +197,6 @@ function PANEL:OnCharInput(char, press)
 	--end
 end
 
-local blink_rate = 0.6
-
 function PANEL:GetTextSize(from_caret)
 	return graphics.GetTextSize(self.Font, from_caret and self.Text:sub(1, self.CaretPos) or self.Text) * self.TextSize
 end
@@ -187,6 +206,10 @@ function PANEL:OnDraw()
 end
 
 function PANEL:OnThink()
+	if self.Key and not self:IsChoked() and INTERVAL(0.02) then
+		self:HandleKey(self.Key)
+	end
+
 	if self.Text ~= self.last_text then
 		self:OnTextChanged(self.Text, self.last_text)		
 		self.last_text = self.Text
@@ -198,7 +221,6 @@ function PANEL:OnEnter(str)
 end
 
 function PANEL:OnUnhandledKey(key)
-	
 end
 
 function PANEL:OnTextChanged()

@@ -47,6 +47,10 @@ public:
 	{
 		handle = _handle;
 	}
+	Channel()
+	{
+
+	}
 };
 
 class Cairo
@@ -107,6 +111,7 @@ public:
 	MMYY_WRAP_CLASS(IParticleEmitter, ParticleEmitter, particle_emitter)
 	MMYY_WRAP_CLASS(Cairo, Cairo, cairo)
 	MMYY_WRAP_CLASS(Channel, Channel, channel)
+	MMYY_WRAP_CLASS(ILightSource, LightSource, lightsource)
 
 
 	MMYY_WRAP_CLASS(Awesomium::WebView, WebView, webview)

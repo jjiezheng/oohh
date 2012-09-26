@@ -5,7 +5,7 @@
 
 LUALIB_FUNCTION(bass, Open)
 {        
-    if (!BASS_Init(-1, 44100, BASS_DEVICE_3D, (HWND)gEnv->pRenderer->GetHWND(), NULL))
+	if (!BASS_Init(-1, 44100, my->ToNumber(1, BASS_DEVICE_DEFAULT | BASS_DEVICE_3D), (HWND)gEnv->pRenderer->GetHWND(), NULL))
     {
 		int error = BASS_ErrorGetCode();
 
@@ -33,22 +33,65 @@ LUALIB_FUNCTION(bass, Status)
 	return 1;
 }
 
-LUALIB_FUNCTION(bass, CreateChannelFromFile)
+#define BASS_MUSIC 1
+#define BASS_FILE 2
+#define BASS_URL 3
+
+class StreamThread : public CryThread<>
 {
-	auto self = new Channel(BASS_StreamCreateFile(false, my->ToString(1), my->ToNumber(2, 0), 0, my->ToNumber(3, BASS_SAMPLE_3D)));
-	
+public:
+	Channel *m_channel;
+	char * m_url;
+	double m_offset;
+	double m_flags;
+
+	StreamThread(Channel *channel, const char *url, double offset, double flags)
+	{
+		m_channel = channel;
+		m_url = (char *)url;
+		m_offset = offset;
+		m_flags = flags;
+	}
+
+	void Run()
+	{
+		if (my)
+		{
+			m_channel->handle = BASS_StreamCreateURL(m_url, m_offset, m_flags, NULL, 0);
+			my->CallEntityHook(m_channel, "OnStreamLoaded");
+		}
+	}
+};
+
+LUALIB_FUNCTION(_G, Channel)
+{
+	auto type = my->ToNumber(1);
+	Channel *self = nullptr;
+
+	if (type == BASS_FILE)
+	{
+		self = new Channel(BASS_StreamCreateFile(false, my->ToString(2), my->ToNumber(3, 0), 0, my->ToNumber(4, BASS_SAMPLE_3D)));
+	}
+	else if (type == BASS_MUSIC)
+	{
+		self = new Channel(BASS_MusicLoad(false, my->ToString(2), my->ToNumber(3, 0), 0, my->ToNumber(4, BASS_MUSIC_FLOAT | BASS_MUSIC_PRESCAN), my->ToNumber(5, 0)));
+	}
+	else if (type == BASS_URL)
+	{
+		auto url = my->ToString(2);
+		auto offset =  my->ToNumber(3, 0);
+		auto flags = my->ToNumber(4, BASS_SAMPLE_3D);
+
+		self = new Channel(0);
+
+		auto thread = new StreamThread(self, url, offset, flags);
+		//thread->Start(); // crashing..
+		thread->Run();
+	}
+
 	my->Push(self);
 
     return 1;
-}
-
-LUALIB_FUNCTION(bass, CreateChannelFromURL)
-{
-	auto self = new Channel(BASS_StreamCreateURL(my->ToString(1), my->ToNumber(2, 0), my->ToNumber(3, BASS_SAMPLE_3D), NULL, 0));
-   
-	my->Push(self);
-
-	return 1;
 }
 
 LUALIB_FUNCTION(bass, SetPosition)
@@ -166,11 +209,25 @@ LUAMTA_FUNCTION(channel, GetFFT)
     return 1;
 }
 
-LUAMTA_FUNCTION(channel, GetRawTag)
+LUAMTA_FUNCTION(channel, GetTags)
 {
 	auto self = my->ToChannel(1);
+	auto tags = BASS_ChannelGetTags((DWORD)self->handle, my->ToNumber(2));
+	
+	if (tags)
+	{
+		my->NewTable();
+		int i = 1;
 
-	my->Push(BASS_ChannelGetTags((DWORD)self->handle, my->ToNumber(2)));
+		while(*tags)
+		{
+			lua_pushstring(L, tags);
+			lua_rawseti(L, -2, i);
+
+			tags += strlen(tags) + 1;
+			i++;
+		}
+	}
 
     return 1;
 }

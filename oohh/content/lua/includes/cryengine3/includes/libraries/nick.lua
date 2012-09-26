@@ -1,7 +1,7 @@
 local META = util.FindMetaTable("player")
 
 function META:GetNickname()
-	return self.nv and self.nv.nick or "dongbag"
+	return self.nv and self.nv.nick or self:GetName()
 end
 
 function META:SetNickname(str)
@@ -9,16 +9,19 @@ function META:SetNickname(str)
 end
 
 console.AddCommand("setnick", function(ply, nick)
-	console.SetVariable("nick", nick or os.getenv("USERNAME"))
 	if SERVER then
 		ply.nv.nick = nick
 	end
 end, true)
 
-console.CreateVariable("nick", os.getenv("USERNAME") or "dongbag")
+console.CreateVariable("nick", os.getenv("USERNAME") or "dongbag", function(val)
+	console.RunCommand("setnick", val)
+end)
 
-hook.Add("LocalPlayerEntered", "nick", function()
-	console.RunCommand("setnick", console.GetVariable("nick"))
+hook.Add("GameInitialized", "nick", function()
+	if CLIENT then
+		console.RunCommand("setnick", console.GetVariable("nick"))
+	end
 	
 	if SERVER then
 		entities.GetLocalPlayer().nv.nick = "server"

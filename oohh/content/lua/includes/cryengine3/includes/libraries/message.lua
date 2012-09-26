@@ -65,7 +65,7 @@ if CLIENT then
 	function message.SendToServer(id, ...)
 		local str = encode(id, ...)
 
-		message.RawSendToServer(str)
+		message.RawSendToServer(str, message.UDP)
 	end
 	
 	message.Send = message.SendToServer
@@ -86,16 +86,20 @@ if SERVER then
 		local str = encode(id, ...)
 
 		if typex(ply) == "player" then
-			message.RawSendToClient(ply, str)
+			message.RawSendToClient(ply, str, message.UDP)
 		elseif typex(ply) == "netmsg_player_filter" then
 			for _, ply in pairs(ply:GetPlayers()) do
 				message.RawSendToClient(ply, str)
 			end
 		else
 			for key, ply in pairs(entities.GetAllPlayers()) do
-				message.RawSendToClient(ply, str)
+				message.RawSendToClient(ply, str, message.UDP)
 			end
 		end
+	end
+	
+	function message.SendToAll(id, ...)
+		return message.SendToClient(id, nil, ...)
 	end
 
 	message.Send = message.SendToClient

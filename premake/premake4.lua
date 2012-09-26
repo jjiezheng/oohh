@@ -99,6 +99,7 @@ if _ACTION == "link" then
 
 	link_dir("Game/Levels/oh_island", "oohh/content/Game/Levels/oh_island")
 	link_dir("Game/Levels/oh_grass", "oohh/content/Game/Levels/oh_grass")
+	link_dir("Game/Levels/oh_construct", "oohh/content/Game/Levels/oh_construct")
 	
 	-- lua dependencies
 	copy("mmyy/lib/lua51.dll", "bin32")

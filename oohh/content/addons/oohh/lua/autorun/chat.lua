@@ -18,18 +18,24 @@ if CLIENT then
 				panel:SetSize(Vec2(512, 16))
 				panel:MakeActivePanel()
 				
-				panel.OnUnhandledKey = function(_, key)
-					if key == "tab" then 
-						if input.IsKeyDown("up") then
-							i = math.clamp(i + 1, 1, #history)
-						elseif input.IsKeyDown("down") then
-							i = math.clamp(i - 1, 1, #history)
-						end
-						
-						if history[i] then
-							panel:SetText(history[i])
-							panel:SetCaretPos(#history[i])
-						end
+				panel.OnUnhandledKey = function(_, key)	
+					local browse = false
+					
+					if key == "up" then
+						i = math.clamp(i + 1, 1, #history)
+						browse = true
+					elseif key == "down" then
+						i = math.clamp(i - 1, 1, #history)
+						browse = true
+					end
+					
+					if browse and history[i] then
+						panel:SetText(history[i])
+						panel:SetCaretPos(#history[i])
+					end
+					
+					if key == "esc" then
+						panel:OnEnter("")
 					end
 				end
 				
@@ -68,11 +74,13 @@ console.AddCommand("say_safe", function(ply, line)
 end, true)
 
 console.AddCommand("say", function(ply, line)
+	printf("%s : %s", ply:GetNickname(), str)
 	hook.CallOnShared("PlayerSay", nil, ply, line)
 end, true)
 
 if SERVER then
 	function Say(str)
 		hook.CallOnShared("PlayerSay", nil, entities.GetLocalPlayer(), str)
+		
 	end
 end

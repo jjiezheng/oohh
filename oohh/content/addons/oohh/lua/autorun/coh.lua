@@ -24,12 +24,12 @@ if CLIENT then
 		ply:SetChatAboveHead(str)
 	end)
 	 
-	function DrawChatAboveHead(pos, str) 
+	function DrawChatAboveHead(pos, str, alpha) 
 		if str ~= "" then
 			local size = graphics.GetTextSize(FONT, str) * SIZE
 			pos = pos - size / 2
-			graphics.DrawRect(Rect(pos.x, pos.y, size.w, size.h):Expand(6), Color(1, 1, 1, 1), 2, 1, Color(0,0,0,1))
-			graphics.DrawText(str, pos, FONT, Vec2()+SIZE, Color(0, 0, 0, 1))
+			graphics.DrawRect(Rect(pos.x, pos.y, size.w, size.h):Expand(6), Color(1, 1, 1, alpha or 1), 2, 1, Color(0, 0, 0, alpha or 1))
+			graphics.DrawText(str, pos, FONT, Vec2()+SIZE, Color(0, 0, 0, alpha or 1))
 		end
 	end
 end

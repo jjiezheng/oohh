@@ -102,3 +102,5 @@ console.AddCommand("spawn_prop", function(ply, line)
 	phys:Wake()
 end, "server")
 --end
+
+util.MonitorFileInclude()
