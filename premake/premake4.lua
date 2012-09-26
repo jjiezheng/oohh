@@ -112,8 +112,10 @@ if _ACTION == "link" then
 	copy("oohh/content/bin32/msvcr110.dll", "bin32")
 	copy("oohh/content/bin32/msvcp110.dll", "bin32")
 	
-	-- not really used
+	-- auto login
 	copy("oohh/content/tools/CryDevLogin.exe", "Tools")
+	copy("oohh/content/bin32/msvcr110.dll", "Tools")
+	copy("oohh/content/bin32/msvcp110.dll", "Tools")
 	
 	include_external("awesomium")
 	include_external("cairo")
