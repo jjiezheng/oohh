@@ -18,7 +18,6 @@ goto again
 
 :link
 	cd %~dp0premake
-	premake4 link
 
 	set /P ANSWER=Do you want to generate the project files to "%CRYENGINETHREEFOLDER%\oohh_project_files\*" (Y/N)?
 	echo You chose: %ANSWER%
@@ -35,8 +34,6 @@ goto again
 	premake4 vs2005
 	premake4 vs2008
 	premake4 vs2010
-	premake4 xcode3
-	premake4 xcode4
 :end
 
 %SystemRoot%\explorer.exe "%CRYENGINETHREEFOLDER%\oohh_project_files\"
