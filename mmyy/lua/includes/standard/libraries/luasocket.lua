@@ -258,7 +258,10 @@ do -- tcp socket meta
 					end
 				end
 
-				local data, err, partial = sock:receive("*line")
+				local data, err, partial = sock:receive("*l")
+				if not data and partial ~= "" then
+					data = partial
+				end
 
 				--self:DebugPrintf("receive: %s, %s, %s, %i", data or "", err or "", partial or "", self.Timeouts)
 				
