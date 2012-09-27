@@ -30,3 +30,28 @@ function META:Clear(color)
 	
 	self:SetPixelTable(img)
 end
+
+textures = textures or {}
+
+local cache = {}
+
+function textures.FindByName(name)
+	local out = {}
+	
+	for i = 1, 10000 do
+		local tex = Texture(i)
+		if tex:IsValid() then
+			local name = tex:GetName()
+			if name ~= "EngineAssets/TextureMsg/ReplaceMe.tif" and name:find(name, nil, true) then
+				table.insert(out, tex)
+			end
+		else
+			print(i)
+			break
+		end
+	end
+		
+	return out
+end
+
+util.MonitorFileInclude()

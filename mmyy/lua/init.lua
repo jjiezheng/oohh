@@ -3,7 +3,7 @@ local status, err = pcall(function()
 Msg = Msg or print
 MsgN = MsgN or print
 
-_G[os.getenv("USERNAME"):upper()] = true
+_G[tostring(os.getenv("USERNAME")):upper():gsub(" ", "_"):gsub("%p", "")] = true
 
 MsgN("")
 MsgN("=========================================")

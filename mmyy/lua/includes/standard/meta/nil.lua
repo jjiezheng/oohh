@@ -34,28 +34,3 @@ function MakeNULL(var)
 end
 
 _G.NULL = GetNULL()
-
-do return end
-
--- ugh hacks 
-local function safecall_ify(meta_name, func_name)
-	local meta = _R[meta_name]
-
-	local old = meta[func_name]
-	meta[func_name] = function(s, ...)
-		if getmetatable(_R.ptrtbl[meta.GetUniqueID(s)]) == NULL then
-			return GetNULL()
-		end
-		return old(s, ...)
-	end
-end
-
-safecall_ify("actor", "GetEntity")
-safecall_ify("player", "GetEntity")
-safecall_ify("weapon", "GetEntity")
-safecall_ify("physics", "GetEntity")
-
-safecall_ify("actor", "__tostring")
-safecall_ify("entity", "__tostring")
-safecall_ify("physics", "__tostring")
-safecall_ify("weapon", "__tostring")

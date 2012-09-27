@@ -5,6 +5,7 @@ if CLIENT then
 	local panel
 	
 	function Say(str)
+		str = tostring(str)
 		console.RunCommand("say_safe", base64.encode(str))
 	end
 
@@ -81,6 +82,5 @@ end, true)
 if SERVER then
 	function Say(str)
 		hook.CallOnShared("PlayerSay", nil, entities.GetLocalPlayer(), str)
-		
 	end
 end

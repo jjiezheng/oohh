@@ -1,5 +1,7 @@
 --console.RunString("sys_flash 0")
 
+if JON then return end -- The thug life didn't choose me
+
 input.Bind("escape", "o toggle_menu")
 
 console.AddCommand("toggle_menu", function()

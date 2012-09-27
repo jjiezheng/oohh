@@ -4,6 +4,27 @@ local META = {}
 
 META.ClassName = "Color"
 
+function META.Constructor(r,g,b,a)
+	if type(r) == "string" then
+		r,g,b = r:match("#?(..)(..)(..)")
+		r = tonumber("0x" .. r)
+		g = tonumber("0x" .. g)
+		b = tonumber("0x" .. b)
+	end
+
+	r = r or 0
+	g = g or 0
+	b = b or 0
+	a = a or 1
+	
+	if r > 1 then r = r / 255 end
+	if g > 1 then g = g / 255 end
+	if b > 1 then b = b / 255 end
+	if a > 1 then a = a / 255 end
+
+	return r,g,b,a
+end
+
 META.NumberType = "float"
 META.Args = {"r", "g", "b", "a"}
 META.ProtectedFields = {a = true}

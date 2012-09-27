@@ -1,22 +1,14 @@
 util.MonitorFileInclude()
 
-local tex
-for i = 0, 10000 do 
-	tex = Texture(i) 
-	if tex:IsValid() and tex:GetName():lower():find("beach") then  
-		print("noising " .. tex:GetName()) 
-		local img = tex:GetPixelTable(true)
-		for i = 0, tex:GetLength() do
-			img[i].r = math.random(255)
-			img[i].g = math.random(255)
-			img[i].b = math.random(255)
-			img[i].a = math.random(255)
-		end
-		tex:SetPixelTable(img)	
-	end 
+local tex = FindTexture("beach")
+local img = tex:GetPixelTable(true)
+for i = 0, tex:GetLength() do
+	img[i].r = i%255
+	img[i].g = math.sin(i/10000)*1000%255
+	img[i].b = math.cos(i*255)%255
+	img[i].a = 255
 end
-
-	
+tex:SetPixelTable(img)	
 
 do return end
 

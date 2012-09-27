@@ -1,5 +1,16 @@
 entities = entities or {}
 
+function Entity(var, ...)
+
+	if tonumber(var) then
+		return entities.GetById(tonumber(var))
+	elseif type(var) == "string" then
+		entities.Create(var, ...)
+	end
+	
+	return NULL
+end
+
 function entities.GetAllPlayers()
 	return entities.FindByClass("Player", true)
 end

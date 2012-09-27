@@ -8,7 +8,7 @@ local function find(tbl, name, pattern)
 			done[val] = true
 			find(val, name .. "." .. key, pattern)
 		else
-			if (T == "function" or T == "number") and key:Compare(pattern) or key:find(pattern) then
+			if (T == "function" or T == "number") and (key:Compare(pattern) or key:find(pattern) or name:Compare(pattern) or name:find(pattern)) then
 				if T == "function" then
 					val = "args(" .. table.concat(debug.getparams(val), ", ") .. ")"
 					if val == "args()" then
@@ -24,11 +24,13 @@ local function find(tbl, name, pattern)
 end
 
 console.AddCommand("lua_find", function(ply, line, pattern, server)
-	done = 
-	{
-		[_G] = true,
-		[_R] = true,
-		[package] = true,
-	}
-	find(_G, "_G", pattern)
+	if CLIENT or SERVER and server then
+		done = 
+		{
+			[_G] = true,
+			[_R] = true,
+			[package] = true,
+		}
+		find(_G, "_G", pattern)
+	end
 end, "shared")
