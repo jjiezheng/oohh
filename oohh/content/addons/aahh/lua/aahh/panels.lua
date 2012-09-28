@@ -973,8 +973,8 @@ do -- meta
 					data.current = data.current + (data.speed * delta) ^ data.exp
 					
 					if data.calc(self, data.current, data) == true then
-						self.Animations[key] = nil
 						data.calc(self, 1, data)
+						self.Animations[key] = nil
 					end
 				end
 			end

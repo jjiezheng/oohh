@@ -18,10 +18,10 @@ function menu.Render()
 	local size = graphics.GetScreenSize()
 	
 	if not entities.GetLocalPlayer():IsValid() then
-		graphics.DrawFilledRect( Rect( 0, 0, size ), Color( 0.5, 0.5, 0.5, 1 ) )
+		graphics.DrawFilledRect( Rect( 0, 0, size.w, size.h ), Color( 0.5, 0.5, 0.5, 1 ) )
 	end
 	
-	graphics.DrawFilledRect( Rect( 0, 0, size ), Color( 0, 0, 0, 0.3 ) )
+	graphics.DrawFilledRect( Rect( 0, 0, size.w, size.h ), Color( 0, 0, 0, 0.3 ) )
 	graphics.DrawFilledRect( Rect( 0, size.h - 60, size.w, 60 ), Color( 0, 0, 0, 0.2 ) )
 	
 	for i = 0, 499 do
@@ -45,10 +45,11 @@ end
 
 local butquit = aahh.Create( "button" )
 butquit.OnDraw = function( self, size )
-	graphics.DrawFilledRect( Rect( 0, 0, size ), Color( 0, 0, 0, 0.5 ) )
+	local size = self:GetSize()
+	graphics.DrawFilledRect( Rect( 0, 0, size.w, size.h ), Color( 0, 0, 0, 0.5 ) )
 	graphics.DrawText( "QUIT", Vec2( 55, 24 ), "trebuc.ttf", 10, Color( 1, 1, 1, 1 ), Vec2( 0, -0.5 ) )
-	graphics.DrawOutlinedRect( Rect( 0, 0, size ), 2, Color( 1, 1, 1, 0.1 ) )
-	graphics.DrawOutlinedRect( Rect( 0, 0, size ), 1, Color( 0, 0, 0, 1 ) )
+	graphics.DrawOutlinedRect( Rect( 0, 0, size.w, size.h ), 2, Color( 1, 1, 1, 0.1 ) )
+	graphics.DrawOutlinedRect( Rect( 0, 0, size.w, size.h ), 1, Color( 0, 0, 0, 1 ) )
 end
 butquit.OnMouseEntered = function(self)
 	self:MoveTo( graphics.GetScreenSize() - Vec2( 150, 50 ) - 5, 1, 0, 1 )
@@ -67,10 +68,11 @@ menu.contents.quit = butquit
 
 local butset = aahh.Create( "button" )
 butset.OnDraw = function( self, size )
-	graphics.DrawFilledRect( Rect( 0, 0, size ), Color( 0, 0, 0, 0.5 ) )
+	local size = self:GetSize()
+	graphics.DrawFilledRect( Rect( 0, 0, size.w, size.h ), Color( 0, 0, 0, 0.5 ) )
 	graphics.DrawText( "SETTINGS", Vec2( 55, 24 ), "trebuc.ttf", 10, Color( 1, 1, 1, 1 ), Vec2( 0, -0.5 ) )
-	graphics.DrawOutlinedRect( Rect( 0, 0, size ), 2, Color( 1, 1, 1, 0.1 ) )
-	graphics.DrawOutlinedRect( Rect( 0, 0, size ), 1, Color( 0, 0, 0, 1 ) )
+	graphics.DrawOutlinedRect( Rect( 0, 0, size.w, size.h ), 2, Color( 1, 1, 1, 0.1 ) )
+	graphics.DrawOutlinedRect( Rect( 0, 0, size.w, size.h ), 1, Color( 0, 0, 0, 1 ) )
 end
 butset.OnMouseEntered = function(self)
 	self:MoveTo( graphics.GetScreenSize() - Vec2( 205, 50 ) - 5, 1, 0, 1 )
@@ -86,10 +88,11 @@ menu.contents.settings = butset
 
 local butdc = aahh.Create( "button" )
 butdc.OnDraw = function( self, size )
-	graphics.DrawFilledRect( Rect( 0, 0, size ), Color( 0, 0, 0, 0.5 ) )
+	local size = self:GetSize()
+	graphics.DrawFilledRect( Rect( 0, 0, size.w, size.h ), Color( 0, 0, 0, 0.5 ) )
 	graphics.DrawText( "DISCONNECT", Vec2( 55, 24 ), "trebuc.ttf", 10, Color( 1, 1, 1, 1 ), Vec2( 0, -0.5 ) )
-	graphics.DrawOutlinedRect( Rect( 0, 0, size ), 2, Color( 1, 1, 1, 0.1 ) )
-	graphics.DrawOutlinedRect( Rect( 0, 0, size ), 1, Color( 0, 0, 0, 1 ) )
+	graphics.DrawOutlinedRect( Rect( 0, 0, size.w, size.h ), 2, Color( 1, 1, 1, 0.1 ) )
+	graphics.DrawOutlinedRect( Rect( 0, 0, size.w, size.h ), 1, Color( 0, 0, 0, 1 ) )
 end
 butdc.OnMouseEntered = function(self)
 	self:SizeTo( Vec2( 150, 50 ), 1, 0, 1 )
