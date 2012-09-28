@@ -20,12 +20,20 @@ local draw_textured_rect = function(x,y,w,h, ...)
 	y = y-0.1
 	w = w-0.1
 	h = h-0.1]]
+	
+	if false and CAPSADMIN and not input.IsKeyDown("space") then
+		local sw, sh = render.GetScreenSize()
+		
+		w = sw
+		h = sh
+	end
+	
 	surface.DrawTexturedRect(x,y,w,h, ...)
 end
 
 local fonts = {}
 local size = 512
-local font_flags = {size, size, 0x20000000}
+local font_flags = {size, size, 0x00020000}
 
 TEXT_ALIGN_CENTER = Vec2(0.5,0.5)
 
@@ -56,7 +64,7 @@ local function DrawText(text, pos, font, size, color, align_normal)
 	pos.y = pos.y - h*size.h*0.25
 	
 	pos = pos + (align_normal * scale)
-			
+	
 	surface.DrawText(text, pos.x, pos.y, size / Vec2(render.GetScreenScale()) * 1.75, nil, nil, 2)
 	
 	return pos
@@ -267,6 +275,22 @@ function graphics.DrawTexture(tex, rect, color, uv, nofilter)
 	
 	surface.SetColor(color or Color(1,1,1,1))
 	surface.SetTexture(tex)
+	
+		
+	if false and CAPSADMIN and not input.IsKeyDown("space") then
+		local w,h = render.GetScreenSize()
+		surface.DrawTexturedRectEx(
+			rect.x,
+			rect.y,
+			w,
+			h,
+
+			nofilter,
+
+			unpack(uv)
+		)
+		return
+	end
 	
 	surface.DrawTexturedRectEx(
 		rect.x,

@@ -14,6 +14,15 @@ function META.Constructor(a,b,c,d)
 		return a.x, a.y, b.w, b.h
 	end
 	
+	if type(a) == "number" and type(b) == "number" and typex(c) == "vec2" then
+		return a, b, c.w, c.h
+	end
+	
+	if type(b) == "number" and type(c) == "number" and typex(a) == "vec2" then
+		return a.x, a.y, b, c
+	end
+	
+	
 	return a or 0, b or 0, c or 0, d or 0
 end
 

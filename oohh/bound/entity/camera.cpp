@@ -24,11 +24,39 @@ LUALIB_FUNCTION(engine3d, GetCurrentCamera)
 	return 1;
 }
 
+LUALIB_FUNCTION(render, GetCamera)
+{
+	auto cam = gEnv->pRenderer->GetCamera();
+
+	my->Push(cam);
+
+	return 1;
+}
+
 LUALIB_FUNCTION(_G, Camera)
 {
 	auto self = CCamera();
 
 	my->Push(self);
+
+	return 1;
+}
+
+
+LUAMTA_FUNCTION(camera, SetMatrix)
+{
+	auto self = my->ToCameraPtr(1);
+
+	self->SetMatrix(my->ToMatrix34(2));
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(camera, GetMatrix)
+{
+	auto self = my->ToCameraPtr(1);
+
+	my->Push(self->GetMatrix());
 
 	return 1;
 }

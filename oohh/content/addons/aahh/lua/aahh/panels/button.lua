@@ -31,7 +31,7 @@ function PANEL:IsDown()
 end
 
 function PANEL:IsMouseOver()
-	return self.MouseOver
+	return self:IsWorldPosInside(Vec2(mouse.GetPos()))
 end
 
 function PANEL:OnPress(key) end

@@ -65,43 +65,6 @@ LUALIB_FUNCTION(render, SetFog)
 	return 0;
 }
 
-LUALIB_FUNCTION(render, ScreenToWorld)
-{
-	auto spos = my->ToVec2(1);
-
-	Vec3 vPos0(0,0,0);
-	rend->UnProjectFromScreen(spos.x, spos.y, 0, &vPos0.x, &vPos0.y, &vPos0.z);
-
-	Vec3 vPos1(0,0,0);
-	rend->UnProjectFromScreen(spos.x, spos.y, 1, &vPos1.x, &vPos1.y, &vPos1.z);
-
-	my->Push((vPos1-vPos0).GetNormalized());
-	
-	return 1;
-}
-
-LUALIB_FUNCTION(render, WorldToScreen)
-{
-	auto wpos = my->ToVec3(1);
-	auto spos = Vec3(0,0,0);
-
-	if (!rend->ProjectToScreen(wpos.x, wpos.y, wpos.z, &spos.x, &spos.y, &spos.z))
-	{
-		my->Push(false);
-
-		return 1;
-	}
-
-	//scale projected values to the actual screen resolution
-	spos.x *= 0.01f * (float)gEnv->pRenderer->GetWidth();
-	spos.y *= 0.01f * (float)gEnv->pRenderer->GetHeight();;
-	
-	my->Push(Vec2(spos.x, spos.y));
-	my->Push(spos.z); // i'm guessing this is always 0?
-
-	return 2;
-}
-
 LUALIB_FUNCTION(render, CreateRenderTarget)
 {
 	my->Push(rend->EF_GetTextureByID(rend->CreateRenderTarget(my->ToNumber(1), my->ToNumber(2), my->ToEnum<ETEX_Format>(3, eTF_A8R8G8B8))));
@@ -123,13 +86,6 @@ LUALIB_FUNCTION(render, SetTexture)
 	return 0;
 }
 
-LUALIB_FUNCTION(render, DrawQuad)
-{
-	rend->DrawQuad(my->ToVec3(2), my->ToVec3(3), my->ToVec3(1), my->ToNumber(4, 0));
-
-	return 0;
-}
-
 LUALIB_FUNCTION(render, SetRenderTarget)
 {
 	my->Push(rend->SetRenderTarget(my->IsNoneOrNil(1) ? 0 : my->ToTexture(1)->GetTextureID(), my->ToNumber(2, 0)));
@@ -140,6 +96,48 @@ LUALIB_FUNCTION(render, SetRenderTarget)
 LUALIB_FUNCTION(render, Set2DMode)
 {
 	rend->Set2DMode(my->ToBoolean(1), my->ToNumber(2), my->ToNumber(3), my->ToNumber(4, -1e10f), my->ToNumber(5, 1e10f));
+
+	return 0;
+}
+
+LUALIB_FUNCTION(render, SetCullMode)
+{
+	rend->SetCullMode(my->ToNumber(1, 2));
+
+	return 0;
+}
+
+LUALIB_FUNCTION(render, GetCurrentNumberOfDrawCalls)
+{
+	my->Push(rend->GetCurrentNumberOfDrawCalls());
+
+	return 1;
+}
+
+LUALIB_FUNCTION(render, SetRenderTile)
+{
+	rend->SetRenderTile(my->ToNumber(1, 0), my->ToNumber(2, 0), my->ToNumber(3, 0),my->ToNumber(4, 0));
+
+	return 0;
+}
+
+LUALIB_FUNCTION(render, GetViewport)
+{
+	int x,y,w,h = 0;
+
+	rend->GetViewport(&x, &y, &w, &h);
+
+	my->Push(x);
+	my->Push(y);
+	my->Push(w);
+	my->Push(h);
+
+	return 4;
+}
+
+LUALIB_FUNCTION(render, SetViewport)
+{
+	rend->SetViewport(my->ToNumber(1, 0), my->ToNumber(2, 0), my->ToNumber(3, 0),my->ToNumber(4, 0));
 
 	return 0;
 }
@@ -164,3 +162,76 @@ LUALIB_FUNCTION(render, Clear)
 
 	return 0;
 }
+
+LUALIB_FUNCTION(render, MakeMatrix)
+{
+	rend->MakeMatrix(my->ToVec3(1), my->ToVec3(2), my->ToVec3(3), my->ToMatrix34Ptr(4));
+
+	return 0;
+}
+
+LUALIB_FUNCTION(render, PushMatrix)
+{
+	rend->PushMatrix();
+
+	return 0;
+}
+
+LUALIB_FUNCTION(render, PopMatrix)
+{
+	rend->PopMatrix();
+
+	return 0;
+}
+
+LUALIB_FUNCTION(render, SetCamera)
+{
+	rend->SetCamera(my->ToCamera(1));
+
+	return 0;
+}
+
+#ifdef CE3
+//gEnv->pRenderer->DrawImageWithUV
+LUALIB_FUNCTION(render, DrawImage)
+{
+	auto pos = my->ToVec3(1);
+	auto w = my->ToNumber(2);
+	auto h = my->ToNumber(3);
+	auto tex = my->ToTexture(4);
+	auto c = my->ToColor(5);
+	auto filter = my->ToBoolean(6);
+
+	static float* s = new float[4];
+	static float* t = new float[4];
+
+	s[0] = 0; t[0] = 0;
+	s[1] = 1; t[1] = 0;
+
+	s[2] = 1; t[2] = 1;
+	s[3] = 1; t[3] = 1;
+
+	gEnv->pRenderer->DrawImageWithUV(
+		pos.x,
+		pos.y,
+		pos.z,
+
+		w,
+		h,
+
+		tex->GetTextureID(),
+
+		s,
+		t,
+
+		c.r,
+		c.g,
+		c.b,
+		c.a,
+
+		filter
+	);
+
+	return 0;
+}
+#endif

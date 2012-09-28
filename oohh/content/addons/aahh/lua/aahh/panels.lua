@@ -557,8 +557,6 @@ do -- meta
 		end
 	end
 
-
-
 	do -- dock
 		
 		-- wrapped
@@ -897,10 +895,11 @@ do -- meta
 	function PANEL:Draw()		
 		if self:IsVisible() and self:VisibleInsideParent() then
 			self:Think()
+			self:Animate()
 
 			aahh.StartDraw(self)
-				self:SafeCall("OnDraw")
-				self:SafeCall("OnPostDraw")
+				self:SafeCall("OnDraw", self:GetSize())
+				self:SafeCall("OnPostDraw", self:GetSize())
 			aahh.EndDraw()
 
 			if not self.HideChildren then
@@ -937,6 +936,11 @@ do -- meta
 					-- Make a call
 					self:SafeCall("OnMouseMove", localpos, true)
 					
+					if not self.mouse_entered then
+						self:SafeCall("OnMouseEntered", localpos)
+						self.mouse_entered = true
+					end
+					
 					if self:GetCursor() ~= 1 then
 						aahh.HoveringPanel = self
 					end
@@ -944,12 +948,93 @@ do -- meta
 					if aahh.HoveringPanel == self then
 						aahh.HoveringPanel = NULL
 					end
+					
 					self:SafeCall("OnMouseMove", localpos, false)
+					
+					if self.mouse_entered then
+						self:SafeCall("OnMouseLeft", localpos)
+						self.mouse_entered = false
+					end
 				end
 			end
 		--end
 				
 		self:SafeCall("OnThink")
+	end
+	
+	do -- animation
+		function PANEL:Animate()
+			if not self.Animations then return end
+			
+			local delta = math.min(FrameTime(), 1)
+			local data = self.Animations
+			for key, data in pairs(self.Animations) do
+				if data and data.begin < os.clock() then
+					data.current = data.current + (data.speed * delta) ^ data.exp
+					
+					if data.calc(self, data.current, data) == true then
+						self.Animations[key] = nil
+						data.calc(self, 1, data)
+					end
+				end
+			end
+		end
+		
+		local function ADD_ANIM(name, original, callback)
+			PANEL[name] = function(self, target, speed, delay, exp)
+				speed = speed or 0.25
+				delay = delay or 0
+				exp = exp or 1
+				
+				self.Animations = self.Animations or {}
+				self.Animations[name] = 
+				{
+					begin = os.clock() + delay,
+					current = 0,
+					original = original(self),
+					calc = callback,
+					
+					target = target, 
+					speed = speed, 
+					delay = delay, 
+					exp = exp
+				}
+			end
+		end
+		 
+		ADD_ANIM(
+			"MoveTo",
+			function(self) 
+				return self:GetPos() 
+			end, 
+			function(self, lerp, data) 
+				self:SetPos(data.original:Lerp(lerp, data.target))
+				return lerp > 1
+			end
+		)
+		ADD_ANIM(
+			"SizeTo",
+			function(self) 
+				return self:GetSize() 
+			end, 
+			function(self, lerp, data) 
+				self:SetSize(data.original:Lerp(lerp, data.target)) 
+				return lerp > 1
+			end
+		)
+		
+		function PANEL:RectTo(rect, ...)
+			self:MoveTo(Vec2(rect.x, rect.y), ...)
+			self:SizeTo(Vec2(rect.w, rect.h), ...)
+		end
+		
+		function PANEL:ExpandLocallyTo(rect, ...)
+			local pos = Vec2(rect.x, rect.y)
+			local siz = Vec2(rect.w, rect.h)
+			
+			self:MoveTo(self:GetPos() + pos, ...)
+			self:SizeTo(self:GetSize() + siz * 2, ...)
+		end
 	end
 	
 	function PANEL:IsValid()
@@ -996,7 +1081,7 @@ do -- meta
 			return
 		end
 	
-		self:SafeCall("OnRequestLayout")
+		self:SafeCall("OnRequestLayout", self:GetSize())
 		self:DockLayout()
 		self:CalcTrap()
 		
@@ -1030,8 +1115,8 @@ do -- meta
 	function PANEL:OnKeyInput(key, press) end
 	function PANEL:OnCharInput(key, press) end
 	function PANEL:OnMouseInput(key, press, pos) end
-	function PANEL:OnMouseEntered(pos) end -- Not Implemented
-	function PANEL:OnMouseLeft(pos) end -- Not Implemented
+	function PANEL:OnMouseEntered(pos) end
+	function PANEL:OnMouseLeft(pos) end
 	function PANEL:OnThink() end
 	function PANEL:OnDraw() end
 	function PANEL:OnPostDraw() end

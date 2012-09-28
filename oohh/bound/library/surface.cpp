@@ -18,6 +18,7 @@ static auto pos_offset = Vec2(0,0);
 static auto bind_texture = 0;
 static auto white = 0;
 static auto clip_rect = RectI(0,0,0,0);
+static auto should_scale = true;
 
 void oohh::SetSurfaceClipRect(int x, int y, int w, int h)
 {
@@ -132,6 +133,13 @@ LUALIB_FUNCTION(surface, GetTranslation)
 	return 2;
 }
 
+LUALIB_FUNCTION(surface, ShouldScale)
+{
+	should_scale = my->ToBoolean(1);
+
+	return 0;
+}
+
 LUALIB_FUNCTION(surface, StartClip)
 {
 	auto x = my->ToNumber(1) + pos_offset.x;
@@ -215,12 +223,15 @@ LUALIB_FUNCTION(surface, DrawFilledRect)
 	auto c2 = my->IsColor(6) ? my->ToColor(6).pack_argb8888() : cb;
 	auto c3 = my->IsColor(7) ? my->ToColor(7).pack_argb8888() : cb;
 	auto c4 = my->IsColor(8) ? my->ToColor(8).pack_argb8888() : cb;
+	
+	if (should_scale)
+	{
+		x /= render->ScaleCoordX(1);
+		y /= render->ScaleCoordY(1);
 
-	x /= render->ScaleCoordX(1);
-	y /= render->ScaleCoordY(1);
-
-	w /= render->ScaleCoordX(1);
-	h /= render->ScaleCoordY(1);
+		w /= render->ScaleCoordX(1);
+		h /= render->ScaleCoordY(1);
+	}
 
 	uidraw->DrawQuad(
 		x, y,
@@ -267,11 +278,14 @@ LUALIB_FUNCTION(surface, DrawTexturedRect)
 	float xbr = my->ToNumber(15, 1);
 	float ybr = my->ToNumber(16, 1);
 
-	x /= render->ScaleCoordX(1);
-	y /= render->ScaleCoordY(1);
+	if (should_scale)
+	{
+		x /= render->ScaleCoordX(1);
+		y /= render->ScaleCoordY(1);
 
-	w /= render->ScaleCoordX(1);
-	h /= render->ScaleCoordY(1);
+		w /= render->ScaleCoordX(1);
+		h /= render->ScaleCoordY(1);
+	}
 
 	uidraw->DrawQuad(
 		x, y,
@@ -427,9 +441,12 @@ LUALIB_FUNCTION(surface, DrawText)
 
 	if (method == 0)
 	{
-		x /= render->ScaleCoordX(1);
-		y /= render->ScaleCoordY(1);
-
+		if (should_scale)
+		{
+			x /= render->ScaleCoordX(1);
+			y /= render->ScaleCoordY(1);
+		}
+		
 		x *= (render->ScaleCoordX(1)/render->ScaleCoordY(1));
 
 		uidraw->DrawTextA(
@@ -462,14 +479,17 @@ LUALIB_FUNCTION(surface, DrawText)
 	}
 	else if (method == 2)
 	{
-		x /= render->ScaleCoordX(1);
-		y /= render->ScaleCoordY(1);
+		if (should_scale)
+		{
+			x /= render->ScaleCoordX(1);
+			y /= render->ScaleCoordY(1);
+		}
 
 		bind_font->DrawString(
 			x,
 			y,
 			str,
-			true,
+			false,
 			GetFontParams(size.x, size.y)
 		);
 	}

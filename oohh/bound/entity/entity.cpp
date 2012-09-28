@@ -837,7 +837,7 @@ LUAMTA_FUNCTION(entity, NetBind)
 	return 0;
 }
 
-LUAMTA_FUNCTION(entity, NetPuse)
+LUAMTA_FUNCTION(entity, NetPulse)
 {
 	auto self = my->ToEntity(1);
 

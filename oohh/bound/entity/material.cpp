@@ -2,33 +2,32 @@
 
 #include "oohh.hpp"
 
+LUALIB_FUNCTION(_G, Material)
+{
+	auto self = gEnv->p3DEngine->GetMaterialManager()->CreateMaterial(my->ToString(1), my->ToNumber(2, 0));
+
+	my->Push(self);
+
+	return 1;
+}
+
+
 LUAMTA_FUNCTION(entity, GetMaterial)
 {
 	auto self = my->ToEntity(1);
-	auto obj = self->GetStatObj(my->ToNumber(2, 0));
 	
-	if (obj)
-	{
-		my->Push(obj->GetMaterial());
-		return 1;
-	}
+	my->Push(self->GetMaterial());
 
-	return 0;
+	return 1;
 }
 
 LUAMTA_FUNCTION(entity, SetMaterial)
 {
 	auto self = my->ToEntity(1);
-	auto obj = self->GetStatObj(my->ToNumber(3, 0));
 
-	if (obj)
-	{
-		obj->SetMaterial(my->ToMaterial(2));
-		return 1;
-	}
+	self->SetMaterial(my->ToMaterial(2));
 
-
-	return 1;
+	return 0;
 }
 
 LUALIB_FUNCTION(materials, FindMaterial)
@@ -41,15 +40,6 @@ LUALIB_FUNCTION(materials, FindMaterial)
 }
 
 #ifdef CE3
-LUALIB_FUNCTION(materials, CopyMaterial)
-{
-	gEnv->p3DEngine->GetMaterialManager()->CopyMaterial(my->ToMaterial(1), my->ToMaterial(2), my->ToEnum<EMaterialCopyFlags>(3, MTL_COPY_DEFAULT));
-
-	return 1;
-}
-#endif
-
-#ifdef CE3
 LUALIB_FUNCTION(materials, CreateFromXML)
 {
 	auto name = my->ToString(1);
@@ -58,25 +48,28 @@ LUALIB_FUNCTION(materials, CreateFromXML)
 	auto xml = GetISystem()->LoadXmlFromBuffer(str.c_str(), str.size());
 
 	if (xml)
-		gEnv->p3DEngine->GetMaterialManager()->LoadMaterialFromXml(name, xml);
+	{
+		my->Push(gEnv->p3DEngine->GetMaterialManager()->LoadMaterialFromXml(name, xml));
+	}
+	else
+	{
+		my->Push((IMaterial *)nullptr);
+	}
 
 	return 0;
 }
 #endif
 
-LUALIB_FUNCTION(materials, GetSkymaterial)
+LUALIB_FUNCTION(materials, CreateFromFile)
 {
-	my->Push(gEnv->p3DEngine->GetSkyMaterial());
+	my->Push(gEnv->p3DEngine->GetMaterialManager()->LoadMaterial(my->ToString(1), false, false, my->ToNumber(2, 0UL)));
 
 	return 1;
 }
 
-LUALIB_FUNCTION(_G, Material)
+LUALIB_FUNCTION(materials, GetSkymaterial)
 {
-
-	auto self = gEnv->p3DEngine->GetMaterialManager()->CreateMaterial(my->ToPath(1, "materials"), my->ToNumber(2, 0));
-
-	my->Push(self);
+	my->Push(gEnv->p3DEngine->GetSkyMaterial());
 
 	return 1;
 }
@@ -92,6 +85,22 @@ LUAMTA_FUNCTION(material, __tostring)
 
 	return 1;
 }
+
+
+#ifdef CE3
+LUAMTA_FUNCTION(material, Copy)
+{
+	auto self = my->ToMaterial(1);
+
+	auto newself = gEnv->p3DEngine->GetMaterialManager()->CreateMaterial(self->GetName(), self->GetFlags());
+
+	gEnv->p3DEngine->GetMaterialManager()->CopyMaterial(self, newself, my->ToEnum<EMaterialCopyFlags>(2, MTL_COPY_DEFAULT));
+
+	my->Push(newself);
+
+	return 1;
+}
+#endif
 
 LUAMTA_FUNCTION(material, SetName)
 {

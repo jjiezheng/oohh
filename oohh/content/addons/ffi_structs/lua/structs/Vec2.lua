@@ -58,6 +58,16 @@ do
 	end
 end
 
+function META.Lerp(a, mult, b)
+
+	a.x = (b.x - a.x) * mult + a.x
+	a.y = (b.y - a.y) * mult + a.y
+	
+	return a
+end
+
+structs.AddGetFunc(META, "Lerp", "Lerped")
+
 function META.GetDot(a, b)
 	return
 		a.x * b.x +

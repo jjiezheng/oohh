@@ -20,6 +20,19 @@ function META:FindClosest(check)
 	return closest.ent or NULL
 end
 
+function META:GetRight()
+	return self:GetAngles():GetRight()
+end
+
+function META:GetUp()
+	return self:GetAngles():GetRight()
+end
+
+function META:GetForward()
+	return self:GetAngles():GetRight()
+end
+
+
 entities.CachedEntities = {}
 
 hook.Add("PostGameUpdate", "entity_update", function()
@@ -44,7 +57,7 @@ hook.Add("PostGameUpdate", "entity_update", function()
 			ent:OnUpdate()
 		end
 	end
-end, print)
+end)
 
 if CLIENT then
 	local buffer = {}

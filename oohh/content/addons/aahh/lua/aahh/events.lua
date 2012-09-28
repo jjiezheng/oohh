@@ -4,9 +4,23 @@ function aahh.StartDraw(pnl)
 	local pos = pnl:GetWorldPos()
 	surface.SetTranslation(pos.x, pos.y)
 	
-	if false and CAPSADMIN then
+	if false and CAPSADMIN then 
+		
+		if input.IsKeyDown("space") then return end
+		
+		
+		surface.ShouldScale(true)
+		surface.SetTranslation(0, 0)
+
 		local siz = pnl:GetSize()
-		surface.StartClip(0, 0, siz.x, siz.y)
+			
+		render.SetViewport(
+			pos.x, 
+			pos.y, 
+			siz.w,
+			siz.h
+		)
+		
 	end
 end
 
@@ -29,8 +43,8 @@ end
 function aahh.EndDraw()
 	surface.SetTranslation(0, 0)
 	
-	if false and CAPSADMIN then 
-		surface.EndClip()
+	if CAPSADMIN then
+		render.SetViewport(0, 0, render.GetScreenSize())
 	end
 end
 

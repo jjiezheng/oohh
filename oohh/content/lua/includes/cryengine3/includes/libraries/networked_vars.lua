@@ -76,3 +76,18 @@ hook.Add("GameInitialized", "nvars", function()
 	nvars.Initialize()
 	nvars.FullUpdate()
 end)
+
+local META = util.FindMetaTable("entity")
+
+-- when you try to use nv for the first time it creates the nv table
+META.nv = setmetatable(
+	{},
+	{
+		__index = function(s,...) 
+			nvars.Initialize()
+		end, 
+		__newindex = function(s, ...) 
+			nvars.Initialize()
+		end
+	}
+)
