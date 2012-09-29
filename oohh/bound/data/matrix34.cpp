@@ -90,3 +90,48 @@ LUAMTA_FUNCTION(matrix34, ScaleTranslation)
 
 	return 1;
 }
+
+LUAMTA_FUNCTION(matrix34, SetRotationX)
+{
+	auto self = my->ToMatrix34Ptr(1);
+
+	self->SetRotationX(my->ToNumber(2), my->ToVec3(3));
+
+	return 1;
+}
+
+LUAMTA_FUNCTION(matrix34, SetRotationY)
+{
+	auto self = my->ToMatrix34Ptr(1);
+
+	self->SetRotationY(my->ToNumber(2), my->ToVec3(3));
+
+	return 1;
+}
+
+LUAMTA_FUNCTION(matrix34, SetRotationZ)
+{
+	auto self = my->ToMatrix34Ptr(1);
+
+	self->SetRotationZ(my->ToNumber(2), my->ToVec3(3));
+
+	return 1;
+}
+
+LUAMTA_FUNCTION(matrix34, SetRotation)
+{
+	auto self = my->ToMatrix34Ptr(1);
+
+	self->SetRotationXYZ(my->ToAng3(2), my->ToVec3(3));
+
+	return 1;
+}
+
+LUAMTA_FUNCTION(matrix34, CreateRotation)
+{
+	auto self = my->ToMatrix34Ptr(1);
+
+	self->CreateRotationXYZ(my->ToAng3(2), my->ToVec3(3));
+
+	return 1;
+}

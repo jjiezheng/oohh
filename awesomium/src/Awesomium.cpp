@@ -9,16 +9,14 @@
 #include <Awesomium/BitmapSurface.h>
 #include <Awesomium/STLHelpers.h>
 
-using namespace Awesomium;
-
-WebCore* core = 0;
+Awesomium::WebCore* core = 0;
 
 LUALIB_FUNCTION(awesomium, Open)
 {
 	if (!core)
 	{
-		WebConfig config;
-		core = WebCore::Initialize(config);
+		Awesomium::WebConfig config;
+		core = Awesomium::WebCore::Initialize(config);
 	}
 
 	my->RunString("hook.Add(\"PostGameUpdate\", \"awesomium\", function() awesomium.Update() end, print)");
@@ -30,7 +28,7 @@ LUALIB_FUNCTION(awesomium, Close)
 {
 	if (core)
 	{
-		WebCore::Shutdown();
+		Awesomium::WebCore::Shutdown();
 	
 		core = nullptr;
 	}
@@ -47,13 +45,15 @@ LUALIB_FUNCTION(awesomium, Update)
 	return 0;
 }
 
+#define tostring(var) ToString(var).c_str()
+
 class MyWebViewListener : 
-	public WebViewListener::Dialog, 
-	public WebViewListener::Load, 
-	public WebViewListener::Menu, 
-	public WebViewListener::Print, 
-	public WebViewListener::Process, 
-	public WebViewListener::View	
+	public Awesomium::WebViewListener::Dialog, 
+	public Awesomium::WebViewListener::Load, 
+	public Awesomium::WebViewListener::Menu, 
+	public Awesomium::WebViewListener::Print, 
+	public Awesomium::WebViewListener::Process, 
+	public Awesomium::WebViewListener::View	
 {
 public:
 
@@ -63,7 +63,11 @@ public:
 		const Awesomium::WebString& title
 	)
 	{
-		my->CallEntityHook(caller, "OnChangeTitle", ToString(title).c_str());
+		my->CallEntityHook(
+			caller, 
+			"OnChangeTitle", 
+			tostring(title)
+		);
 	}
 
 	
@@ -73,7 +77,11 @@ public:
 		const Awesomium::WebURL& url
 	)
 	{
-		my->CallEntityHook(caller, "OnChangeAddressBar", ToString(url.path()).c_str());
+		my->CallEntityHook(
+			caller, 
+			"OnChangeAddressBar", 
+			tostring(url.path())
+		);
 	}
 	
 
@@ -83,7 +91,11 @@ public:
 		const Awesomium::WebString& tooltip
 	)
 	{
-		my->CallEntityHook(caller, "OnChangeTooltip", ToString(tooltip).c_str());
+		my->CallEntityHook(
+			caller, 
+			"OnChangeTooltip", 
+			tostring(tooltip)
+		);
 	}
 	
 
@@ -93,7 +105,11 @@ public:
 		const Awesomium::WebURL& url
 	)
 	{
-		my->CallEntityHook(caller, "OnChangeTargetURL", ToString(url.path()).c_str());
+		my->CallEntityHook(
+			caller, 
+			"OnChangeTargetURL", 
+			tostring(url.path())
+		);
 	}
 	
 
@@ -103,7 +119,11 @@ public:
 		Awesomium::Cursor cursor
 	)
 	{
-		my->CallEntityHook(caller, "OnChangeCursor", cursor);
+		my->CallEntityHook(
+			caller, 
+			"OnChangeCursor", 
+			cursor
+		);
 	}
 	
 
@@ -111,7 +131,11 @@ public:
 		Awesomium::FocusedElementType focused_type
 	)
 	{
-		my->CallEntityHook(caller, "OnChangeFocus", focused_type);
+		my->CallEntityHook(
+			caller, 
+			"OnChangeFocus", 
+			focused_type
+		);
 	}
 
 	
@@ -125,7 +149,17 @@ public:
 		bool is_popup
 	)
 	{
-
+		my->CallEntityHook(
+			caller, 
+			"OnShowCreatedWebView", 
+			tostring(opener_url.path()), 
+			tostring(target_url.path()), 
+			initial_pos.x, 
+			initial_pos.x, 
+			initial_pos.width, 
+			initial_pos.height, 
+			is_popup
+		);
 	}
 
 	
@@ -138,7 +172,14 @@ public:
 		bool is_error_page
 	) 
 	{
-
+		my->CallEntityHook(
+			caller, 
+			"OnBeginLoadingFrame",
+			(double)frame_id,
+			is_main_frame,
+			tostring(url.path()),
+			is_error_page
+		);
 	}
 
 	
@@ -152,7 +193,14 @@ public:
 		const Awesomium::WebString& error_desc
 	) 
 	{
-
+		my->CallEntityHook(
+			caller, 
+			"OnFailLoadingFrame",
+			(double)frame_id,
+			is_main_frame,
+			tostring(url.path()),
+			tostring(error_desc)
+		);
 	}
 
 	
@@ -164,7 +212,13 @@ public:
 		const Awesomium::WebURL& url
 	) 
 	{
-
+		my->CallEntityHook(
+			caller, 
+			"OnFinishLoadingFrame",
+			(double)frame_id,
+			is_main_frame,
+			tostring(url.path())
+		);
 	}
 
 	void OnDocumentReady
@@ -173,7 +227,11 @@ public:
 		const Awesomium::WebURL& url
 	) 
 	{
-		my->CallEntityHook(caller, "OnDocumentReady", ToString(url.path()).c_str());
+		my->CallEntityHook(
+			caller, 
+			"OnDocumentReady", 
+			tostring(url.path())
+		);
 	}
 
 
@@ -182,7 +240,10 @@ public:
 		Awesomium::WebView* caller
 	) 
 	{
-
+		my->CallEntityHook(
+			caller, 
+			"OnUnresponsive"
+		);
 	}
 
 
@@ -191,7 +252,10 @@ public:
 		Awesomium::WebView* caller
 	) 
 	{
-
+		my->CallEntityHook(
+			caller, 
+			"OnResponsive"
+		);
 	}
 
 
@@ -201,24 +265,32 @@ public:
 		Awesomium::TerminationStatus status
 	) 
 	{
-
+		my->CallEntityHook(
+			caller, 
+			"OnCrashed",
+			tostring(status)
+		);
 	}
 
 
 	void OnShowPopupMenu
 	(
 		Awesomium::WebView* caller,
-		const WebPopupMenuInfo& menu_info
+		const Awesomium::WebPopupMenuInfo& menu_info
 	) 
 	{
-
+		/*my->CallEntityHook(
+			caller, 
+			"OnShowPopupMenu",
+			menu_info.items.
+		);*/
 	}
 
 
 	void OnShowContextMenu
 	(
 		Awesomium::WebView* caller,
-		const WebContextMenuInfo& menu_info
+		const Awesomium::WebContextMenuInfo& menu_info
 	) 
 	{
 
@@ -228,17 +300,17 @@ public:
 	void OnShowFileChooser
 	(
 		Awesomium::WebView* caller,
-		const WebFileChooserInfo& chooser_info
+		const Awesomium::WebFileChooserInfo& chooser_info
 	) 
 	{
-
+		
 	}
 
 
 	void OnShowLoginDialog
 	(
 		Awesomium::WebView* caller,
-		const WebLoginDialogInfo& dialog_info
+		const Awesomium::WebLoginDialogInfo& dialog_info
 	) 
 	{
 
@@ -250,7 +322,10 @@ public:
 		Awesomium::WebView* caller
 	) 
 	{
-
+		my->CallEntityHook(
+			caller, 
+			"OnRequestPrint"
+		);
 	}
 
 
@@ -260,7 +335,12 @@ public:
 		int request_id
 	) 
 	{
-
+		my->CallEntityHook(
+			caller, 
+			"OnFailPrint",
+			request_id,
+			0
+		);
 	}
 
 
@@ -268,11 +348,17 @@ public:
 	(
 		Awesomium::WebView* caller,
 		int request_id,
-		const WebStringArray& file_list)
+		const Awesomium::WebStringArray& file_list)
 	{
-
+		my->CallEntityHook(
+			caller, 
+			"OnFinishPrint",
+			request_id
+		);
 	}
 };
+
+using namespace Awesomium;
 
 LUALIB_FUNCTION(_G, WebView)
 {
@@ -286,6 +372,10 @@ LUALIB_FUNCTION(_G, WebView)
 	auto self = core->CreateWebView(my->ToNumber(1), my->ToNumber(2));
 	auto listener = new MyWebViewListener();
 	self->set_view_listener(listener);
+	self->set_dialog_listener(listener);
+	self->set_menu_listener(listener);
+	self->set_process_listener(listener);
+	self->set_print_listener(listener);
 
 	my->Push(self);
 

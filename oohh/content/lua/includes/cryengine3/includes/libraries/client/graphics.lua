@@ -1,6 +1,9 @@
 graphics = {}
 
+local disable_flags
+
 function graphics.Set2DFlags(...)
+	if disable_flags then return end
 	render.SetState(
 		bit.bor(
 			GS_BLSRC_SRCALPHA,
@@ -9,6 +12,10 @@ function graphics.Set2DFlags(...)
 			...
 		)
 	)
+end
+
+function graphics.DisableFlags(b)
+	disable_flags = b
 end
 
 local white

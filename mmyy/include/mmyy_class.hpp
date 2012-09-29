@@ -882,12 +882,5 @@ inline void Print(const char *str)
 
 		EndEntityHook(7, args_to_lua);
 
-		if (err)
-		{
-			OnPrint(err);
-			lua_settop(L, 0);
-			return false;
-		}
-
 		return true;
 	}

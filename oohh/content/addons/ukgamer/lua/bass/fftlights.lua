@@ -10,7 +10,7 @@ for i = 1, BUCKETS do
     fftlights[i]:Spawn()
 end
 
-fftlightsplayer = Channel(BASS_URL, "http://pub2.di.fm/di_techhouse", 0, BASS_STREAM_STATUS)
+fftlightsplayer = fftlightsplayer or Channel(BASS_URL, "http://pub2.di.fm/di_techhouse", 0, BASS_STREAM_STATUS)
 fftlightsplayer:Play()
 
 local function update()

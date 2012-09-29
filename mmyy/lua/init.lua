@@ -3,7 +3,8 @@ local status, err = pcall(function()
 Msg = Msg or print
 MsgN = MsgN or print
 
-_G[tostring(os.getenv("USERNAME")):upper():gsub(" ", "_"):gsub("%p", "")] = true
+USERNAME = tostring(os.getenv("USERNAME")):upper():gsub(" ", "_"):gsub("%p", "")
+_G[USERNAME] = true
 
 MsgN("")
 MsgN("=========================================")
@@ -198,6 +199,8 @@ include("includes/standard/meta/nil.lua")
 
 include("includes/"..(MMYY_PLATFORM or "nil").."/init.lua")
 addons.LoadAll()
+
+addons.AutorunAll(USERNAME)
 
 print("ran init.lua")
 MsgN("=========================================")

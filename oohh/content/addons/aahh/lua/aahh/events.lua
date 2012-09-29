@@ -77,7 +77,7 @@ end
 if CRYENGINE3 then
 	aahh.ActivePanel = NULL
 	
-	hook.Add("PostGameUpdate", "aahh", function(delta)
+	hook.Add("PostMenuUpdate", "aahh", function(delta)
 		for key, pnl in pairs(aahh.GetPanels()) do
 			if pnl.remove_me then
 				MakeNULL(pnl)

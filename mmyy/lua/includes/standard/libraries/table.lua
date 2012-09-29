@@ -19,8 +19,8 @@ function table.GetKey(tbl, val)
 end
 
 function table.count(tbl)
-	check(tbl, "table")
 	local i = 0
+	
 	for k,v in pairs(tbl) do
 		i = i + 1
 	end
@@ -40,7 +40,7 @@ function table.random(tbl)
 	local key = math.random(1, table.count(tbl))
 	local i = 1
 	for _key, _val in pairs(tbl) do
-		if i == _key then
+		if i == key then
 			return _val, _key
 		end
 		i = i + 1

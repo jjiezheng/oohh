@@ -80,6 +80,15 @@ LUAMTA_FUNCTION(camera, GetPos)
 	return 1;
 }
 
+LUAMTA_FUNCTION(camera, UpdateFrustum)
+{
+	auto self = my->ToCameraPtr(1);
+
+	self->UpdateFrustum();
+
+	return 0;
+}
+
 LUAMTA_FUNCTION(camera, SetAngles)
 {
 	auto self = my->ToCameraPtr(1);
@@ -98,17 +107,44 @@ LUAMTA_FUNCTION(camera, GetAngles)
 	return 1;
 }
 
-LUAMTA_FUNCTION(camera, SetFustrum)
+LUAMTA_FUNCTION(camera, CreateViewdir)
+{
+	auto self = my->ToCameraPtr(1);
+
+	my->Push(self->CreateViewdir(my->ToAng3(2)));
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(camera, GetViewdir)
+{
+	auto self = my->ToCameraPtr(1);
+
+	my->Push(self->GetViewdir());
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(camera, IsPointVisible)
+{
+	auto self = my->ToCameraPtr(1);
+
+	self->IsPointVisible(my->ToVec3(2));
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(camera, SetFrustum)
 {
 	auto self = my->ToCameraPtr(1);
 
 	self->SetFrustum(
-		my->ToNumber(1, gEnv->pRenderer->GetWidth()),
-		my->ToNumber(2, gEnv->pRenderer->GetHeight()), 
-		my->ToNumber(3, DEFAULT_FOV), 
-		my->ToNumber(4, DEFAULT_NEAR), 
-		my->ToNumber(5, DEFAULT_FAR), 
-		my->ToNumber(6, 1.0f)
+		my->ToNumber(2, gEnv->pRenderer->GetWidth()),
+		my->ToNumber(3, gEnv->pRenderer->GetHeight()), 
+		my->ToNumber(4, DEFAULT_FOV), 
+		my->ToNumber(5, DEFAULT_NEAR), 
+		my->ToNumber(6, DEFAULT_FAR), 
+		my->ToNumber(7, 1.0f)
 	);
 
 	return 0;

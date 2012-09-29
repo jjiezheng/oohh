@@ -9,6 +9,8 @@ chatgui.history = chatgui.history or {}
 
 chatgui.alpha = 1
 
+local COLOR_LIGHT = aahh.GetSkinColor("light")
+local COLOR_DARK = aahh.GetSkinColor("dark")
 
 local function add_0(n)
 	return n < 10 and "0"..n or n
@@ -65,10 +67,10 @@ function chatgui.Draw()
 			Vec2(0, (chatgui.alpha * chatgui.font_size) + graphics.GetScreenSize().h * 0.5) + Vec2(chatgui.font_size, ((key - #chatgui.history) * chatgui.font_size * chatgui.spacing)), 
 			chatgui.font, 
 			chatgui.font_size, 
-			Color(1, 1, 1, chatgui.alpha),
+			Color(COLOR_LIGHT.r, COLOR_LIGHT.g, COLOR_LIGHT.b, chatgui.alpha),
 			Vec2(0,0), 
 			Vec2()+1,
-			Color(0,0,0,chatgui.alpha)
+			Color(COLOR_DARK.r, COLOR_DARK.g, COLOR_DARK.b, chatgui.alpha)
 		)
 	end
 end

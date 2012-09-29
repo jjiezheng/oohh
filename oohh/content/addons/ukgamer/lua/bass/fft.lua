@@ -4,7 +4,7 @@ local BUCKETS = 50
 
 local songs = {}
 
-for name, data in pairs(file.Find("addons/ukgamer/sound/*", true)) do
+for name, data in pairs(file.Find("addons/ukgamer/sounds/*", true)) do
     table.insert(songs, name)
 end
 
@@ -26,7 +26,7 @@ local function nextsong()
     end
     
     testplayer:Stop()
-    testplayer = Channel(BASS_MUSIC, Path((("sound/" .. songs[cursong]):gsub("!/../", ""))), 0, BASS_DEFAULT)
+    testplayer = Channel(BASS_MUSIC, Path((("sounds/" .. songs[cursong]):gsub("!/../", ""))), 0, BASS_DEFAULT)
     testplayer:Play()
 end
 
@@ -38,14 +38,14 @@ local function prevsong()
     end
     
     testplayer:Stop()
-    testplayer = Channel(BASS_MUSIC, Path((("sound/" .. songs[cursong]):gsub("!/../", ""))), 0, BASS_DEFAULT)
+    testplayer = Channel(BASS_MUSIC, Path((("sounds/" .. songs[cursong]):gsub("!/../", ""))), 0, BASS_DEFAULT)
     testplayer:Play()
 end
 
 local function updatehud()
     if testplayer == NULL or not testplayer then return end
     
-    if testplayer:GetPosition() >= (testplayer:GetLength() - 0.25) then nextsong() end --in seconds (i doubt this works)
+    if testplayer:GetPosition() >= (testplayer:GetLength() - 0.1) then nextsong() end --in seconds
     
     scrw, scrh = render.GetScreenSize()
     
@@ -53,7 +53,8 @@ local function updatehud()
     
     local text = "Now playing " .. songs[cursong]
     
-	tempsize = tempsize + ((10 + (fft[4] ^ 0.7) * 5) - tempsize) * math.min(FrameTime() * 30, 1)
+    local bassavg = (fft[3] + fft[4] + fft[5] + fft[6]) / 4
+	tempsize = tempsize + ((10 + (bassavg ^ 0.7) * 5) - tempsize) * math.min(FrameTime() * 30, 1)
     
     local w = graphics.GetTextSize("segoeui.ttf", text).w * tempsize
     
@@ -84,7 +85,7 @@ end
 
 local function start()
     if testplayer ~= NULL and testplayer:IsValid() then testplayer:Stop() end
-    testplayer = Channel(BASS_MUSIC, Path((("sound/" .. songs[cursong]):gsub("!/../", ""))), 0, BASS_DEFAULT)
+    testplayer = Channel(BASS_MUSIC, Path((("sounds/" .. songs[cursong]):gsub("!/../", ""))), 0, BASS_DEFAULT)
     print(bass.GetLastError())
     testplayer:Play()
     

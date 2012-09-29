@@ -191,6 +191,15 @@ LUALIB_FUNCTION(render, SetCamera)
 	return 0;
 }
 
+LUALIB_FUNCTION(render, SetColor)
+{
+	auto c = my->ToColor(1);
+
+	rend->SetMaterialColor(c.r, c.g, c.b, c.a);
+
+	return 0;
+}
+
 #ifdef CE3
 //gEnv->pRenderer->DrawImageWithUV
 LUALIB_FUNCTION(render, DrawImage)
