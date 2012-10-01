@@ -106,6 +106,7 @@ CItem::CItem()
 	memset(m_animationTime, 0, sizeof(m_animationTime));
 	memset(m_animationEnd, 0, sizeof(m_animationTime));
 	memset(m_animationSpeed, 0, sizeof(m_animationSpeed));
+	memset(m_additiveLayers, 0, sizeof(bool) * ITEM_MAX_ADDITIVE_LAYERS);
 }
 
 //------------------------------------------------------------------------
@@ -1229,6 +1230,35 @@ void CItem::Select(bool select)
 		CloakEnable(false, false);
 	OnSelected(select);
 }
+
+//------------------------------------------------------------------------
+struct CItem::DeselectAction
+{
+	DeselectAction(EntityId itemId) : nextItemId(itemId) {};
+
+	void execute(CItem *item)
+	{
+		item->SetBusy(false);
+
+		item->GetOwnerActor()->SelectItem(nextItemId, true);
+	}
+
+	EntityId nextItemId;
+};
+
+void CItem::Deselect(EntityId nextItemId)
+{
+	if(HasAction(g_pItemStrings->deselect))
+	{
+		SetBusy(true);
+
+		PlayAction(g_pItemStrings->deselect, 0, false, eIPAF_Default|eIPAF_NoBlend);
+		GetScheduler()->TimerAction(GetCurrentAnimationTime(eIGS_FirstPerson), CSchedulerAction<DeselectAction>::Create(DeselectAction(nextItemId)), false);
+	}
+	else
+		GetOwnerActor()->SelectItem(nextItemId, true);
+}
+
 //------------------------------------------------------------------------
 void CItem::Drop(float impulseScale, bool selectNext, bool byDeath)
 {
@@ -2032,7 +2062,12 @@ CActor *CItem::GetOwnerActor() const
 {
 	if(!m_pGameFramework)
 		return NULL;
-	return static_cast<CActor *>(m_pGameFramework->GetIActorSystem()->GetActor(m_ownerId));
+
+	auto actor = m_pGameFramework->GetIActorSystem()->GetActor(m_ownerId);
+	if (!actor)
+		return NULL;
+
+	return static_cast<CActor *>(actor);
 }
 
 //------------------------------------------------------------------------

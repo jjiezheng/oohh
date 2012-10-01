@@ -75,3 +75,10 @@ LUALIB_FUNCTION(system, GetHostName)
 
 	return 1;
 }
+
+LUALIB_FUNCTION(system, SetViewCamera)
+{
+	gEnv->pSystem->SetViewCamera(my->ToCamera(1));
+
+	return 0;
+}

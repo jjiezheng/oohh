@@ -105,6 +105,15 @@ namespace oohh
 
 			virtual bool OnRemove(IEntity *ent)
 			{
+				if (
+					!gEnv->pGame || 
+					!gEnv->pGame->GetIGameFramework() || 
+					!gEnv->pGame->GetIGameFramework()->GetClientActor() ||
+					!gEnv->pGame->GetIGameFramework()->GetClientActor()->GetEntity() ||
+					!gEnv->pGame->GetIGameFramework()->GetClientActor()->GetEntity()->IsInitialized()
+					)
+				return true;
+
 				my->CallHook("EntityRemoved", ent, 1);
 			
 				if (my->IsFalse(-1))

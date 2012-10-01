@@ -44,7 +44,7 @@ local function include_external(libname)
 		files("../" .. libname .. "/src/**.hpp")
 		files("../" .. libname .. "/src/**.cpp")
 		
-		paths[libname .. "/*"] = path.getabsolute("../" .. libname .. "/src")
+		paths["oohh/bound/external/" .. libname .. "/*"] = path.getabsolute("../" .. libname .. "/src")
 	end
 end
 
@@ -137,28 +137,42 @@ return end
 paths = {
 	["gamedll/*"] = path.getabsolute("../gamedll"),
 	["oohh/*"] = path.getabsolute("../oohh"),
-	["mmyy/*"] = path.getabsolute("../mmyy/include"),
+	["oohh/mmyy/*"] = path.getabsolute("../mmyy/include"),
 }
 
 solution("oohh")
 	location(FOLDER .. "/oohh_project_files/" .. _ACTION)
 	
 	platforms("x32")
+	
 	defines("FORCE_STANDARD_ASSERT")
 	defines("NDEBUG")
 	defines("GAMEDLL_EXPORTS")
 	defines("_XKEYCHECK_H")
-		
 	defines("CE3")
 
-	if _ACTION == "vs2010" or _ACTION == "vs2008" then
-		buildoptions("/MP")
-		flags("NoMinimalRebuild")
-	end
-
 	configurations{"Debug", "Release"}
-
+	
 	project("GameDLL")
+
+		flags("FloatFast")
+		flags("NoRTTI")
+		flags("NoMinimalRebuild")
+		
+		buildoptions
+		{
+			"/Gy",
+			"/GS",
+			"/GF",
+			"/MP",
+			"/arch:SSE",
+		}
+		
+		linkoptions
+		{
+			("/BASE:\"@%s,GameDll\""):format(path.getabsolute("../gamedll/BaseAddress.Win32.txt")),
+		}
+	
 		language("C++")
 		kind("SharedLib")
 
@@ -205,7 +219,7 @@ solution("oohh")
 		
 		debugargs("-noborder -dx9")
 		debugdir(FOLDER.."/bin32")
-
+		
 		configuration("debug")
 			flags("Symbols")
 			

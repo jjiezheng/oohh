@@ -244,10 +244,15 @@ void SCVars::InitCVars(IConsole *pConsole)
 	REGISTER_CVAR(designer_warning_level_resources, 0, 0, "Designer warnings about resource load during run-time");
 
 	// GOC
-	REGISTER_CVAR(goc_enable, 0, VF_NULL, "gears of crysis");	
-	REGISTER_CVAR(goc_targetx, 0.5f, VF_NULL, "target position of camera");
-	REGISTER_CVAR(goc_targety, -2.5f, VF_NULL, "target position of camera");
-	REGISTER_CVAR(goc_targetz, 0.2f, VF_NULL, "target position of camera");
+	//registred additional commands for controling offsets.
+	pConsole->Register("goc_targetx", &goc_targetx, 0.4f, VF_DUMPTODISK, "target position of camera");
+	pConsole->Register("goc_targety", &goc_targety, -1.8f, VF_DUMPTODISK, "target position of camera");
+	pConsole->Register("goc_targetz", &goc_targetz, 0.3f, VF_DUMPTODISK, "target position of camera");
+	pConsole->Register("goc_positionBottom", &goc_positionBottom, 0.1f, VF_DUMPTODISK, "secondary offset if");
+	pConsole->Register("goc_targetTopz", &goc_targetTopz, .9f, VF_DUMPTODISK, "secondary offset if");
+	pConsole->Register("goc_targetBottomx", &goc_targetBottomx, 0.4f, VF_DUMPTODISK, "secondary offset if");
+	pConsole->Register("goc_targetBottomy", &goc_targetBottomy, -1.5f, VF_DUMPTODISK, "secondary offset if");
+	pConsole->Register("goc_targetBottomz", &goc_targetBottomz, 0.5f, VF_DUMPTODISK, "secondary offset if");
 	REGISTER_COMMAND("GOCMode", CmdGOCMode, VF_NULL, "Enable GOC mode");
 
 	REGISTER_CVAR(g_enableSlimCheckpoints, 0, 0, "Enable the use of console style checkpoints instead of full save.");

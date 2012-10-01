@@ -91,16 +91,20 @@ public:
 
 	#include "mmyy_class.hpp"
 
+	MMYY_WRAP_STRUCT(AABB, AABB, aabb)
 	MMYY_WRAP_STRUCT(Vec3, Vec3, vec3)
 	MMYY_WRAP_STRUCT(Ang3, Ang3, ang3)
 	MMYY_WRAP_STRUCT(Vec2, Vec2, vec2)
 	MMYY_WRAP_STRUCT(Quat, Quat, quat)
+	MMYY_WRAP_STRUCT(Matrix44, Matrix44, matrix44)
 	MMYY_WRAP_STRUCT(Matrix34, Matrix34, matrix34)
+	MMYY_WRAP_STRUCT(Matrix33, Matrix33, matrix33)
 	MMYY_WRAP_STRUCT(ColorF, Color, color)
 	MMYY_WRAP_STRUCT(Rect, Rect, rect)
 	MMYY_WRAP_STRUCT(CCamera, Camera, camera)
 
 	MMYY_WRAP_CLASS(ISound, Sound, sound)
+	MMYY_WRAP_CLASS(IRenderNode, RenderNode, render_node)
 	MMYY_WRAP_CLASS(ITexture, Texture, texture)
 	MMYY_WRAP_CLASS(IMaterial, Material, material)
 	MMYY_WRAP_CLASS(IFFont, Font, font)
@@ -111,7 +115,7 @@ public:
 	MMYY_WRAP_CLASS(IParticleEmitter, ParticleEmitter, particle_emitter)
 	MMYY_WRAP_CLASS(Cairo, Cairo, cairo)
 	MMYY_WRAP_CLASS(Channel, Channel, channel)
-	MMYY_WRAP_CLASS(ILightSource, LightSource, lightsource)
+	MMYY_WRAP_CLASS(ILightSource, LightSource, light_source)
 
 
 	MMYY_WRAP_CLASS(Awesomium::WebView, WebView, webview)

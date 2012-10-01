@@ -1,7 +1,27 @@
 #include "StdAfx.h"
 #include "oohh.hpp"
+#include "ICryPak.h"
 
 string base = "../";
+
+
+LUALIB_FUNCTION(file, GetFullPath)
+{
+	TCHAR buffer[MAX_PATH] = TEXT(""); 
+	GetFullPathName(my->ToString(1), MAX_PATH, buffer, NULL);
+		
+	my->Push(buffer);
+
+    return 1;
+}
+
+LUALIB_FUNCTION(file, OpenPacks)
+{
+	my->Push(gEnv->pCryPak->OpenPacks(my->ToString(1), ICryPak::FLAGS_PATH_REAL));
+
+    return 1;
+}
+
 
 LUALIB_FUNCTION(file, SetAlias)
 {
@@ -19,20 +39,20 @@ LUALIB_FUNCTION(file, RemoveAlias)
 
 LUALIB_FUNCTION(file, OpenPak)
 {
-    my->Push(gEnv->pCryPak->OpenPack(base + my->ToString(1)));
+    my->Push(gEnv->pCryPak->OpenPack(my->ToString(1)));
 
     return 1;
 }
 LUALIB_FUNCTION(file, ClosePak)
 {
-    my->Push(gEnv->pCryPak->ClosePack(base + my->ToString(1)));
+    my->Push(gEnv->pCryPak->ClosePack(my->ToString(1)));
 
     return 1;
 }
 
 LUALIB_FUNCTION(file, ExistsInPak)
 {
-    my->Push(gEnv->pCryPak->IsFileExist(base + my->ToString(1)));
+    my->Push(gEnv->pCryPak->IsFileExist(my->ToString(1)));
 
     return 1;
 }

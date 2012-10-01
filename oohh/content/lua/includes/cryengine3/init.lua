@@ -26,7 +26,9 @@ end
 
 RefreshStates()
 
+include("includes/libraries/enums.lua")
 include("includes/libraries/message.lua")
+include("includes/libraries/console.lua")
 include("includes/libraries/*")
 
 if CLIENT then

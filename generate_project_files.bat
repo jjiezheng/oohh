@@ -6,7 +6,7 @@ goto again
 	cls
 	echo enter your Cryengine 3 free SDK folder
 	set /P CRYENGINETHREEFOLDER="Cryengine 3 free SDK folder: "
-	if exist "%CRYENGINETHREEFOLDER%\Bin32\CryAction.dll" goto link
+	if exist "%CRYENGINETHREEFOLDER%\Bin32\CryAction.dll" goto premake
 	if not exist "%CRYENGINETHREEFOLDER%\Bin32\CryAction.dll" goto notexist
 
 :notexist
@@ -16,16 +16,9 @@ goto again
 	pause
 	goto again
 
-:link
-	cd %~dp0premake
-
-	set /P ANSWER=Do you want to generate the project files to "%CRYENGINETHREEFOLDER%\oohh_project_files\*" (Y/N)?
-	echo You chose: %ANSWER%
-	if /i {%ANSWER%}=={y} (goto :premake)
-	if /i {%ANSWER%}=={yes} (goto :premake)
-	goto :end
-
 :premake
+	cd %~dp0premake
+	
 	premake4 codeblocks
 	premake4 codelite
 	premake4 gmake
@@ -34,6 +27,8 @@ goto again
 	premake4 vs2005
 	premake4 vs2008
 	premake4 vs2010
+	
+	pause
 :end
 
 %SystemRoot%\explorer.exe "%CRYENGINETHREEFOLDER%\oohh_project_files\"

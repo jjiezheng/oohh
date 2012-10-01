@@ -131,7 +131,34 @@ LUAMTA_FUNCTION(matrix34, CreateRotation)
 {
 	auto self = my->ToMatrix34Ptr(1);
 
-	self->CreateRotationXYZ(my->ToAng3(2), my->ToVec3(3));
+	my->Push(self->CreateRotationXYZ(my->ToAng3(2), my->ToVec3(3)));
+
+	return 1;
+}
+
+LUAMTA_FUNCTION(matrix34, SetRotation33)
+{
+	auto self = my->ToMatrix34Ptr(1);
+
+	self->SetRotation33(my->ToMatrix33(3));
+
+	return 1;
+}
+
+LUAMTA_FUNCTION(matrix34, TransformPoint)
+{
+	auto self = my->ToMatrix34Ptr(1);
+
+	my->Push(self->TransformPoint(my->ToVec3(3)));
+
+	return 1;
+}
+
+LUAMTA_FUNCTION(matrix34, TransformVector)
+{
+	auto self = my->ToMatrix34Ptr(1);
+
+	my->Push(self->TransformVector(my->ToVec3(3)));
 
 	return 1;
 }

@@ -324,7 +324,7 @@ LUAMTA_FUNCTION(channel, GetFrequency)
     return 1;
 }
 
-LUAMTA_FUNCTION(channel, set3dposition)
+LUAMTA_FUNCTION(channel, Set3DPos)
 {	
 	auto self = my->ToChannel(1);
 

@@ -301,30 +301,28 @@ inline void Print(const char *str)
 	template<typename T>
 	inline bool StartEntityHook(T *udata, const char *hook_event)
 	{
-		if (!this || !L || !udata) return false;
-	
+		if (!this) return false;
+
+		if (!L || !udata) return false;
+		
 		lua_settop(L, 0);
 
-		lua_getglobal(L, "hook");
-		if (lua_type(L, -1) != LUA_TTABLE)
+		if (my_getuidtable(L, udata)) // enttbl
 		{
-			lua_settop(L, 0);
-			return false;
+			lua_getfield(L, -1, hook_event); // enttbl, val
+
+			if (lua_isfunction(L, -1))
+			{
+				Push(udata); // enttbl, val, func, udata
+				return true;
+			}
+
+			lua_remove(L, -1); // enttbl
 		}
 
-		lua_getfield(L, -1, "UserDataCall");
-		if (lua_type(L, -1) != LUA_TFUNCTION)
-		{
-			lua_settop(L, 0);
-			return false;
-		}
+		lua_remove(L, 1); //
 
-		lua_remove(L, 1);
-
-		Push(udata);
-		lua_pushstring(L, hook_event);
-
-		return true;
+		return false;
 	}
 
 	inline bool EndEntityHook(int args_to_lua = 0, int args_to_cpp = 0)
@@ -334,7 +332,7 @@ inline void Print(const char *str)
 		if (err)
 		{
 			lua_settop(L, 0);
-			Error(err);
+			//Error(err);
 			return false;
 		}
 

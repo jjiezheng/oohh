@@ -160,6 +160,8 @@ public:
 		EOP_OnMouseReleased,
 		EOP_MouseX,
 		EOP_MouseY,
+		EOP_MouseWheelUp,
+		EOP_MouseWheelDown,
 		EOP_MouseHitPos,
 		EOP_MouseHitDir,
 		EOP_SelectedEntity
@@ -192,6 +194,8 @@ public:
 			OutputPortConfig<int>("OnReleased", _HELP("Returns an integer which represents the released mouse key")),
 			OutputPortConfig<int>("X", _HELP("Mouse cursor x position")),
 			OutputPortConfig<int>("Y", _HELP("Mouse cursor y position")),
+			OutputPortConfig_Void("WheelUp", _HELP("Mouse wheel moved up")),
+			OutputPortConfig_Void("WheelDown", _HELP("Mouse wheel moved down")),
 			OutputPortConfig<Vec3>("HitPos", _HELP("Hit position of the mouse cursor in world coordinates")),
 			OutputPortConfig<Vec3>("HitDir", _HELP("Direction from the camera position to the mouse cursor position")),
 			OutputPortConfig<EntityId>("SelectedEntityIDs", _HELP("EntityID's of the selected entities")),
@@ -465,6 +469,14 @@ public:
 		else if(rInputEvent.keyId == eKI_Mouse8 && rInputEvent.state == eIS_Released && m_bKeyPressed)
 		{
 			ActivateOutput(&m_actInfo, EOP_OnMouseReleased, 8);
+		}
+
+		if(rInputEvent.state == eIS_Pressed)
+		{
+			if(rInputEvent.keyId == eKI_MouseWheelUp)
+				ActivateOutput(&m_actInfo, EOP_MouseWheelUp, 0);
+			else if(rInputEvent.keyId == eKI_MouseWheelDown)
+				ActivateOutput(&m_actInfo, EOP_MouseWheelDown, 0);
 		}
 
 		if((rInputEvent.keyId == eKI_LCtrl || rInputEvent.keyId == eKI_RCtrl) && rInputEvent.state == eIS_Pressed && m_bKeyPressed)

@@ -147,7 +147,9 @@ LUAMTA_FUNCTION(material, GetParam)
 	if (!shader_item.m_pShader) return 0;
 	auto params = shader_item.m_pShader->GetPublicParams();
 
-	for (auto it = params.begin(), end = params.end(); it != end; ++it)
+	auto it = params.begin();
+	auto end = params.end();
+	for (it; it != end; ++it)
 	{
 		auto val = *it;
 		
@@ -196,7 +198,9 @@ LUAMTA_FUNCTION(material, SetParam)
 	if (!shader_item.m_pShader) return 0;
 	auto params = shader_item.m_pShader->GetPublicParams();
 
-	for (auto it = params.begin(), end = params.end(); it != end; ++it)
+	auto it = params.begin();
+	auto end = params.end();
+	for (it; it != end; ++it)
 	{
 		auto val = *it;
 

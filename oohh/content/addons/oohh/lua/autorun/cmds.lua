@@ -32,6 +32,8 @@ console.RunString(
 	
 	sv_gamerules DeathMatch
 	sv_gamerulesdefault DeathMatch
+	
+	s_ReverbDynamic 2
 	]]
 	--[==[	
 	

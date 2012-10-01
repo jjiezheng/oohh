@@ -45,7 +45,7 @@ end
 local function updatehud()
     if testplayer == NULL or not testplayer then return end
     
-    if testplayer:GetPosition() >= (testplayer:GetLength() - 0.1) then nextsong() end --in seconds
+    if testplayer:GetPosition() >= testplayer:GetLength() then nextsong() end --in seconds
     
     scrw, scrh = render.GetScreenSize()
     
@@ -71,7 +71,7 @@ local function updatehud()
     for i = 1, BUCKETS do
         local val = (fft[i] ^ 0.7) * 200
         local col = Color(1, 0, 0, 0.3)
-        col:SetHue(-val + 100)
+        col:SetHue(math.clamp(-val + 100, 0, 100))
         graphics.DrawRect(Rect(barx, scrh - val, 20, val), col)
         barx = barx + 25
     end

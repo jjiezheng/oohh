@@ -196,10 +196,26 @@ do -- console vars
 	console.cvar_file_name = "cvars.txt"
 	console.vars = nil
 	
+	-- what's the use?
+	do -- cvar meta
+		local META = {}
+		META.__index = META
+		
+		function META:Get()
+			return console.vars[self.cvar]
+		end
+		
+		function META:Set(var)
+			console.SetVariable(self.cvar, var)
+		end
+			
+		console.CVarMeta = META
+	end
+	
 	function console.ReloadVariables()
 		console.vars = luadata.ReadFile(console.cvar_file_name)
 	end
-
+	
 	function console.CreateVariable(name, def, callback)
 		if not console.vars then
 			console.ReloadVariables()
@@ -220,6 +236,8 @@ do -- console vars
 		end
 
 		console.AddCommand(name, func)
+		
+		return setmetatable({cvar = name}, console.CVarMeta)
 	end
 
 	function console.GetVariable(var, def)
@@ -314,7 +332,7 @@ do -- funsong
 				-- lua cvars
 				local tbl = console.vars
 				if tbl[key] then
-					return tbl[var]
+					return tbl[key]
 				end
 				
 				-- engine cvars

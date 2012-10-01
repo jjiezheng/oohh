@@ -24,12 +24,16 @@ for i = 1, 3 do
     threedbrowsers[i].texture = Texture(WIDTH, HEIGHT, ETF_A8R8G8B8)
 end
 
+local origin = Vec3(1257, 825, 38)
+local angles = Ang3(30, 10, -26):GetRad()
+local scale = Vec3()+1
+
 hook.Add("PostGameUpdate", "3dweb", function()
 	local cam = render.GetCamera()
-	cam:SetPos(cam:GetPos() + Vec3(0,0,-50))
-	cam:CreateViewDir(cam:GetAngles())
-	render.SetCamera(cam)
-	--graphics.DisableFlags(true)
+	cam:SetPos(cam:GetPos() - origin)
+	render.SetCamera(cam) 
+	
+	graphics.DisableFlags(true)
     for i = 1, #threedbrowsers do
         threedbrowsers[i]:UpdateTexture(threedbrowsers[i].texture)
 			
@@ -43,7 +47,7 @@ hook.Add("PostGameUpdate", "3dweb", function()
         graphics.DrawTexture(threedbrowsers[i].texture, Rect(i * ((WIDTH / 16) + 3), 0, -WIDTH / 16, HEIGHT / 16), nil, nil, false)
 		
     end
-	--graphics.DisableFlags(false)
+	graphics.DisableFlags(false)
 end)
 
 util.MonitorFileInclude()

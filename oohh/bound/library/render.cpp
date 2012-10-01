@@ -165,10 +165,11 @@ LUALIB_FUNCTION(render, Clear)
 
 LUALIB_FUNCTION(render, MakeMatrix)
 {
-	rend->MakeMatrix(my->ToVec3(1), my->ToVec3(2), my->ToVec3(3), my->ToMatrix34Ptr(4));
+	rend->MakeMatrix(my->ToVec3(1), my->ToVec3(2), my->ToVec3(3, Vec3(1,1,1)), my->ToMatrix34Ptr(4));
 
 	return 0;
 }
+
 
 LUALIB_FUNCTION(render, PushMatrix)
 {
@@ -200,47 +201,53 @@ LUALIB_FUNCTION(render, SetColor)
 	return 0;
 }
 
-#ifdef CE3
-//gEnv->pRenderer->DrawImageWithUV
-LUALIB_FUNCTION(render, DrawImage)
+LUALIB_FUNCTION(render, GetModelViewMatrix)
 {
-	auto pos = my->ToVec3(1);
-	auto w = my->ToNumber(2);
-	auto h = my->ToNumber(3);
-	auto tex = my->ToTexture(4);
-	auto c = my->ToColor(5);
-	auto filter = my->ToBoolean(6);
+	static auto temp = new float[11];
 
-	static float* s = new float[4];
-	static float* t = new float[4];
+	rend->GetModelViewMatrix(temp);
 
-	s[0] = 0; t[0] = 0;
-	s[1] = 1; t[1] = 0;
+	auto m = Matrix34();
+	m.m00 = temp[0];
+	m.m01 = temp[1];
+	m.m02 = temp[2];
+	m.m03 = temp[3];
 
-	s[2] = 1; t[2] = 1;
-	s[3] = 1; t[3] = 1;
+	m.m10 = temp[4];
+	m.m11 = temp[5];
+	m.m12 = temp[6];
+	m.m13 = temp[7];
 
-	gEnv->pRenderer->DrawImageWithUV(
-		pos.x,
-		pos.y,
-		pos.z,
+	m.m20 = temp[8];
+	m.m21 = temp[9];
+	m.m22 = temp[10];
+	m.m23 = temp[11];
 
-		w,
-		h,
+	my->Push(m);
 
-		tex->GetTextureID(),
-
-		s,
-		t,
-
-		c.r,
-		c.g,
-		c.b,
-		c.a,
-
-		filter
-	);
-
-	return 0;
+	return 1;
 }
-#endif
+
+LUALIB_FUNCTION(render, UnProjectFromScreen)
+{
+	auto in = my->ToVec3(1);
+	auto out = Vec3();
+
+	rend->UnProjectFromScreen(in.x, in.y, in.z, &out.x, &out.y, &out.z);
+
+	my->Push(out);
+
+	return 1;
+}
+
+LUALIB_FUNCTION(render, ProjectToScreen)
+{
+	auto in = my->ToVec3(1);
+	auto out = Vec3();
+
+	rend->ProjectToScreen(in.x, in.y, in.z, &out.x, &out.y, &out.z);
+
+	my->Push(out);
+
+	return 1;
+}

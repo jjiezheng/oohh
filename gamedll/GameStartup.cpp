@@ -439,7 +439,7 @@ int CGameStartup::Update(bool haveFocus, unsigned int updateFlags)
 		}
 	}
 
-	//s_autoTesterSingleton.Update();
+	s_autoTesterSingleton.Update();
 
 	GCOV_FLUSH_UPDATE;
 
@@ -673,11 +673,6 @@ bool CGameStartup::InitFramework(SSystemInitParams &startupParams)
 		SubclassWindow((HWND)startupParams.hWnd, (WNDPROC)CGameStartup::WndProc);
 #endif
 
-	startupParams.bTesting = false; 
-	startupParams.bTestMode = false;
-	startupParams.bUIFramework = false;
-
-
 	// initialize the engine
 	if (!m_pFramework->Init(startupParams))
 	{
@@ -747,7 +742,7 @@ void CGameStartup::ShutdownWindow()
 //////////////////////////////////////////////////////////////////////////
 #ifdef WIN32
 
-//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 LRESULT CALLBACK CGameStartup::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(msg)
@@ -793,13 +788,8 @@ LRESULT CALLBACK CGameStartup::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		}
 		return  0;
 	case WM_HOTKEY:
-		return DefWindowProc(hWnd, msg, wParam, lParam);
-	case WM_KEYDOWN:
-		return DefWindowProc(hWnd, msg, wParam, lParam);
-	case WM_KEYUP:
-		return DefWindowProc(hWnd, msg, wParam, lParam);
-	/*case WM_SYSCHAR:	// prevent ALT + key combinations from creating 'ding' sounds
-		return  0;*/
+	case WM_SYSCHAR:	// prevent ALT + key combinations from creating 'ding' sounds
+		return  0;
 	case WM_CHAR:
 		{
 			if (my)
@@ -832,7 +822,7 @@ LRESULT CALLBACK CGameStartup::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			}
 		}
 		break;
-	/*case WM_SYSKEYDOWN:	// prevent ALT-key entering menu loop
+	case WM_SYSKEYDOWN:	// prevent ALT-key entering menu loop
 			if (wParam != VK_RETURN && wParam != VK_F4)
 			{
 				return 0;
@@ -853,7 +843,7 @@ LRESULT CALLBACK CGameStartup::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 				}
 				// let the F4 pass through to default handler (it will send an WM_CLOSE)
 			}
-		break;*/
+		break;
 	case WM_SETCURSOR:
 		if(g_pGame)
 		{

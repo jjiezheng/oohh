@@ -35,14 +35,14 @@ textures = textures or {}
 
 local cache = {}
 
-function textures.FindByName(name)
+function textures.FindByName(find)
 	local out = {}
 	
 	for i = 1, 10000 do
 		local tex = Texture(i)
 		if tex:IsValid() then
 			local name = tex:GetName()
-			if name ~= "EngineAssets/TextureMsg/ReplaceMe.tif" and name:find(name, nil, true) then
+			if name ~= "EngineAssets/TextureMsg/ReplaceMe.tif" and name:find(find, nil, true) then
 				table.insert(out, tex)
 			end
 		else

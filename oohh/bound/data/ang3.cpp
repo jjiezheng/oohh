@@ -46,6 +46,15 @@ LUAMTA_FUNCTION(ang3, GetQuat)
 	return 1;
 }
 
+LUAMTA_FUNCTION(ang3, GetMatrix33)
+{
+	auto self = my->ToAng3(1);
+	
+	my->Push(Matrix33(self));
+
+	return 1;
+}
+
 LUAMTA_FUNCTION(ang3, IsInRangePI)
 {
 	auto self = my->ToAng3Ptr(1);

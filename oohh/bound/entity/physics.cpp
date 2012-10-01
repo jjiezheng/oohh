@@ -5,7 +5,7 @@ LUAMTA_FUNCTION(entity, GetPhysics)
 {
 	auto self = my->ToEntity(1);
 
-	if (self->IsGarbage() || !(IEntityPhysicalProxy *)self->GetProxy(ENTITY_PROXY_PHYSICS))
+	if (self->IsGarbage() || !(IEntityPhysicalProxy *)self->GetProxy(ENTITY_PROXY_PHYSICS) || !self->IsInitialized() || !self->IsPrePhysicsActive())
 	{
 		my_pushnull(L);
 		return 1;

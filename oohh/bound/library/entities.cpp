@@ -138,6 +138,18 @@ LUALIB_FUNCTION(entities, GetAll)
     //Stack is now: {}
     my->NewTable();
 
+	if (!gEnv->IsDedicated())
+	{
+		if (
+			!gEnv->pGame || 
+			!gEnv->pGame->GetIGameFramework() || 
+			!gEnv->pGame->GetIGameFramework()->GetClientActor() ||
+			!gEnv->pGame->GetIGameFramework()->GetClientActor()->GetEntity() ||
+			!gEnv->pGame->GetIGameFramework()->GetClientActor()->GetEntity()->IsInitialized()
+			)
+		return 1;
+	}
+
     //Initialize the entity iterator that we're going to use to loop through all entities
     auto iterator = gEnv->pEntitySystem->GetEntityIterator();
 
@@ -181,4 +193,13 @@ LUALIB_FUNCTION(entities, GetById)
 	my->Push(oohh::GetEntityFromId(my->ToNumber(1), my->IsTrue(2)));
 
     return 1;
+}
+
+#include "IEntityPoolManager.h"
+
+LUALIB_FUNCTION(entities, ResetPools)
+{
+	gEnv->pEntitySystem->GetIEntityPoolManager()->ResetPools();
+
+    return 0;
 }

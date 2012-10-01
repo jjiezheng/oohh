@@ -44,7 +44,7 @@ local params =
 }
 
 hook.Add("ProcessPlayerGroundMove", "move", function(ply)
-    if typex(ply) ~= "player" or not ply:IsAlive() then
+	if typex(ply) ~= "player" or not ply:IsAlive() then
 	return end
 	
 	local phys = ply:GetPhysics()
@@ -54,7 +54,6 @@ hook.Add("ProcessPlayerGroundMove", "move", function(ply)
 	end
 	
 	--ply:SetPlayerDynamics(params)
-	
 	local vel = calc_sliding(phys)
 	if vel then return vel end
 	local ground = ply:IsOnGround()
@@ -94,22 +93,24 @@ hook.Add("ProcessPlayerGroundMove", "move", function(ply)
 			return ply.move_vel + ang:GetUp() * 4, 6
 		end
 		 
-		ply.move_vel = ply.move_vel * math.clamp(FrameTime() * 100, 0.5, 0.925)
+		ply.move_vel = ply.move_vel * math.clamp(RealFrameTime() * 100, 0.5, 0.925)
 	
 		return ply.move_vel
+	else
+		ply.move_vel = Vec3()
 	end
 end)
 
 hook.Add("PlayerActionEvent", "gmod_move", function(ply, key, press)
-    if ply == entities.GetLocalPlayer() and SERVER then return end
+	if ply == entities.GetLocalPlayer() and SERVER then return end
 
 	if press and key == "jump" and ply:IsOnGround() then
 		ply.jumped = true
-    end
+	end
 end)
 
 hook.Add("PlayerPreViewProcess", "view", function(ply, pos, rot, fov)
-    if ply == entities.GetLocalPlayer() and SERVER then return end
+	if ply == entities.GetLocalPlayer() and SERVER then return end
 	
 	if ply:IsThirdPerson() or ply:GetParent():IsValid() then
 		return
@@ -117,7 +118,6 @@ hook.Add("PlayerPreViewProcess", "view", function(ply, pos, rot, fov)
 	
 	return ply:GetEyePos(), ply:GetViewRotation(), fov + math.rad(15)
 end)
-
 
 util.MonitorFileInclude()
 

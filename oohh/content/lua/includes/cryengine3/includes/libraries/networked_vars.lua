@@ -41,8 +41,6 @@ function nvars.Initialize()
 	hook.Add("EntitySpawned", "nvars", function(ent)
 		nvars.AttachEntity(ent)
 	end)
-	
-	nv_G = nvars.CreateObject("_G")
 end
 
 function nvars.FullUpdate()

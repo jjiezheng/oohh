@@ -11,7 +11,15 @@ local sayings = {
 }
 local thissaying = sayings[ math.random( 1, #sayings ) ]
 
-
+console.AddCommand("mount_game",function()
+	aahh.StringInput("Enter the path to your cryengine3 based /game folder", "E:/steam/steamapps/common/crysis 2/gamecrysis2", function(str)
+		file.OpenPacks(str .. "/*.pak")
+		
+		for level in lfs.dir(str .. "/levels/") do
+			file.OpenPacks(str .. "/levels/".. level .."/*.pak")
+		end
+	end)
+end )
 
 local bg_oohh = {}
 for i = 1, 40 do
@@ -102,7 +110,7 @@ menu.AddBackground( function( size, fade )
 	--surface.SetTranslation(0,0)
 	
 	graphics.Set2DFlags()
-	graphics.DrawFilledRect(f.rect)
+	graphics.DrawFilledRect(f.rect, Color( 0.9, 0.9, 0.9, 1 * fade ) )
 	for i, part in pairs(f.sand) do
 		-- random velocity for some variation
 		part.vel.x = part.vel.x + ext_vel_x + math.randomf(-1,1)
@@ -138,7 +146,7 @@ menu.AddBackground( function( size, fade )
 		end
 	
 		--surface.DrawTexturedRect(part.pos.x, part.pos.y, part.siz, part.siz)
-		surface.SetColor(Color(part.vel.x*0.01, part.vel.y*0.01, 1, 1))
+		surface.SetColor(Color(part.vel.x*0.01, part.vel.y*0.01, 1, 1 * fade))
 		surface.DrawLine(part.pos.x, part.pos.y, part.pos.x - part.vel.x*0.5, part.pos.y - part.vel.y*0.5)
 	end
 	--surface.SetTranslation(x,y)

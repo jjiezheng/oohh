@@ -470,10 +470,9 @@ bool CGame::Init(IGameFramework *pFramework)
 	}
 	gEnv->pNetwork->GetLobby()->SetLobbyService(eCLS_Online);
 
-	/*
 	if ( gEnv->pScaleformGFx && gEnv->pScaleformGFx->IsScaleformSupported() )
 	{
-		CUIManager::Init(); // oohh: nah
+		CUIManager::Init();
 	}
 	else
 	{
@@ -482,7 +481,6 @@ bool CGame::Init(IGameFramework *pFramework)
 			m_pBitmapUi = new CBitmapUi();
 		}
 	}
-	*/
 #if ENABLE_FEATURE_TESTER
 	new CFeatureTester();
 #endif
@@ -568,13 +566,7 @@ extern Vec3 g_vel;
 
 int CGame::Update(bool haveFocus, unsigned int updateFlags)
 {
-	bool bRun = m_pFramework->PreUpdate(oohh::IsFocused(), updateFlags);
-
-	if (!oohh::IsRendering())
-	{
-		m_pFramework->PostUpdate(oohh::IsFocused(), updateFlags);
-		return bRun ? 1 : 0;
-	}
+	bool bRun = m_pFramework->PreUpdate( true, updateFlags );
 
 	float frameTime = gEnv->pTimer->GetFrameTime();
 	m_colorGradientManager->UpdateForThisFrame(frameTime);
@@ -588,7 +580,7 @@ int CGame::Update(bool haveFocus, unsigned int updateFlags)
 	{
 			FRAME_PROFILER("GlobalIntersectionTester", gEnv->pSystem, PROFILE_AI);
 
-			m_pIntersectionTester->SetQuota(6);	
+			m_pIntersectionTester->SetQuota(6);
 			m_pIntersectionTester->Update(frameTime);
 	}
 

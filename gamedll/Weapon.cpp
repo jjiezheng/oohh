@@ -2555,7 +2555,7 @@ void CWeapon::FixAccessories(SAccessoryParams *params, bool attach)
 		{
 			EnableZoomMode(GetZoomModeIdx(params->zoommode), true);
 			SetCurrentZoomMode(GetZoomModeIdx(params->zoommode));
-		}
+		}	
 	}	
 }
 

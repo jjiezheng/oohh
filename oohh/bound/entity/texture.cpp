@@ -88,7 +88,7 @@ LUAMTA_FUNCTION(texture, GetFormat)
 {
 	auto self = my->ToTexture(1);
 
-	my->Push(self->GetTextureSrcFormat());
+	my->Push((uint8)self->GetTextureSrcFormat());
 
 	return 1;
 }

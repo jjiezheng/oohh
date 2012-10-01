@@ -774,6 +774,8 @@ void CGameRules::OnRevive(CActor *pActor, const Vec3 &pos, const Quat &rot, int 
 //------------------------------------------------------------------------
 void CGameRules::OnKill(CActor *pActor, EntityId shooterId, const char *weaponClassName, int damage, int material, int hit_type)
 {
+	NOTIFY_UI_MP( PlayerKilled(pActor->GetEntityId(), shooterId) );
+
 	auto attacker = oohh::GetEntityFromId(shooterId);
 	my->CallHook("PlayerDied", pActor, attacker, weaponClassName, damage, material, hit_type);
 	my->CallEntityHook(pActor, "OnDeath", pActor, attacker, weaponClassName, damage, material, hit_type);
@@ -788,7 +790,7 @@ void CGameRules::OnReviveInVehicle(CActor *pActor, EntityId vehicleId, int seatI
 	SGameObjectEvent evt(eCGE_ActorRevive,eGOEF_ToAll, IGameObjectSystem::InvalidExtensionID, (void*)pActor);
 	
 	ScriptHandle handle(pActor->GetEntityId());
-	ScriptHandle vhandle(pActor->GetEntityId());
+	ScriptHandle vhandle(vehicleId);
 	CallScript(m_clientScript, "OnReviveInVehicle", handle, vhandle, seatId, teamId);
 }
 

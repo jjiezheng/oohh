@@ -1,6 +1,6 @@
 <download name="oh_construct" type="Map">
  <index src="filelist.xml" dest="filelist.xml"/>
  <files>
-  <file src="level.pak" dest="level.pak" size="3426650" md5="7e7c50ca728b7f35d43246e881a56cf9"/>
+  <file src="level.pak" dest="level.pak" size="3013456" md5="5c0869c26ba1ec79fcdb028630714846"/>
  </files>
 </download>

@@ -167,13 +167,21 @@ function menu.MakeButtons()
 	menu.AddButton("Host", function() 
 		aahh.StringInput("Enter the map name", cookies.Get("lastmap", "oh_island"), function(str)
 			cookies.Set("lastmap", str)
-			os.execute([[start "" "%CD%\bin32\launcher.exe" "server" "+map ]] .. str .. [[ s"]])
+			os.execute([[start "" "%CD%\bin32\launcher.exe" "server" "+r_driver dx9" "+map ]] .. str .. [[ s"]])
 			--console.RunString("map " .. str .. " s")
 			--menu.Close()
 		end)
 	end)
+	
 	menu.AddButtonSpace()
-
+	
+	menu.AddButton("Mount", function() 
+		aahh.StringInput("Enter the game content folder and restart your game", "E:\\steam\\steamapps\\common\\crysis 2\\gamecrysis2", function(str)
+			MountGame(str)
+		end)
+	end)
+	
+	
 	menu.AddButton("Tests", function()
 
 		local frame = aahh.Create("frame")
