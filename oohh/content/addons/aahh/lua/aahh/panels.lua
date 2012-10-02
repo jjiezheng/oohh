@@ -1,4 +1,4 @@
-function aahh.Create(name, parent)
+function aahh.Create(name, parent, pos)
 	local pnl = class.Create("panel", name, "base")
 	
 	if not pnl then return end
@@ -19,9 +19,7 @@ function aahh.Create(name, parent)
 		pnl:SafeCall("Initialize")
 	end
 
-	pnl:SetParent(parent)
-
-	return pnl
+	return pnl, pnl:SetParent(parent, pos)
 end
 
 function aahh.SafeCall(pnl, name, ...)
@@ -124,7 +122,7 @@ do -- meta
 		self.Skin = aahh.ActiveSkin
 		self:UpdateSkinColors()
 	end
-		
+			
 	do -- colors
 		function PANEL:UpdateSkinColors()
 			local skin = self.Skin
@@ -307,19 +305,17 @@ do -- meta
 	end
 	
 	do -- parenting
-		function PANEL:CreatePanel(name)
-			local pnl = aahh.Create(name)
-			self:AddChild(self)
-			return pnl
+		function PANEL:CreatePanel(name, pos)
+			return aahh.Create(name, self, pos)
 		end
 	
-		function PANEL:SetParent(var)
+		function PANEL:SetParent(var, pos)
 			var = var or aahh.World
 			if not var:IsValid() then
 				self:UnParent()
 				return false
 			else
-				return var:AddChild(self)
+				return var:AddChild(self, pos)
 			end
 		end
 		
@@ -327,7 +323,7 @@ do -- meta
 			return self.Parent or NULL
 		end	
 				
-		function PANEL:AddChild(var)
+		function PANEL:AddChild(var, pos)
 			var = var or NULL
 			if not var:IsValid() then 
 				return
@@ -341,12 +337,14 @@ do -- meta
 		
 			var.Parent = self
 
-			local id = table.insert(self:GetChildren(), var)
+			pos = pos or #self:GetChildren() + 1
+			table.insert(self:GetChildren(), pos, var)
+			
 			
 			var:SafeCall("OnParent", self)
 			self:SafeCall("OnChildAdd", var)
 
-			return id
+			return pos
 		end
 
 		function PANEL:HasParent()
@@ -876,6 +874,9 @@ do -- meta
 			end
 		end
 		self.Visible = b
+		if self:IsInFront() then
+			aahh.FrontPanel = NULL
+		end
 	end
 	
 	function PANEL:VisibleInsideParent()
@@ -900,13 +901,11 @@ do -- meta
 			aahh.StartDraw(self)
 				self:SafeCall("OnDraw", self:GetSize())
 				self:SafeCall("OnPostDraw", self:GetSize())
-			aahh.EndDraw()
+			aahh.EndDraw(self)
 
 			if not self.HideChildren then
 				for key, pnl in pairs(self:GetChildren()) do
-					aahh.StartDraw(pnl)
-						pnl:Draw()
-					aahh.EndDraw()
+					pnl:Draw()
 				end
 			end
 		end
@@ -975,13 +974,16 @@ do -- meta
 					if data.calc(self, data.current, data) == true then
 						data.calc(self, 1, data)
 						self.Animations[key] = nil
+						if data.done_func then
+							data.done_func(self, data)
+						end
 					end
 				end
 			end
 		end
 		
 		local function ADD_ANIM(name, original, callback)
-			PANEL[name] = function(self, target, speed, delay, exp)
+			PANEL[name] = function(self, target, speed, delay, exp, done_func)
 				speed = speed or 0.25
 				delay = delay or 0
 				exp = exp or 1
@@ -993,6 +995,7 @@ do -- meta
 					current = 0,
 					original = original(self),
 					calc = callback,
+					done_func = done_func,
 					
 					target = target, 
 					speed = speed, 

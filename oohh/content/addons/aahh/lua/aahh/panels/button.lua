@@ -4,21 +4,17 @@ PANEL.ClassName = "button"
 
 function PANEL:Initialize()
 	self:SetCursor(IDC_HAND)
+	self.button_down = {}
 end
 
 function PANEL:OnMouseInput(key, press)
-	if key == "mouse1" then
-		if press and not self.is_down then 
-			self.is_down = true
-		return end
-			
-		if not press then
-			self:OnRelease(key)
-		end
-		
-		if not press and self.is_down then
-			return self:OnPress(key)
-		end
+	if press then
+		self.button_down[key] = press
+		return
+	end
+	
+	if not press and self.button_down[key] then
+		return self:OnPress(key)
 	end
 end
 

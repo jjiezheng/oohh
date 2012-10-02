@@ -14,7 +14,7 @@ if CLIENT then
 		
 		if not showing then
 			if chatgui then chatgui.Show(1) end
-			panel = aahh.Create("textentry")
+			panel = aahh.Create("textinput")
 				panel:SetPos(Vec2(20, Vec2(render.GetScreenSize()).h-300))
 				panel:SetSize(Vec2(512, 16))
 				panel:MakeActivePanel()

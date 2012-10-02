@@ -18,6 +18,25 @@ function graphics.DisableFlags(b)
 	disable_flags = b
 end
 
+function graphics.GetScreenRect()
+	return Rect(0,0,render.GetScreenSize())
+end
+
+local draw_rect
+
+function graphics.SetRect(rect)
+	draw_rect = rect
+	
+	if rect then
+		
+		surface.SetTranslation(0,0)
+		
+		render.SetViewport(draw_rect.x, draw_rect.y, draw_rect.w, draw_rect.h)
+	else
+		render.SetViewport(0,0,render.GetScreenSize())
+	end
+end
+
 local white
 
 local corner
@@ -27,14 +46,13 @@ local draw_textured_rect = function(x,y,w,h, ...)
 	y = y-0.1
 	w = w-0.1
 	h = h-0.1]]
-	
-	if false and CAPSADMIN and not input.IsKeyDown("space") then
-		local sw, sh = render.GetScreenSize()
 		
-		w = sw
-		h = sh
+	if draw_rect then
+		x = 0
+		y = 0
+		w,h = render.GetScreenSize()
 	end
-	
+		
 	surface.DrawTexturedRect(x,y,w,h, ...)
 end
 
@@ -282,22 +300,6 @@ function graphics.DrawTexture(tex, rect, color, uv, nofilter)
 	
 	surface.SetColor(color or Color(1,1,1,1))
 	surface.SetTexture(tex)
-	
-		
-	if false and CAPSADMIN and not input.IsKeyDown("space") then
-		local w,h = render.GetScreenSize()
-		surface.DrawTexturedRectEx(
-			rect.x,
-			rect.y,
-			w,
-			h,
-
-			nofilter,
-
-			unpack(uv)
-		)
-		return
-	end
 	
 	surface.DrawTexturedRectEx(
 		rect.x,

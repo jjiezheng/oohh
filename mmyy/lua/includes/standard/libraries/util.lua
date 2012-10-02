@@ -1,5 +1,22 @@
 util = util or {}
 
+function util.RemoveOldObject(obj, id)
+	
+	if hasindex(obj) and type(obj.Remove) == "function" then
+		UTIL_REMAKES = UTIL_REMAKES or {}
+		
+		id = id or debug.getinfo(2).short_src
+		
+		if typex(UTIL_REMAKES[id]) == typex(obj) then
+			UTIL_REMAKES[id]:Remove()
+		end
+		
+		UTIL_REMAKES[id] = obj
+	end
+	
+	return obj
+end
+
 function util.OverrideUserDataMeta(udata, meta)
     local REAL = getmetatable(udata)
     local META = table.copy(REAL)

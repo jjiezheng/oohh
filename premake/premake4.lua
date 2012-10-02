@@ -104,6 +104,11 @@ if _ACTION == "link" then
 	-- lua dependencies
 	copy("mmyy/lib/lua51.dll", "bin32")
 	
+	-- vs2010 dependencies
+	-- debug
+	copy("oohh/content/bin32/msvcr100d.dll", "bin32")
+	copy("oohh/content/bin32/msvcp100d.dll", "bin32")
+	
 	-- vs2012 dependencies
 	-- debug
 	copy("oohh/content/bin32/msvcr110d.dll", "bin32")

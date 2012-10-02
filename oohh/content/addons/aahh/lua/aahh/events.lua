@@ -1,3 +1,6 @@
+
+local white
+
 function aahh.StartDraw(pnl)
 	if not pnl:IsValid() then return end
 		
@@ -5,22 +8,30 @@ function aahh.StartDraw(pnl)
 	surface.SetTranslation(pos.x, pos.y)
 	
 	if false and CAPSADMIN then 
-		
 		if input.IsKeyDown("space") then return end
-		
-		
-		surface.ShouldScale(true)
-		surface.SetTranslation(0, 0)
+		graphics.SetRect(Rect(pos.x, pos.y, pnl:GetSize():Unpack()))
+	end
+end
+
+function aahh.EndDraw(pnl)	
+	if aahh.debug then 
+		white = white or Texture("defaults/white.dds"):GetId() -- ugh
 
 		local siz = pnl:GetSize()
-			
-		render.SetViewport(
-			pos.x, 
-			pos.y, 
-			siz.w,
-			siz.h
-		)
 		
+		surface.SetColor(Color(1,1,0,0.5))
+		surface.SetTexture(white)
+		render.SetState(bit.bor(OS_MULTIPLY_BLEND, GS_BLSRC_SRCALPHA, GS_BLDST_DSTALPHA, GS_NODEPTHTEST, GS_WIREFRAME))
+		surface.DrawTexturedRect(0,0, siz.w, siz.h)
+	end
+
+	surface.SetTranslation(0, 0)
+
+	
+	if false and CAPSADMIN then 
+		if input.IsKeyDown("space") then return end
+
+		graphics.SetRect()
 	end
 end
 
@@ -40,14 +51,6 @@ function aahh.Draw(delta)
 	end
 end
 
-function aahh.EndDraw()
-	surface.SetTranslation(0, 0)
-	
-	if CAPSADMIN then
-		render.SetViewport(0, 0, render.GetScreenSize())
-	end
-end
-
 function aahh.CallEvent(pnl, name, ...)
 	pnl = pnl or aahh.World
 	
@@ -56,8 +59,9 @@ end
 
 function aahh.MouseInput(key, press, pos)
 	local tbl = {}
+	
 	for _, pnl in pairs(aahh.GetPanels()) do
-		if not pnl.IgnoreMouse and pnl:IsWorldPosInside(pos) then
+		if not pnl.IgnoreMouse and pnl:IsWorldPosInside(pos) and pnl:IsVisible() then
 			table.insert(tbl, pnl)
 		end
 	end
@@ -90,7 +94,31 @@ if CRYENGINE3 then
 			input.DisableFocus = false
 		end
 		
-		surface.StartDraw()
+		if false and CAPSADMIN then
+			aahh.Zoom = aahh.Zoom or 1
+			
+			if input.WasKeyPressed("mwheel_up") then
+				aahh.Zoom = aahh.Zoom - 0.1
+			elseif input.WasKeyPressed("mwheel_down") then
+				aahh.Zoom = aahh.Zoom + 0.1
+			end
+			
+			aahh.Zoom = math.clamp(aahh.Zoom, 0, 1)
+			
+			local z = aahh.Zoom * 1000
+			local x,y = mouse.GetPos()
+			local w,h = render.GetScreenSize()
+
+			local rect = Rect(0,0,w,h)
+			
+			rect:Shrink(z)
+			
+			print(rect)
+			render.SetViewport(rect:Unpack())
+			--render.SetViewport(0,0,w,h)
+		end
+		
+		--surface.StartDraw()
 			graphics.Set2DFlags()
 			
 			hook.Call("DrawHUD")
@@ -98,7 +126,7 @@ if CRYENGINE3 then
 			hook.Call("PreDrawMenu")
 				aahh.Draw(delta)
 			hook.Call("PostDrawMenu")
-		surface.EndDraw()
+		--surface.EndDraw()
 	end)
 
 	function aahh.KeyInput(key, press)

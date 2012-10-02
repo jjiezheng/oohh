@@ -3,6 +3,7 @@ sys_maxfps
 e_ViewDistRatio
 e_ViewDistRatioVegetation
 e_ViewDistMin
+e_Vegetation
 
 r_WaterRefractions 
 r_WaterReflections 

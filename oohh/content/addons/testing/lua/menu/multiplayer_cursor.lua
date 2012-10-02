@@ -9,7 +9,7 @@ else
 	--luasocket.debug = true
 end
 
-if fun_server:IsValid() then    
+if (fun_server or NULL):IsValid() then    
 	fun_server:Remove()  
 end
 

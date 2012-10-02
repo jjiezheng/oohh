@@ -16,12 +16,12 @@ function aahh.StringInput(msg, default, callback, check)
 	label:SetSize(label:GetSize()+Vec2(0, 4))
 	label:AppendToBottom(4)
 	
-	local textentry = aahh.Create("textentry", frame)
-	textentry:SetTrapInsideParent(false)
-	textentry:SetText(default)
-	textentry:SetPos(Vec2(x, y))
-	textentry:SetSize(Vec2(400, 20))
-	textentry:AppendToBottom(4)
+	local textinput = aahh.Create("textinput", frame)
+	textinput:SetTrapInsideParent(false)
+	textinput:SetText(default)
+	textinput:SetPos(Vec2(x, y))
+	textinput:SetSize(Vec2(400, 20))
+	textinput:AppendToBottom(4)
 	
 	local textbutton = aahh.Create("textbutton", frame)
 	textbutton:SetTrapInsideParent(false)
@@ -32,12 +32,12 @@ function aahh.StringInput(msg, default, callback, check)
 	
 	
 	textbutton.OnPress = function(self)
-		callback(textentry:GetText())
+		callback(textinput:GetText())
 		frame:Remove()
 	end
 	
-	textentry.OnEnter = function(self)
-		local str = textentry:GetText()
+	textinput.OnEnter = function(self)
+		local str = textinput:GetText()
 		if not check or check(str, self) ~= false then
 			callback()
 			frame:Remove()

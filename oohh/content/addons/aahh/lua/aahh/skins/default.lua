@@ -47,8 +47,8 @@ local c = {}
 	
 	c.text 		 = 	c.medium:Copy()
 	
-	c.textentry1 = 	c.light3:Copy()
-	c.textentry0 = 	Color(0.75, 0.75, 0.75) * light_shift
+	c.textinput1 = 	c.light3:Copy()
+	c.textinput0 = 	Color(0.75, 0.75, 0.75) * light_shift
 
 	c.border =		Color(0.40, 0.40, 0.40, 0.50) * light_shift
 SKIN.Colors = c
@@ -272,7 +272,7 @@ do -- button text
 	end
 end
 
-do--menuitem
+if false then--menuitem
 	local border = PAD/4
 	
 	function SKIN:MenuItemDraw(pnl, c)		
@@ -311,6 +311,45 @@ do--menuitem
 	end
 end
 
+do--menuitem
+	local border = PAD/4
+	
+	function SKIN:MenuItemDraw(pnl, c)		
+		if pnl:IsWorldPosInside(MPOS) then
+			local rct = Rect(Vec2(0,0), pnl:GetSize())
+			if pnl:IsDown() then
+				rct:Shrink(1)
+			end
+			
+			graphics.DrawRect(rct, c.highlight2)
+		end
+	end
+	
+	function SKIN:ContextDraw( pnl )
+		graphics.DrawRect(Rect(Vec2(0,0), pnl:GetSize()), c.light, nil, nil, c.medium)
+	end
+
+	function SKIN:MenuItemLayout(pnl)
+		pnl.img:SetSize(Vec2() + pnl:GetHeight())
+		pnl.img:Align(ALIGN_CENTERLEFT)
+	
+		pnl.lbl:SetFont(self.Fonts.aahh_default)
+		pnl.lbl:SetTextSize(8)
+		pnl.lbl:SizeToText()
+		pnl.lbl:SetSkinColor("text", "dark")
+		pnl.lbl:SetTrapInsideParent( false )
+		pnl.lbl:SetPos(pnl.img:GetPos() + pnl.img:GetSize() + Vec2(PAD, 0))
+		pnl.lbl:CenterY()
+		
+		pnl:SetSize(Vec2(pnl.lbl:GetSize().w + pnl.img.w + PAD, 16))
+	end
+	
+	function SKIN:ContextLayout( pnl )
+		pnl:Stack()
+		pnl:SetSize( pan:GetSize() + Vec2( 0, PAD * 2 ) )
+	end
+end
+
 do--image
 	function SKIN:ImageDraw(pnl, c)
 		graphics.DrawTexture(pnl.Texture, Rect(Vec2(0,0), pnl:GetSize()), pnl.Color, pnl.UV)
@@ -321,8 +360,8 @@ do--image
 	end
 end
 
-do--textentry
-	function SKIN:TextEntryDraw(pnl, c)
+do--textinput
+	function SKIN:TextInputDraw(pnl, c)
 		
 		local siz = pnl:GetTextSize(true)
 		local center = pnl:GetSize() / 2

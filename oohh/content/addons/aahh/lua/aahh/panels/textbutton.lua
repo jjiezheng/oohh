@@ -4,6 +4,8 @@ PANEL.ClassName = "textbutton"
 PANEL.Base = "button"
 
 function PANEL:Initialize()
+	self.BaseClass.Initialize(self)
+	
 	self.lbl = aahh.Create("label", self)
 	self.lbl:SetIgnoreMouse(true)
 	

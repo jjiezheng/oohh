@@ -28,10 +28,10 @@ bottompnl:SetTrapInsideParent(false)
 bottompnl:Dock("bottom")
 bottompnl:SetSize(Vec2(20, 20))
 
-local textentry = aahh.Create("textentry", bottompnl)
-textentry:SetTrapInsideParent(false)
-textentry:Dock("fill")
-textentry:SetSize(Vec2(20, 20))
+local textinput = aahh.Create("textinput", bottompnl)
+textinput:SetTrapInsideParent(false)
+textinput:Dock("fill")
+textinput:SetSize(Vec2(20, 20))
 
 local buttonmode = aahh.Create("textbutton", bottompnl)
 buttonmode:SetTrapInsideParent(false)
@@ -165,7 +165,7 @@ end
 
 local histind = 0
 
-textentry.OnUnhandledKey = function(self, key)
+textinput.OnUnhandledKey = function(self, key)
 	
 	if #history == 0 then return end
 	
@@ -186,7 +186,7 @@ textentry.OnUnhandledKey = function(self, key)
 	self:SetText(history[histind])
 end
 
-textentry.OnEnter = function(self, str)
+textinput.OnEnter = function(self, str)
 	if str == "" then return end
 	local func, err = loadstring(str, "Lineviewer Lua Execute")
 	

@@ -1,7 +1,7 @@
 local smoothfps = 0
 local color = aahh.GetSkinColor("light")
 
-hook.Add("DrawHUD", "FPS", function()
+hook.Add("PostDrawMenu", "FPS", function()
 	local fps = 1 / FrameTime()
 	if tonumber(tostring(fps)) then 
 		smoothfps = smoothfps + ((fps - smoothfps) * FrameTime())

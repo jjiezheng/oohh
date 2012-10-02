@@ -1,4 +1,4 @@
-menu = menu or {}
+util.MonitorFileInclude()
 
 local sayings = {
 	"fascinating!!1",
@@ -7,64 +7,37 @@ local sayings = {
 	"achieved with AowlEngine3",
 	"what am i doing",
 	"[menu.lua]:" .. math.random( 50, 350 ) .. ": '<eof>' expected near 'oohh'",
-	"eek"
+	"eek",
+	"did that take forever to calculate"
 }
 local thissaying = sayings[ math.random( 1, #sayings ) ]
 
-console.AddCommand("mount_game",function()
-	aahh.StringInput("Enter the path to your cryengine3 based /game folder", "E:/steam/steamapps/common/crysis 2/gamecrysis2", function(str)
-		file.OpenPacks(str .. "/*.pak")
-		
-		for level in lfs.dir(str .. "/levels/") do
-			file.OpenPacks(str .. "/levels/".. level .."/*.pak")
-		end
-	end)
-end )
+menu = menu or {}
 
-local bg_oohh = {}
-for i = 1, 40 do
-	local tab = {}
-	tab.text = string.rep( "o", math.random( 2, 8 ) ) .. "hh"
-	tab.color = Color( math.random( 0, 100 ) / 100, math.random( 0, 100 ) / 100, math.random( 0, 100 ) / 100, 1 )
-	tab.size = math.random( 14, 30 )
-	tab.speed = math.random( 500, 1000 ) / 30
-	bg_oohh[i] = tab
+if menu.backplate and menu.backplate:IsValid() then
+	menu.backplate:Remove()
 end
+
+-- Backgrounds
 
 menu.backgrounds = {}
+menu.activebackground = "plain"
 
-function menu.AddBackground( draw, id )
-	menu.backgrounds[id or tostring(draw)] = draw
+menu.backgrounds.plain = function( size )
+	graphics.DrawFilledRect( Rect( 0, 0, size ), Color( 0.8, 0.8, 0.8, 1 ) )
 end
 
-menu.AddBackground( function( size, fade ) 
-	graphics.DrawFilledRect( Rect( 0, 0, size.w, size.h ), Color( 0.1, 0.1, 0.1, 1 * fade ) )
-	for i = 1, 40 do
-		local color = bg_oohh[i].color:Copy()
-		color.a = color.a * fade
-		
-		graphics.DrawText( 
-			bg_oohh[i].text, 
-			Vec2( ( size.w * 2 - os.clock() * 3 * bg_oohh[i].speed ) % ( size.w * 2 ) - size.w, 
-			( bg_oohh[i].speed * 30 * math.floor( ( size.w - os.clock() * 3 * bg_oohh[i].speed ) / size.w ) ) % size.h ), 
-			"trebuc.ttf", 
-			bg_oohh[i].size, 
-			color
-		)
-	end
-end )
-
-menu.AddBackground( function( size, fade ) 
+menu.backgrounds.pixelgrid = function( size ) 
 	local mpos = Vec2(mouse.GetPos()) - size.w / 20
 	for i = 0, 9 do
 		for j = 0, math.ceil( 9 * size.h / size.w ) do
 			local a = 0.2 + math.clamp( 1 - ( ( mpos.x - size.x * i / 10 )^2 + ( mpos.y - size.w * j / 10 )^2 ) ^ 0.5 / 800, 0, 1 ) * 0.7
-			graphics.DrawFilledRect( Rect( i * size.w / 10, j * size.w / 10, size.w / 10, size.w / 10 ), Color( a, a, a, 1 * fade ) )
+			graphics.DrawFilledRect( Rect( i * size.w / 10, j * size.w / 10, size.w / 10, size.w / 10 ), Color( a, a, a, 1 ) )
 		end
 	end
-end )
+end
 
-menu.AddBackground( function( size, fade )
+menu.backgrounds.sand = function( size )
 	sand_particles = sand_particles or {}
 	local f = sand_particles
 				
@@ -110,7 +83,7 @@ menu.AddBackground( function( size, fade )
 	--surface.SetTranslation(0,0)
 	
 	graphics.Set2DFlags()
-	graphics.DrawFilledRect(f.rect, Color( 0.9, 0.9, 0.9, 1 * fade ) )
+	graphics.DrawFilledRect(f.rect, Color( 0.9, 0.9, 0.9, 1 ) )
 	for i, part in pairs(f.sand) do
 		-- random velocity for some variation
 		part.vel.x = part.vel.x + ext_vel_x + math.randomf(-1,1)
@@ -146,176 +119,399 @@ menu.AddBackground( function( size, fade )
 		end
 	
 		--surface.DrawTexturedRect(part.pos.x, part.pos.y, part.siz, part.siz)
-		surface.SetColor(Color(part.vel.x*0.01, part.vel.y*0.01, 1, 1 * fade))
+		surface.SetColor(Color(part.vel.x*0.01, part.vel.y*0.01, 1, 1 ))
 		surface.DrawLine(part.pos.x, part.pos.y, part.pos.x - part.vel.x*0.5, part.pos.y - part.vel.y*0.5)
 	end
 	--surface.SetTranslation(x,y)
 	
 	f.last_pos = pos
-end )  
-
-function menu.SelectRandomBackground()
-	if menu.active_background then
-		menu.prev_active_background = menu.active_background
-		menu.background_fade = 0
-	end
-	
-	menu.active_background = table.random(menu.backgrounds)
-	
-	if not menu.prev_active_background or menu.active_background == menu.prev_active_background then
-		menu.prev_active_background = nil
-	end
 end
 
-menu.SelectRandomBackground()
-
--- Render Code
-
-util.MonitorFileInclude()
-function menu.Render()
-	local size = graphics.GetScreenSize()
-	
-	if not entities.GetLocalPlayer():IsValid() and menu.active_background then
-		if menu.prev_active_background then
-			menu.background_fade = math.clamp(menu.background_fade + FrameTime(), 0, 1)
-			menu.prev_active_background( size, -menu.background_fade + 1 )
-			menu.active_background( size, menu.background_fade )
-			
-			if menu.background_fade == 1 then
-				menu.prev_active_background = nil
-			end	
-		else
-			menu.active_background( size, 1 )		
+menu.backgrounds.gridvacuum = function( size )
+	local mpos = Vec2(mouse.GetPos())
+	graphics.DrawFilledRect( Rect( 0, 0, size ), Color( 0.3, 0.3, 0.3, 1 ) )
+	for i = -50, graphics.GetScreenSize().w + 100, 50 do
+		for j = -50, graphics.GetScreenSize().h + 100, 50 do
+			surface.SetColor( Color( 1, 1, 1, 1 ) )
+			local p1 = Vec2( i, j ) + Vec2( math.clamp( ( mpos - Vec2( i, j ) ).x, -50, 50 ), math.clamp( ( mpos - Vec2( i, j ) ).y, -50, 50 ) ) * ( CurTime() % 1 )
+			local p2 = Vec2( i + 50, j ) + Vec2( math.clamp( ( mpos - Vec2( i + 50, j ) ).x, -50, 50 ), math.clamp( ( mpos - Vec2( i + 50, j ) ).y, -50, 50 ) ) * ( CurTime() % 1 )
+			local p3 = Vec2( i, j + 50 ) + Vec2( math.clamp( ( mpos - Vec2( i, j + 50 ) ).x, -50, 50 ), math.clamp( ( mpos - Vec2( i, j + 50 ) ).y, -50, 50 ) ) * ( CurTime() % 1 )
+			surface.DrawLine( p1.x, p1.y, p2.x, p2.y )
+			surface.DrawLine( p1.x, p1.y, p3.x, p3.y )
 		end
 	end
+end
+
+local textures = {}
+
+menu.backgrounds.gravsim = function( size )
+	local mpos = Vec2(mouse.GetPos())
+	grav_particles = grav_particles or {}
 	
-	graphics.DrawFilledRect( Rect( 0, 0, size.w, size.h ), Color( 0, 0, 0, 0.3 ) )
-	graphics.DrawFilledRect( Rect( 0, size.h - 60, size.w, 60 ), Color( 0, 0, 0, 0.2 ) )
-	
-	for i = 0, 499 do
-		graphics.DrawFilledRect( Rect( i, 0, 1, size.h ), Color( 0, 0, 0, 0.6 - 0.6 * ( i / 500 ) ) )
+	while #grav_particles < 300 do
+		local part = {}
+		part.pos = Vec2( math.random( 0, size.w ), math.random( 0, size.h ) )
+		part.vel = Vec2( math.random( -500, 500 ), math.random( -500, 500 ) ) / 10000
+		part.mass = math.random( 20, 200 ) / 100
+		grav_particles[#grav_particles + 1] = part
 	end
 	
-	graphics.DrawText( "oohh", Vec2( 50, 50 ), "trebuc.ttf", 40, Color( 1, 1, 1, 1 ) )
-	graphics.DrawText( thissaying, Vec2( 50, 100 ), "trebuc.ttf", 20, Color( 0.8, 0.8, 0.8, 1 ) )
+	graphics.DrawFilledRect( Rect( 0, 0, size ), Color( 0.1, 0.1, 0.1, 1 ) )
+	
+	graphics.DisableFlags( true )
+	render.SetState( bit.bor(	
+		--OS_ADD_BLEND,
+		OS_MULTIPLY_BLEND,
+		GS_BLSRC_SRCALPHA, GS_BLDST_DSTALPHA,
+		--GS_BLSRC_ONEMINUSDSTCOL, GS_BLDST_SRCCOL,
+		GS_NODEPTHTEST
+	) )
+	for k, v in pairs( grav_particles ) do
+		v.pos = v.pos + v.vel * RealFrameTime() * 100
+		if math.random( 1, 100 ) < 4 then
+			for nk, nv in pairs( grav_particles ) do
+				if nk ~= k then
+					v.vel = v.vel + ( nv.pos - v.pos ) / 100000 * nv.mass * v.mass
+				end
+			end
+		end
+		local col = Color( math.min( math.abs( v.vel.x / 1 ), 1 ), math.min( math.abs( v.vel.y / 1 ), 1 ), 1, 1 )
+		local speed = v.vel:GetLength() * 300
+		col.a = 0.015
+		
+		graphics.DrawTexture( textures.spriteglow, Rect( v.pos - speed / 2, Vec2( speed, speed ) ), col)
+		col.a = 1
+		surface.SetColor( col )
+		surface.DrawLine( v.pos.x, v.pos.y, v.pos.x - v.vel.x * 10 * v.mass, v.pos.y - v.vel.y * 10 * v.mass )
+		
+		if v.pos.x < 0 or v.pos.x > size.x then
+			v.vel.x = v.vel.x * -0.95
+			if v.pos.x < 0 then
+				v.pos.x = 0
+			else
+				v.pos.x = size.x
+			end
+		end
+		if v.pos.y < 0 or v.pos.y > size.y then
+			v.vel.y = v.vel.y * -0.95
+			if v.pos.y < 0 then
+				v.pos.y = 0
+			else
+				v.pos.y = size.y
+			end
+		end
+	end
+
 end
 
--- Buttons'n'shite
-menu.contents = menu.contents or {}
+-- GUI
 
-for key, pnl in pairs( menu.contents ) do
-	if pnl:IsValid() then
-		pnl:Remove()
+textures.backgrad = Texture( 100, 1 )
+local img = textures.backgrad:GetPixelTable( true )
+for i = 0, textures.backgrad:GetLength() do
+	img[i].r, img[i].g, img[i].b = 1, 1, 1
+	-- img[i].a = i % render.GetScreenSize() < 360 and 100 * math.cos( math.rad( ( i % render.GetScreenSize() ) / 4 ) ) or 0
+	img[i].a = 100 - i
+end
+textures.backgrad:SetPixelTable( img )
+textures.innerpan = Texture( 1, 50 )
+local img = textures.innerpan:GetPixelTable( true )
+for i = 0, textures.innerpan:GetLength() do
+	img[i].r, img[i].g, img[i].b = 1, 1, 1
+	-- img[i].a = i % render.GetScreenSize() < 360 and 100 * math.cos( math.rad( ( i % render.GetScreenSize() ) / 4 ) ) or 0
+	img[i].a = 50 - i
+end
+textures.innerpan:SetPixelTable( img )
+textures.spriteglow = Texture( 100, 100 )
+local img = textures.spriteglow:GetPixelTable( true )
+for i = 0, textures.spriteglow:GetLength() do
+	img[i].r, img[i].g, img[i].b = 255, 255, 255
+	-- img[i].a = i % render.GetScreenSize() < 360 and 100 * math.cos( math.rad( ( i % render.GetScreenSize() ) / 4 ) ) or 0
+	local x = i % 100
+	local y = math.floor( i / 100 )
+	img[i].a = math.min( math.max( 50 - ( ( 50 - x )^2 + ( 50 - y )^2 ) ^ 0.6, 0 ) ^ 1.45, 255)
+end
+textures.spriteglow:SetPixelTable( img )
+
+local backpan = aahh.Create( "panel" )
+menu.backplate = backpan
+backpan:SetObeyMargin( false )
+backpan:SetSize( graphics.GetScreenSize() )
+backpan.OnDraw = function( me, size )
+	if not MULTIPLAYER then
+		menu.backgrounds[ menu.activebackground ]( graphics.GetScreenSize() )
+	end
+	graphics.DrawFilledRect( Rect( 0, 0, size ), Color( 0, 0, 0, 0.5 ) )
+	graphics.DrawTexture( textures.backgrad, Rect( 0, 0, 300, size.h ) )
+	
+	for i = -1, 1 do
+		for j = -1, 1 do
+			graphics.DrawText( "oohh", Vec2( 50 + i, 50 + j ), "verdana.ttf", 40, Color( 1, 1, 1, math.abs( math.sin( CurTime() ) * 0.9 + 0.1 ) ) )
+		end
+	end
+	graphics.DrawText( "oohh", Vec2( 50, 50 ), "verdana.ttf", 40, Color( 1, 1, 1, 1 ) )
+	graphics.DrawText( thissaying, Vec2( 50, 100 ), "verdana.ttf", 20, Color( 0.8, 0.8, 0.8, 1 ) )
+	
+	graphics.DrawFilledRect( Rect( 0, size.h - 40, size.w, 40 ), Color( 0, 0, 0, 0.2 ) )
+	graphics.DrawText( "Connecting...", Vec2( 14, size.h - 22 ), "verdana.ttf", 14, Color( 1, 1, 1, 1 ), Vec2( 0, -0.5 ) )
+end
+
+menu.controls = {}
+
+local connectmenuheight = 94
+local conpan = aahh.Create( "button", backpan )
+menu.controls.butconnect = conpan
+local conmen = aahh.Create( "panel", backpan )
+menu.controls.menconnect = conmen
+conpan:SetPos( Vec2( 50, 200 ) )
+conpan:SetSize( Vec2( 200, 40 ) )
+conpan.OnDraw = function( me, size )
+	graphics.DrawText( "Connect", Vec2( 12, 12 ), "verdana.ttf", 16, Color( 1, 1, 1, 1 ) )
+	if me:IsMouseOver() then
+		graphics.DrawOutlinedRect( Rect( 1, 1, size - 1 ), 1, Color( 1, 1, 1, 0.1 ) )
+		graphics.DrawFilledRect( Rect( size.w - 39, 2, 1, 37 ), Color( 1, 1, 1, 0.1 ) )
+		graphics.DrawOutlinedRect( Rect( 0, 0, size - 1 ), 1, Color( 0, 0, 0, 0.2 ) )
+		graphics.DrawFilledRect( Rect( size.w - 40, 1, 1, 37 ), Color( 0, 0, 0, 0.2 ) )
+	end
+end
+conpan.OnPress = function( me )
+	if ( mouse.GetPos() - me:GetPos() ).w > 160 then
+		if conmen:GetSize().w < 9 then
+			conmen:SetVisible( true )
+			conmen:SetSize( Vec2( 9, connectmenuheight ) )
+			conmen:SizeTo( Vec2( 200, connectmenuheight ), 0.4 )
+		else
+			conmen:SizeTo( Vec2( 0, connectmenuheight ), 0.4, 0, 1, function() conmen:SetVisible( false ) end )
+		end
+	else
+		-- aahh.StringInput("Enter the server IP", cookies.Get("lastip", "localhost"), function(str)
+			-- cookies.Set("lastip", str)
+			-- console.RunString("connect "..str)
+		-- end)
+		local pan = aahh.Create( "context" )
+		
+		pan:AddOption( Texture("gui/corner.dds"), "asd", function() print( "asd" ) end )
 	end
 end
 
-local butquit = aahh.Create( "button" )
-butquit.OnDraw = function( self, size )
-	local size = self:GetSize()
-	graphics.DrawFilledRect( Rect( 0, 0, size.w, size.h ), Color( 0, 0, 0, 0.5 ) )
-	graphics.DrawText( "QUIT", Vec2( 55, 24 ), "trebuc.ttf", 10, Color( 1, 1, 1, 1 ), Vec2( 0, -0.5 ) )
-	graphics.DrawOutlinedRect( Rect( 0, 0, size.w, size.h ), 2, Color( 1, 1, 1, 0.1 ) )
-	graphics.DrawOutlinedRect( Rect( 0, 0, size.w, size.h ), 1, Color( 0, 0, 0, 1 ) )
+conmen:SetPos( Vec2( 250, 200 ) )
+conmen:SetSize( Vec2( 0, conmenheight ) )
+conmen:SetVisible( false )
+local inpdel = false
+conmen.OnDraw = function( me, size )
+	if me.shutitdown then
+		me.shutitdown = false
+		conmen:SizeTo( Vec2( 0, connectmenuheight ), 0.4, 0, 1, function() conmen:SetVisible( false ) end )
+	end
+	if inpdel and not input.IsKeyDown( "mouse1" ) then
+		me.shutitdown = true
+	end
+	inpdel = me:GetSize().w > 199 and input.IsKeyDown( "mouse1" ) or false
+	graphics.DrawTexture( textures.innerpan, Rect( 0, size.h - connectmenuheight, size.w, connectmenuheight ) )
+	-- graphics.DrawOutlinedRect( Rect( 1, 1, size - 1 ), 1, Color( 1, 1, 1, 0.05 ) )
+	graphics.DrawOutlinedRect( Rect( 0, 0, size ), 1, Color( 0, 0, 0, 0.2 ) )
 end
-butquit.OnMouseEntered = function(self)
-	self:MoveTo( graphics.GetScreenSize() - Vec2( 150, 50 ) - 5, 1, 0, 1 )
-	self:SizeTo( Vec2( 150, 50 ), 1, 0, 1 )
-	menu.contents.settings:MoveTo( graphics.GetScreenSize() - Vec2( 205, 50 ) - 5, 1, 0, 1 )
-end
-butquit.OnMouseLeft = function(self)
-	self:MoveTo( graphics.GetScreenSize() - Vec2( 50, 50 ) - 5, 1, 0, 1 )
-	self:SizeTo( Vec2( 50, 50 ), 1, 0, 1 )
-	menu.contents.settings:MoveTo( graphics.GetScreenSize() - Vec2( 105, 50 ) - 5, 1, 0, 1 )
-end
-butquit:SetPos( graphics.GetScreenSize() - Vec2( 50, 50 ) - 5 )
-butquit:SetSize( Vec2( 50, 50 ) )
-butquit.OnRelease = function() console.RunString("quit") end
-menu.contents.quit = butquit
 
-local butset = aahh.Create( "button" )
-butset.OnDraw = function( self, size )
-	local size = self:GetSize()
-	graphics.DrawFilledRect( Rect( 0, 0, size.w, size.h ), Color( 0, 0, 0, 0.5 ) )
-	graphics.DrawText( "SETTINGS", Vec2( 55, 24 ), "trebuc.ttf", 10, Color( 1, 1, 1, 1 ), Vec2( 0, -0.5 ) )
-	graphics.DrawOutlinedRect( Rect( 0, 0, size.w, size.h ), 2, Color( 1, 1, 1, 0.1 ) )
-	graphics.DrawOutlinedRect( Rect( 0, 0, size.w, size.h ), 1, Color( 0, 0, 0, 1 ) )
+local conlast = aahh.Create( "button", conmen )
+conlast:SetTrapInsideParent( false )
+conlast:SetPos( Vec2( 2, 2 ) )
+conlast:SetSize( Vec2( 196, 30 ) )
+conlast.OnDraw = function( me, size )
+	me.textanim = me.textanim + ( ( me:IsMouseOver() and 1 or 0 ) - me.textanim ) * math.min( FrameTime() * 15, 1 )
+	graphics.DrawText( "Last Server", Vec2( 8, 8 - 30 * me.textanim ), "verdana.ttf", 12, Color( 1, 1, 1, 1 ) )
+	local lastip = cookies.Get( "lastip", "localhost" )
+	local textsize = graphics.GetTextSize( "verdana.ttf", lastip ) * 12
+	if textsize.w > 190 then
+		graphics.DrawText( lastip, Vec2( 38 + textsize.w - ( textsize.w + 30 ) * ( CurTime() % ( textsize.w / 40 ) ) / ( textsize.w / 40 ), 38 - 30 * me.textanim ), "verdana.ttf", 12, Color( 1, 1, 1, 1 ) )
+		graphics.DrawText( lastip, Vec2( 8 - ( textsize.w + 30 ) * ( CurTime() % ( textsize.w / 40 ) ) / ( textsize.w / 40 ), 38 - 30 * me.textanim ), "verdana.ttf", 12, Color( 1, 1, 1, 1 ) )
+	else
+		graphics.DrawText( lastip, Vec2( 8, 38 - 30 * me.textanim ), "verdana.ttf", 12, Color( 1, 1, 1, 1 ) )
+	end
+	if me:IsMouseOver() then
+		graphics.DrawOutlinedRect( Rect( 1, 1, size - 1 ), 1, Color( 1, 1, 1, 0.1 ) )
+		graphics.DrawOutlinedRect( Rect( 0, 0, size - 1 ), 1, Color( 0, 0, 0, 0.2 ) )
+	end
 end
-butset.OnMouseEntered = function(self)
-	self:MoveTo( graphics.GetScreenSize() - Vec2( 205, 50 ) - 5, 1, 0, 1 )
-	self:SizeTo( Vec2( 150, 50 ), 1, 0, 1 )
+conlast.textanim = 0
+conlast.OnPress = function( me )
+	console.RunString( "connect " .. cookies.Get( "lastip", "localhost" ), true, true )
 end
-butset.OnMouseLeft = function(self)
-	self:MoveTo( graphics.GetScreenSize() - Vec2( 105, 50 ) - 5, 1, 0, 1 )
-	self:SizeTo( Vec2( 50, 50 ), 1, 0, 1 )
+local conhist = aahh.Create( "button", conmen )
+conhist:SetTrapInsideParent( false )
+conhist:SetPos( Vec2( 2, 32 ) )
+conhist:SetSize( Vec2( 196, 30 ) )
+conhist.OnDraw = function( me, size )
+	graphics.DrawText( "History", Vec2( 8, 8 ), "verdana.ttf", 12, Color( 1, 1, 1, 1 ) )
+	if me:IsMouseOver() then
+		graphics.DrawOutlinedRect( Rect( 1, 1, size - 1 ), 1, Color( 1, 1, 1, 0.1 ) )
+		graphics.DrawOutlinedRect( Rect( 0, 0, size - 1 ), 1, Color( 0, 0, 0, 0.2 ) )
+	end
 end
-butset:SetPos( graphics.GetScreenSize() - Vec2( 105, 50 ) - 5 )
-butset:SetSize( Vec2( 50, 50 ) )
-menu.contents.settings = butset
+conhist.OnPress = function( me )
+	-- console.RunString( "connect " .. cookies.Get( "lastip", "localhost" ), true, true )
+end
+local conbrow = aahh.Create( "button", conmen )
+conbrow:SetTrapInsideParent( false )
+conbrow:SetPos( Vec2( 2, 62 ) )
+conbrow:SetSize( Vec2( 196, 30 ) )
+conbrow.OnDraw = function( me, size )
+	graphics.DrawText( "Browse", Vec2( 8, 8 ), "verdana.ttf", 12, Color( 1, 1, 1, 1 ) )
+	if me:IsMouseOver() then
+		graphics.DrawOutlinedRect( Rect( 1, 1, size - 1 ), 1, Color( 1, 1, 1, 0.1 ) )
+		graphics.DrawOutlinedRect( Rect( 0, 0, size - 1 ), 1, Color( 0, 0, 0, 0.2 ) )
+	end
+end
+conbrow.OnPress = function( me )
+	-- console.RunString( "connect " .. cookies.Get( "lastip", "localhost" ), true, true )
+end
 
-local butdc = aahh.Create( "button" )
-butdc.OnDraw = function( self, size )
-	local size = self:GetSize()
-	graphics.DrawFilledRect( Rect( 0, 0, size.w, size.h ), Color( 0, 0, 0, 0.5 ) )
-	graphics.DrawText( "DISCONNECT", Vec2( 55, 24 ), "trebuc.ttf", 10, Color( 1, 1, 1, 1 ), Vec2( 0, -0.5 ) )
-	graphics.DrawOutlinedRect( Rect( 0, 0, size.w, size.h ), 2, Color( 1, 1, 1, 0.1 ) )
-	graphics.DrawOutlinedRect( Rect( 0, 0, size.w, size.h ), 1, Color( 0, 0, 0, 1 ) )
+local disconpan = aahh.Create( "button", backpan )
+menu.controls.butdisconnect = disconpan
+disconpan:SetPos( Vec2( 50, 240 ) )
+disconpan:SetSize( Vec2( 200, 40 ) )
+disconpan:SetVisible( MULTIPLAYER )
+disconpan.OnDraw = function( me, size )
+	graphics.DrawText( "Disconnect", Vec2( 12, 12 ), "verdana.ttf", 16, Color( 1, 1, 1, 1 ) )
+	if me:IsMouseOver() then
+		graphics.DrawOutlinedRect( Rect( 1, 1, size - 1 ), 1, Color( 1, 1, 1, 0.1 ) )
+		graphics.DrawOutlinedRect( Rect( 0, 0, size - 1 ), 1, Color( 0, 0, 0, 0.2 ) )
+	end
 end
-butdc.OnMouseEntered = function(self)
-	self:SizeTo( Vec2( 150, 50 ), 1, 0, 1 )
-end
-butdc.OnMouseLeft = function(self)
-	self:SizeTo( Vec2( 50, 50 ), 1, 0, 1 )
-end
-butdc:SetPos( Vec2( 5, graphics.GetScreenSize().y - 55 ) )
-butdc:SetSize( Vec2( 50, 50 ) )
-butquit.OnRelease = function() console.RunString("disconnect") end
-menu.contents.disconnect = butdc
 
--- Other shit
+local hostpan = aahh.Create( "button", backpan )
+menu.controls.buthost = hostpan
+hostpan:SetPos( Vec2( 50, 260 + ( disconpan:IsVisible() and 40 or 0 ) ) )
+hostpan:SetSize( Vec2( 200, 40 ) )
+hostpan.OnDraw = function( me, size )
+	graphics.DrawText( "Host", Vec2( 12, 12 ), "verdana.ttf", 16, Color( 1, 1, 1, 1 ) )
+	if me:IsMouseOver() then
+		graphics.DrawOutlinedRect( Rect( 1, 1, size - 1 ), 1, Color( 1, 1, 1, 0.1 ) )
+		graphics.DrawOutlinedRect( Rect( 0, 0, size - 1 ), 1, Color( 0, 0, 0, 0.2 ) )
+	end
+end
+function hostpan:OnPress( me )
+	aahh.StringInput("Enter the map name", cookies.Get("lastmap", "oh_island"), function(str)
+		cookies.Set("lastmap", str)
+		os.execute([[start "" "%CD%\bin32\launcher.exe" "server" "+r_driver dx9" "+map ]] .. str .. [[ s"]])
+		--console.RunString("map " .. str .. " s")
+		--menu.Close()
+	end)
+end
+
+local setpan = aahh.Create( "button", backpan )
+menu.controls.butsettings = setpan
+setpan:SetPos( Vec2( 50, 320 + ( disconpan:IsVisible() and 40 or 0 ) ) )
+setpan:SetSize( Vec2( 200, 40 ) )
+setpan.OnDraw = function( me, size )
+	graphics.DrawText( "Settings", Vec2( 12, 12 ), "verdana.ttf", 16, Color( 1, 1, 1, 1 ) )
+	if me:IsMouseOver() then
+		graphics.DrawOutlinedRect( Rect( 1, 1, size - 1 ), 1, Color( 1, 1, 1, 0.1 ) )
+		graphics.DrawOutlinedRect( Rect( 0, 0, size - 1 ), 1, Color( 0, 0, 0, 0.2 ) )
+	end
+end
+
+local extrasmenuheight = 64
+local morpan = aahh.Create( "button", backpan )
+menu.controls.butextras = morpan
+local mormen = aahh.Create( "panel", backpan )
+menu.controls.menextras = mormen
+morpan:SetPos( Vec2( 50, 360 + ( disconpan:IsVisible() and 40 or 0 ) ) )
+morpan:SetSize( Vec2( 200, 40 ) )
+morpan.OnDraw = function( me, size )
+	graphics.DrawText( "Extras", Vec2( 12, 12 ), "verdana.ttf", 16, Color( 1, 1, 1, 1 ) )
+	if me:IsMouseOver() then
+		graphics.DrawOutlinedRect( Rect( 1, 1, size - 1 ), 1, Color( 1, 1, 1, 0.1 ) )
+		graphics.DrawOutlinedRect( Rect( 0, 0, size - 1 ), 1, Color( 0, 0, 0, 0.2 ) )
+	end
+end
+morpan.OnPress = function( me, k )
+	if mormen:GetSize().w < 9 then
+		mormen:SetVisible( true )
+		mormen:SetSize( Vec2( 9, extrasmenuheight ) )
+		mormen:SizeTo( Vec2( 200, extrasmenuheight ), 0.4 )
+	else
+		mormen:SizeTo( Vec2( 0, extrasmenuheight ), 0.4, 0, 1, function() mormen:SetVisible( false ) end )
+	end
+end
+mormen:SetPos( Vec2( 250, 360 + ( disconpan:IsVisible() and 40 or 0 ) ) )
+mormen:SetSize( Vec2( 0, conmenheight ) )
+mormen:SetVisible( false )
+local inpdel = false
+mormen.OnDraw = function( me, size )
+	if me.shutitdown then
+		me.shutitdown = false
+		me:SizeTo( Vec2( 0, extrasmenuheight ), 0.4, 0, 1, function() me:SetVisible( false ) end )
+	end
+	if inpdel and not input.IsKeyDown( "mouse1" ) then
+		me.shutitdown = true
+	end
+	inpdel = me:GetSize().w > 199 and input.IsKeyDown( "mouse1" ) or false
+	graphics.DrawTexture( textures.innerpan, Rect( 0, size.h - extrasmenuheight, size.w, extrasmenuheight ) )
+	-- graphics.DrawOutlinedRect( Rect( 1, 1, size - 1 ), 1, Color( 1, 1, 1, 0.05 ) )
+	graphics.DrawOutlinedRect( Rect( 0, 0, size ), 1, Color( 0, 0, 0, 0.2 ) )
+end
+
+local reohpan = aahh.Create( "button", backpan )
+menu.controls.butreoh = reohpan
+reohpan:SetPos( Vec2( 50, 420 + ( disconpan:IsVisible() and 40 or 0 ) ) )
+reohpan:SetSize( Vec2( 200, 40 ) )
+reohpan.OnDraw = function( me, size )
+	graphics.DrawText( "Reset", Vec2( 12, 12 ), "verdana.ttf", 16, Color( 1, 1, 1, 1 ) )
+	if me:IsMouseOver() then
+		graphics.DrawOutlinedRect( Rect( 1, 1, size - 1 ), 1, Color( 1, 1, 1, 0.1 ) )
+		graphics.DrawOutlinedRect( Rect( 0, 0, size - 1 ), 1, Color( 0, 0, 0, 0.2 ) )
+	end
+end
+function reohpan:OnPress()
+	console.RunString( "reoh", true, true )
+end
+
+local extpan = aahh.Create( "button", backpan )
+menu.controls.butexit = extpan
+extpan:SetPos( Vec2( 50, 460 + ( disconpan:IsVisible() and 40 or 0 ) ) )
+extpan:SetSize( Vec2( 200, 40 ) )
+extpan.OnDraw = function( me, size )
+	graphics.DrawText( "Exit", Vec2( 12, 12 ), "verdana.ttf", 16, Color( 1, 1, 1, 1 ) )
+	if me:IsMouseOver() then
+		graphics.DrawOutlinedRect( Rect( 1, 1, size - 1 ), 1, Color( 1, 1, 1, 0.1 ) )
+		graphics.DrawOutlinedRect( Rect( 0, 0, size - 1 ), 1, Color( 0, 0, 0, 0.2 ) )
+	end
+end
+function extpan:OnPress()
+	console.RunString( "quit", true, true )
+end
+
+-- Commands
 
 input.Bind( "escape", "o toggle_menu" )
 console.AddCommand( "toggle_menu", function()
 	menu.Toggle()
 end )
 
-menu.visible = false
-
-function menu.Open()
-	menu.visible = true
-	hook.Add( "PreDrawMenu", "MainMenu", menu.Render )
-	for k, v in pairs( menu.contents ) do
-		v:SetVisible( true )
-	end
-	if entities.GetLocalPlayer():IsValid() then
-		menu.contents.disconnect:SetVisible( true )
-	else
-		menu.contents.disconnect:SetVisible( false )
-	end
+function menu.Show()
+	menu.backplate:SetVisible( true )
 	mouse.ShowCursor( true )
 end
-function menu.Close()
-	menu.visible = false
-	hook.Remove( "PreDrawMenu", "MainMenu" )
-	for k, v in pairs( menu.contents ) do
-		v:SetVisible( false )
-	end
+
+function menu.Hide()
+	menu.backplate:SetVisible( false )
 	mouse.ShowCursor( false )
 end
 
 function menu.Toggle()
-	if menu.visible then
-		menu.Close()
+	if menu.backplate:IsVisible() then
+		menu.Hide()
 	else
-		menu.Open()
+		menu.Show()
 	end
 end
 
 if not MULTIPLAYER then
 	hook.Add("SystemEvent", "mainmenu", function(event) 
 		if event == ESYSTEM_EVENT_GAME_POST_INIT then
-			menu.Open()
+			menu.Show()
 			return HOOK_DESTROY
 		end
 	end)
-	menu.Open()
+	menu.Show()
 end

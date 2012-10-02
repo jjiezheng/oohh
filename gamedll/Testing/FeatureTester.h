@@ -11,7 +11,7 @@
 	#define ENABLE_FEATURE_TESTER            0
 #else
 	// Feel free to turn this on/off or add more conditions (platform, _DEBUG etc.) here...
-	#define ENABLE_FEATURE_TESTER            1
+	//#define ENABLE_FEATURE_TESTER            1
 #endif
 
 #if ENABLE_FEATURE_TESTER

@@ -2,10 +2,8 @@ if threedplayer and threedplayer:IsValid() then threedplayer:Stop() threedplayer
 
 threedplayer = Channel(BASS_MUSIC, Path((("sounds/UT1999 - Foregone Destruction.it"):gsub("!/../", ""))), 0, BASS_MUSIC_3D)
 
-if threedplayer ~= NULL and threedplayer:IsValid() then threedplayer:Stop() end
 print(bass.GetLastError())
 threedplayer:Play()
-
 
 bars = bars or {}
 

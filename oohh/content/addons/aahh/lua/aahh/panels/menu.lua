@@ -6,7 +6,8 @@ PANEL.Base = "button"
 function PANEL:Initialize()
 	self.lbl = aahh.Create("label", self)
 	self.img = aahh.Create("image", self)
-	self.img:SetIgnoreMouse(true)
+	-- self.img:SetIgnoreMouse(true)
+	self.button_down = {}
 end
 
 function PANEL:SetText(...)
@@ -37,6 +38,7 @@ function PANEL:Initialize()
 	self:SetSizeToWidth(true)
 	self:SetItemSize(false)
 	self:SetSpacing(false)
+	self:SetPos( Vec2(mouse.GetPos()) )
 end
 
 function PANEL:AddOption(icon, str, callback)
@@ -53,6 +55,10 @@ end
 
 function PANEL:OnLayoutRequest()
 	self:LayoutHook("ContextLayout")
+end
+
+function PANEL:OnDraw()
+	self:DrawHook("ContextDraw")
 end
 
 aahh.RegisterPanel(PANEL)

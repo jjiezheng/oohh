@@ -29,15 +29,13 @@
 	<Policy name="stab" impl="StringTable"/>
 
 	<Policy name="wrld" impl="QuantizedVec3">
-		<XParams min="0" max="4095.0" nbits="24"/>
-		<YParams min="0" max="4095.0" nbits="24"/>
-		<ZParams min="0" max="4095.0" nbits="24"/>
+		<XParams nbits="24"/>
+		<YParams nbits="24"/>
+		<ZParams nbits="24"/>
 	</Policy>
 
 	<Policy name="wrl2" impl="AdaptiveVec3">
 		<XParams 
-			min="0" 
-			max="4095" 
 			nbits="24" 
 			probHeight="1024" 
 			minRange="0.0312" 
@@ -45,8 +43,6 @@
 			quantization="RoundLeft"
 			inRange="85"/>
 		<YParams 
-			min="0" 
-			max="4095" 
 			nbits="24" 
 			probHeight="1024" 
 			minRange="0.0312" 
@@ -54,8 +50,6 @@
 			quantization="RoundLeft"
 			inRange="85"/>
 		<ZParams 
-			min="0" 
-			max="2047" 
 			nbits="24" 
 			probHeight="1024" 
 			minRange="0.0312" 
@@ -65,8 +59,6 @@
 	</Policy>
 	<Policy name="wrl3" impl="AdaptiveVec3"><!-- for positions that can be out of terrain range usually "target destination" -->
 		<XParams 
-			min="-2045" 
-			max="6145" 
 			nbits="30" 
 			probHeight="1024" 
 			minRange="0.0312" 
@@ -74,8 +66,6 @@
 			quantization="RoundLeft"
 			inRange="85"/>
 		<YParams 
-			min="-2045" 
-			max="6145" 
 			nbits="30" 
 			probHeight="1024" 
 			minRange="0.0312" 
@@ -83,8 +73,6 @@
 			quantization="RoundLeft"
 			inRange="85"/>
 		<ZParams 
-			min="-2095" 
-			max="6145" 
 			nbits="28" 
 			probHeight="1024" 
 			minRange="0.0312" 

@@ -37,7 +37,8 @@ if SERVER or system.GetCommandLine().server then
 		end)
 	end)
 	
-	timer.Simple(0.5, function() 
+		
+	hook.Add("GameInitialized", "server", function()
 		console.RunString(
 			[[
 			r_displayInfo 1

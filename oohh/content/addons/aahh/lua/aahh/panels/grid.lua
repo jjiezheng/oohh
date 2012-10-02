@@ -14,7 +14,9 @@ function PANEL:Stack()
 	local w = 0
 	local h
 	
-	for key, pnl in ipairs(self:GetChildren()) do
+	for key, pnl in ipairs(self.CustomList or self:GetChildren()) do
+		if not pnl:IsVisible() then goto NEXT end
+	
 		pnl:SetTrapInsideParent(false)
 		
 		local siz = self.ItemSize or pnl:GetSize()
@@ -50,6 +52,8 @@ function PANEL:Stack()
 		elseif self.SizeToWidth then
 			pnl:SetWidth(self:GetWidth()-self:GetSkinVar("Padding", 1))
 		end
+		
+		::NEXT::
 	end
 	
 	if self.SizeToWidth then
