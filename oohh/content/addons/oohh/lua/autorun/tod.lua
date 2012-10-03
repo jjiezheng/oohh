@@ -264,7 +264,7 @@ function tod.GetCurrentConfig()
 		if type(val) == "table" then
 			out[key] = val.get()
 		else
-			out[key] = engine3d.GetGlobalParameter(val, type(tod.Default[val]) == "number")
+			out[key] = engine3d.GetGlobalParameter(val, type(tod.Enums[val]) == "number")
 		end
 	end
 	return out

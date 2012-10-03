@@ -108,6 +108,13 @@ function _include(path, ...)
 end
 
 function include(path, ...)
+	if hook then
+		local args = {hook.Call("LuaInclude", path, ...)}
+		if args[1] == false then
+			return select(2, unpack(args))
+		end
+	end
+	
 	if path:sub(-2) == "/*" then
 		local folder = path:sub(0, -3)
 		local new_path = Folder(4) .. folder
@@ -193,6 +200,7 @@ include("includes/standard/libraries/base64.lua")
 include("includes/standard/libraries/path.lua")
 include("includes/standard/libraries/input.lua")
 include("includes/standard/libraries/msgpack.lua")
+include("includes/standard/libraries/filesystem.lua")
 
 -- meta
 include("includes/standard/meta/nil.lua")

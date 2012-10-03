@@ -209,3 +209,6 @@ function ColorToHSV(c)
 end
 
 structs.Register(META) 
+
+color_white = Color(1,1,1,1)
+color_black = Color(0,0,0,1)

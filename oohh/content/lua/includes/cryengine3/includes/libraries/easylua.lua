@@ -118,6 +118,7 @@ end
 function easylua.CreateEntity(class)
 	if class:lower():find("cgf") then
 		local ent = entities.Create("BasicEntity")
+		ent:BindToNetwork()
 		ent:Spawn()
 		ent:SetPos(there)
 		ent:SetModel(class)

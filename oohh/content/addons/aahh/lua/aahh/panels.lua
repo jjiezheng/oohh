@@ -286,8 +286,6 @@ do -- meta
 							end
 						end
 					end
-					
-					self:MakeActivePanel()
 				end
 			end
 

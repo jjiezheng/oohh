@@ -34,10 +34,7 @@ PANEL.ClassName = "context"
 PANEL.Base = "grid"
 
 function PANEL:Initialize()
-	self:SetStackRight(false)
-	self:SetSizeToWidth(true)
-	self:SetItemSize(false)
-	self:SetSpacing(false)
+	self:SetItemSize(Vec2()+16)
 	self:SetPos( Vec2(mouse.GetPos()) )
 end
 
@@ -47,10 +44,14 @@ function PANEL:AddOption(icon, str, callback)
 	itm:SetTexture(icon)
 	itm:RequestLayout()
 	itm.OnPress = function() callback(self) end
+	
+	self:RequestLayout()
 end
 
 function PANEL:AddSpace()
 	local itm = aahh.Create("menuitem", self)
+	
+	self:RequestLayout()
 end
 
 function PANEL:OnLayoutRequest()

@@ -4,6 +4,7 @@
 #include "IEntitySystem.h"
 #include "IIndexedMesh.h"
 
+
 LUAMTA_FUNCTION(entity, __tostring)
 {
 	auto self = my->ToEntity(1);
@@ -851,6 +852,72 @@ LUAMTA_FUNCTION(entity, SetNetParent)
 	auto self = my->ToEntity(1);
 
 	gEnv->pGame->GetIGameFramework()->GetNetContext()->SetParentObject(self->GetId(), my->ToEntity(2)->GetId());
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(entity, BindToNetwork)
+{
+	auto self = my->ToEntity(1);
+	auto obj = gEnv->pGame->GetIGameFramework()->GetIGameObjectSystem()->CreateGameObjectForEntity(self->GetId());
+
+	obj->EnablePrePhysicsUpdate(ePPU_Always);
+	obj->EnablePhysicsEvent(true, eEPE_AllImmediate);
+	obj->SetAspectProfile(eEA_Physics, ePT_Rigid);
+
+	obj->BindToNetwork();
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(entity, AddEntityLink)
+{
+	auto self = my->ToEntity(1);
+
+	self->AddEntityLink(my->ToString(2), my->ToEntity(3)->GetId(), my->ToQuat(4, Quat(IDENTITY)), my->ToVec3(5, IDENTITY));
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(entity, RemoveEntityLink)
+{
+	auto self = my->ToEntity(1);
+	auto str = my->ToString(2);
+
+	for (auto link = self->GetEntityLinks(); link; link= link->next)
+    {
+		if (strcmp(link->name, str) == 0)
+		{
+			self->RemoveEntityLink(link);
+			break;
+		}
+	}
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(entity, GetEntityLinks)
+{
+	auto self = my->ToEntity(1);
+	auto str = my->ToString(2);
+
+	my->NewTable();
+
+	for (auto link = self->GetEntityLinks(); link; link= link->next)
+    {
+		my->NewTable();
+			my->SetMember(-1, "name", link->name);
+			my->SetMember(-1, "pos", link->relPos);
+			my->SetMember(-1, "rot", link->relRot);
+		my->SetTable(-2);
+	}
+
+	return 1;
+}
+
+LUAMTA_FUNCTION(entity, RemoveAllEntityLinks)
+{
+	my->ToEntity(1)->RemoveAllEntityLinks();
 
 	return 0;
 }

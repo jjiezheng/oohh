@@ -341,12 +341,13 @@ do--menuitem
 		pnl.lbl:SetPos(pnl.img:GetPos() + pnl.img:GetSize() + Vec2(PAD, 0))
 		pnl.lbl:CenterY()
 		
-		pnl:SetSize(Vec2(pnl.lbl:GetSize().w + pnl.img.w + PAD, 16))
+		pnl:SetSize(Vec2(pnl.lbl:GetSize().w + pnl.img:GetSize().w + PAD, 16))
 	end
 	
 	function SKIN:ContextLayout( pnl )
-		pnl:Stack()
+		pnl:SetItemSize(Vec2()+16)
 		pnl:SetSize( pan:GetSize() + Vec2( 0, PAD * 2 ) )
+		pnl:Stack()
 	end
 end
 

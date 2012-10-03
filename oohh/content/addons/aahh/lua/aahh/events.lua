@@ -118,7 +118,7 @@ if CRYENGINE3 then
 			--render.SetViewport(0,0,w,h)
 		end
 		
-		--surface.StartDraw()
+		surface.StartDraw()
 			graphics.Set2DFlags()
 			
 			hook.Call("DrawHUD")
@@ -126,7 +126,7 @@ if CRYENGINE3 then
 			hook.Call("PreDrawMenu")
 				aahh.Draw(delta)
 			hook.Call("PostDrawMenu")
-		--surface.EndDraw()
+		surface.EndDraw()
 	end)
 
 	function aahh.KeyInput(key, press)
