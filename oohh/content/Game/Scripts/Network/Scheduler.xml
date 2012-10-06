@@ -47,8 +47,7 @@
 	</Group>
 	
 	<!-- physicalized objects -->
-	<Group name="phys" priority="6" drawn="1" normalDistance="40" close="3" far="1" foi="60" front="3" back="2">
-		<Pulse name="bump" bump="2" decayTime="2"/>
+	<Group name="phys" priority="20">
 	</Group>
 
 	<!-- vehicle seat serializer -->

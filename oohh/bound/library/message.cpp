@@ -19,10 +19,10 @@ LUALIB_FUNCTION(message, RawSendToClient)
 
 	if(my->ToBoolean(3))
 	{
-		INVOKE(CGameRules::oohhFromServerUDP(), CGameRules::oohhNetMsgUDP(msg), eRMI_ToClientChannel, my->ToPlayer(1)->GetChannelId());
+		INVOKE(CGameRules::oohhFromServerTCP(), CGameRules::oohhNetMsgTCP(msg), eRMI_ToClientChannel, my->ToPlayer(1)->GetChannelId());
 	}
 	{
-		INVOKE(CGameRules::oohhFromServerTCP(), CGameRules::oohhNetMsgTCP(msg), eRMI_ToClientChannel, my->ToPlayer(1)->GetChannelId());
+		INVOKE(CGameRules::oohhFromServerUDP(), CGameRules::oohhNetMsgUDP(msg), eRMI_ToClientChannel, my->ToPlayer(1)->GetChannelId());	
 	}
 
 	return 0;
@@ -47,11 +47,11 @@ LUALIB_FUNCTION(message, RawSendToServer)
 
 	if(my->ToBoolean(2))
 	{
-		INVOKE(CGameRules::oohhFromClientUDP(), CGameRules::oohhNetMsgUDP(msg), eRMI_ToServer);
+		INVOKE(CGameRules::oohhFromClientTCP(), CGameRules::oohhNetMsgTCP(msg), eRMI_ToServer);
 	}
 	else
 	{
-		INVOKE(CGameRules::oohhFromClientTCP(), CGameRules::oohhNetMsgTCP(msg), eRMI_ToServer);
+		INVOKE(CGameRules::oohhFromClientUDP(), CGameRules::oohhNetMsgUDP(msg), eRMI_ToServer);
 	}
 
 	return 0;

@@ -14,7 +14,11 @@ function PANEL:OnMouseInput(key, press)
 	end
 	
 	if not press and self.button_down[key] then
-		return self:OnPress(key)
+		if key == "mouse1" then
+			return self:OnPress()
+		else
+			return self:OnOtherKeyPress(key)
+		end
 	end
 end
 
@@ -30,6 +34,7 @@ function PANEL:IsMouseOver()
 	return self:IsWorldPosInside(Vec2(mouse.GetPos()))
 end
 
+function PANEL:OnOtherKeyPress(key) end
 function PANEL:OnPress(key) end
 function PANEL:OnRelease(key) end
 

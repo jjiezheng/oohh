@@ -357,7 +357,9 @@ namespace oohh
 
 		virtual void Print( const char *str )
 		{
+			my_suppress_lock();
 			my->CallHook("ConsolePrint", str);
+			my_allow_lock();
 		}
 
 		virtual void OnSystemEvent(ESystemEvent event, UINT_PTR wparam, UINT_PTR lparam)
@@ -376,6 +378,7 @@ namespace oohh
 			{	
 				if (!(event.keyId == eKI_SYS_Commit || event.keyId == eKI_MouseX || event.keyId == eKI_MouseY || event.keyId == eKI_MouseZ))
 				{
+					my_suppress_lock();
 					my->CallHook(
 						"InputEvent", 
 						event.keyName.c_str(), 
@@ -383,6 +386,7 @@ namespace oohh
 						gEnv->pInput->GetInputCharAscii(event),
 						1
 					);
+					my_allow_lock();
 
 					if (my->IsFalse(-1))
 						return true;

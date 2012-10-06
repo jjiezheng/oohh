@@ -19,19 +19,22 @@ LUALIB_FUNCTION(awesomium, Open)
 		core = Awesomium::WebCore::Initialize(config);
 	}
 
+	my_suppress_lock();
 	my->RunString("hook.Add(\"PostGameUpdate\", \"awesomium\", function() awesomium.Update() end, print)");
-
+	my_allow_lock();
 	return 0;
 }
 
 LUALIB_FUNCTION(awesomium, Close)
 {
-	if (core)
+	// awesomium hates being shut down and opened again..
+
+	/*if (core)
 	{
 		Awesomium::WebCore::Shutdown();
-	
+	 
 		core = nullptr;
-	}
+	}*/
 
 	return 0;
 }

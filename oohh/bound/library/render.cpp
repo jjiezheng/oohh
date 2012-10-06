@@ -26,6 +26,27 @@ LUALIB_FUNCTION(render, GetScreenScale)
 	return 2;
 }
 
+LUALIB_FUNCTION(render, Render)
+{
+	gEnv->pSystem->Render();
+
+	return 0;
+}
+
+LUALIB_FUNCTION(render, RenderBegin)
+{
+	gEnv->pSystem->RenderBegin();
+
+	return 0;
+}
+
+LUALIB_FUNCTION(render, RenderEnd)
+{
+	gEnv->pSystem->RenderEnd();
+
+	return 0;
+}
+
 LUALIB_FUNCTION(render, BeginFrame)
 {
 	rend->BeginFrame();
@@ -65,13 +86,6 @@ LUALIB_FUNCTION(render, SetFog)
 	return 0;
 }
 
-LUALIB_FUNCTION(render, CreateRenderTarget)
-{
-	my->Push(rend->EF_GetTextureByID(rend->CreateRenderTarget(my->ToNumber(1), my->ToNumber(2), my->ToEnum<ETEX_Format>(3, eTF_A8R8G8B8))));
-
-	return 1;
-}
-
 LUALIB_FUNCTION(render, DestroyRenderTarget)
 {
 	my->Push(rend->DestroyRenderTarget(my->ToTexture(1)->GetTextureID()));
@@ -88,9 +102,23 @@ LUALIB_FUNCTION(render, SetTexture)
 
 LUALIB_FUNCTION(render, SetRenderTarget)
 {
-	my->Push(rend->SetRenderTarget(my->IsNoneOrNil(1) ? 0 : my->ToTexture(1)->GetTextureID(), my->ToNumber(2, 0)));
+	my->Push(rend->SetRenderTarget(my->IsTexture(1) ? my->ToTexture(1)->GetTextureID() : 0, my->ToNumber(2, 0)));
 
 	return 1;
+}
+
+LUALIB_FUNCTION(render, ClearBuffer)
+{
+	rend->ClearBuffer(my->ToNumber(2, 0), my->ToColorPtr(1), my->ToNumber(3, 1.0f));
+
+	return 0;
+}
+
+LUALIB_FUNCTION(render, SetClearColor)
+{
+	rend->SetClearColor(my->ToVec3(1));
+
+	return 0;
 }
 
 LUALIB_FUNCTION(render, Set2DMode)

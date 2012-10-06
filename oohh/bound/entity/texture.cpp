@@ -13,9 +13,27 @@ LUALIB_FUNCTION(_G, Texture)
 	}
 	else if (my->IsNumber(1) && my->IsNumber(2))
 	{
-		auto flag = my->ToEnum<ETEX_Format>(3, eTF_A8R8G8B8);
-		auto id = gEnv->pRenderer->DownLoadToVideoMemory(nullptr,  my->ToNumber(1),  my->ToNumber(2), flag, flag, 1); 
-		self = gEnv->pRenderer->EF_GetTextureByID(id);
+		if (my->IsBoolean(3) && my->ToBoolean(3))
+		{
+			if(my->ToBoolean(4))
+			{
+				self = gEnv->pRenderer->EF_GetTextureByID( 
+					gEnv->pRenderer->SF_CreateTexture(my->ToNumber(1), my->ToNumber(2), 1, nullptr, eTF_A8R8G8B8, FT_USAGE_RENDERTARGET)
+				);
+			}
+			else
+			{
+				self = gEnv->pRenderer->EF_GetTextureByID( 
+					gEnv->pRenderer->CreateRenderTarget(my->ToNumber(1), my->ToNumber(2), eTF_A8R8G8B8)
+				);
+			}
+		}
+		else
+		{
+			self = gEnv->pRenderer->EF_GetTextureByID( 
+				gEnv->pRenderer->DownLoadToVideoMemory(nullptr,  my->ToNumber(1),  my->ToNumber(2), eTF_A8R8G8B8, eTF_A8R8G8B8, 1, true, 2, 0, nullptr, my->ToNumber(3, 0))
+			);
+		}
 	}
 	else if (my->IsNumber(1))
 	{
@@ -25,6 +43,31 @@ LUALIB_FUNCTION(_G, Texture)
 	my->Push(self);
 
 	return 1;
+}
+
+unsigned char* copyPlane( unsigned int cols, unsigned int lines, unsigned char* dst, unsigned int dstStride, unsigned char* src, unsigned int srcStride ) 
+{ 
+    if ( srcStride == dstStride ) 
+    { 
+        // source and destination paddings equal 
+        memcpy( dst, src, srcStride * lines ); 
+        dst += srcStride * lines; 
+    } 
+ 
+    else 
+    { 
+        // source and destination paddings need to be converted 
+        ++lines; 
+ 
+        while ( --lines ) 
+        { 
+            memcpy( dst, src, cols ); 
+            src += srcStride; 
+            dst += dstStride; 
+        } 
+    } 
+ 
+    return dst; 
 }
 
 LUAMTA_FUNCTION(texture, SetData)
@@ -42,26 +85,59 @@ LUAMTA_FUNCTION(texture, SetData)
 		buffer = (unsigned char *)my->ToString(2);
 	}
 
+	bool OK = false;
+	auto id = self->GetTextureID();
 	auto rect = my->ToRect(3, Rect(0, 0, self->GetWidth(), self->GetHeight()));
+	auto type = my->ToNumber(4, 0);
 
-	if (buffer[2])
+	if (type == 0)
 	{
 		gEnv->pRenderer->UpdateTextureInVideoMemory(
-			self->GetTextureID(), 
+			id, 
 			buffer, 
 			rect.x, 
 			rect.y, 
 			rect.w,
 			rect.h, 
-			my->ToEnum<ETEX_Format>(4, eTF_A8R8G8B8)
+			eTF_A8R8G8B8
 		);
 		
-		my->Push(true);
-
-		return 1;
+		OK = true;
 	}
+	else if (type == 1)
+	{
+		uint32 nDestPitch = 0; 
+		uint32 nSourcePitch = 0; 
+		void* pData = nullptr; 
+		OK = gEnv->pRenderer->SF_MapTexture(id, 0, pData, nDestPitch); 
 
-	return 0;
+		if (pData)
+		{
+			nSourcePitch = (unsigned int)rect.w << 2; 
+			copyPlane( nSourcePitch, rect.w, (unsigned char *)pData, nDestPitch, buffer, nSourcePitch ); 
+		}
+
+		OK = gEnv->pRenderer->SF_UnmapTexture(id, 0); 
+	}
+	else if (type == 2)
+	{
+		IRenderer::SUpdateRect rects;
+		rects.Set(rect.x, rect.y, rect.x, rect.y, rect.w, rect.h);
+
+		OK = gEnv->pRenderer->SF_UpdateTexture(
+			id,
+			0,
+			1,
+			&rects,
+			buffer, 
+			0,
+			eTF_A8R8G8B8
+		);
+	}
+			
+	my->Push(OK);
+
+	return 1;
 }
 
 LUAMTA_FUNCTION(texture, GetData)
@@ -116,6 +192,24 @@ LUAMTA_FUNCTION(texture, GetName)
 	auto self = my->ToTexture(1);
 
 	my->Push(self->GetName());
+
+	return 1;
+}
+
+LUAMTA_FUNCTION(texture, SaveJPG)
+{
+	auto self = my->ToTexture(1);
+
+	my->Push(self->SaveJPG(my->ToString(2)));
+
+	return 1;
+}
+
+LUAMTA_FUNCTION(texture, SaveTGA)
+{
+	auto self = my->ToTexture(1);
+
+	my->Push(self->SaveTGA(my->ToString(2)));
 
 	return 1;
 }

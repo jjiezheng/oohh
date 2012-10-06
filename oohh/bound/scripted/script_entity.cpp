@@ -2,26 +2,37 @@
 #include "oohh.hpp"
 #include <IGameObject.h>
 
-class PropNetworked : public CGameObjectExtensionHelper<PropNetworked, IGameObjectExtension>
+class ScriptedEntity : public CGameObjectExtensionHelper<ScriptedEntity, IGameObjectExtension>
 {	
+	IAnimatedCharacter *m_AnimatedCharacter;
+
+	~ScriptedEntity()
+	{
+		GetGameObject()->ReleaseExtension("AnimatedCharacter");
+	}
+
 	bool Init(IGameObject * obj)
 	{
-		SetGameObject(obj);
+		SetGameObject(obj);	
 
-		obj->EnablePrePhysicsUpdate(ePPU_Always);
-		obj->EnablePhysicsEvent(true, eEPE_OnPostStepImmediate);
-
-		obj->SetAspectProfile(eEA_Physics, ePT_Rigid);
-
-		if (!obj->BindToNetwork())
+		if (!GetGameObject()->BindToNetwork())
 			return false;
+
+		m_AnimatedCharacter = static_cast<IAnimatedCharacter *>(obj->AcquireExtension("AnimatedCharacter"));
 
 		return true;
 	}
 	
 	void PostInit(IGameObject * obj)
-	{
-		obj->EnableUpdateSlot(this, 0);
+	{	
+		obj->EnablePrePhysicsUpdate(ePPU_Always);
+		obj->EnablePhysicsEvent(true, eEPE_AllImmediate);
+		obj->SetAspectProfile(eEA_Physics, ePT_Rigid);
+				
+		obj->EnableUpdateSlot(this, 0);	
+		obj->EnablePostUpdates(this);
+
+		my->CallEntityHook(GetEntity(), "OnPostInitialize");
 	}
 	
 	void InitClient(int channelId)
@@ -34,7 +45,6 @@ class PropNetworked : public CGameObjectExtensionHelper<PropNetworked, IGameObje
 	
 	void Release()
 	{
-		//delete this;
 	}
 	
 	void FullSerialize(TSerialize ser)
@@ -61,6 +71,7 @@ class PropNetworked : public CGameObjectExtensionHelper<PropNetworked, IGameObje
 	
 	void Update(SEntityUpdateContext& ctx, int updateSlot)
 	{
+		my->CallEntityHook(GetEntity(), "OnUpdate", ctx.fFrameTime, *ctx.pCamera, ctx.fCurrTime, ctx.fMaxViewDist, ctx.nFrameID, 0);
 	}
 	
 	void HandleEvent(const SGameObjectEvent& event)
@@ -89,7 +100,7 @@ class PropNetworked : public CGameObjectExtensionHelper<PropNetworked, IGameObje
 
 	bool ReloadExtension(IGameObject * pGameObject, const SEntitySpawnParams &params)
 	{
-		return true;
+		return false;
 	}
 
 	void PostReloadExtension(IGameObject * pGameObject, const SEntitySpawnParams &params)
@@ -98,7 +109,7 @@ class PropNetworked : public CGameObjectExtensionHelper<PropNetworked, IGameObje
 
 	bool GetEntityPoolSignature(TSerialize signature)
 	{
-		return true;
+		return false;
 	}
 
 	void GetMemoryUsage(ICrySizer *pSizer) const 
@@ -129,5 +140,5 @@ class PropNetworked : public CGameObjectExtensionHelper<PropNetworked, IGameObje
 
 void oohh::RegisterScriptedEntity(IGameFramework *framework)
 {
-	REGISTER_GAME_OBJECT(framework, PropNetworked, "scripts/entities/PropNetworked.lua");
+	REGISTER_GAME_OBJECT(framework, ScriptedEntity, "scripts/entities/ScriptedEntity.lua");
 }

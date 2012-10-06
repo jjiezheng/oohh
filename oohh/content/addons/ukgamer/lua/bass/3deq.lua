@@ -22,7 +22,7 @@ for i = 1, n do
     threedeq.bars[i]:SetPos(pos + Vec3(math.cos(math.rad(i * 7.2)) * spacing, math.sin(math.rad(i * 7.2)) * spacing, 0))
     threedeq.bars[i]:SetAngles(Ang3(0, 0, -math.atan2(math.cos(math.rad(i * 7.2)) * spacing, math.sin(math.rad(i * 7.2)) * spacing)))
     threedeq.bars[i]:Spawn()
-    threedeq.bars[i]:SetModelNoNetwork("objects/default/box.cgf")
+    threedeq.bars[i]:SetModel("objects/default/box.cgf")
     threedeq.bars[i]:SetMaterial(materials.CreateFromFile("materials/presets/surfacetypes/white.mtl"))
     threedeq.bars[i]:EnablePhysics(false)
 end
@@ -31,6 +31,7 @@ if threedeq.light and threedeq.light:IsValid() then threedeq.light:Remove() end
 threedeq.light = entities.Create("light")
 threedeq.light:SetPos(pos + Vec3(0, 0, 1))
 threedeq.light:Spawn()
+threedeq.light:SetKeyValue("Options.CastShadows", 2)
 
 hook.Add("PostGameUpdate", "3deq", function()
     local fft = threedeq.player:GetFFT()

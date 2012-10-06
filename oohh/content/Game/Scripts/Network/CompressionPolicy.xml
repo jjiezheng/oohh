@@ -104,27 +104,27 @@
 		<ZParams min="0" max="1" nbits="5" quantization="TruncateLeft"/>
 	</Policy>
 	<Policy name="dMov" impl="QuantizedVec3" >
-		<XParams min="-1" max="1" nbits="8" quantization="TruncateLeft"/>
-		<YParams min="-1" max="1" nbits="8" quantization="TruncateLeft"/>
-		<ZParams min="-1" max="1" nbits="4" quantization="TruncateLeft"/>
+		<XParams nbits="8" quantization="TruncateLeft"/>
+		<YParams nbits="8" quantization="TruncateLeft"/>
+		<ZParams nbits="4" quantization="TruncateLeft"/>
 	</Policy>
 	<Policy name="pMov" impl="AdaptiveVec3" samplingWeight="0.5">
-		<XParams min="-2" max="2" nbits="6" quantization="TruncateLeft"/>
-		<YParams min="-2" max="2" nbits="6" quantization="TruncateLeft"/>
-		<ZParams min="-2" max="2" nbits="5" quantization="TruncateLeft"/>
+		<XParams nbits="6" quantization="TruncateLeft"/>
+		<YParams nbits="6" quantization="TruncateLeft"/>
+		<ZParams nbits="5" quantization="TruncateLeft"/>
 	</Policy>
 	<Policy name="vHPs" impl="AdaptiveVec3">
-		<XParams min="-40" max="40" nbits="10"/>
-		<YParams min="-40" max="40" nbits="10"/>
-		<ZParams min="-40" max="40" nbits="10"/>
+		<XParams nbits="10"/>
+		<YParams nbits="10"/>
+		<ZParams nbits="10"/>
 	</Policy>
 	<Policy name="jmpv" impl="QuantizedVec3" >
-		<XParams min="-10" max="10" nbits="8" quantization="TruncateLeft"/>
-		<YParams min="-10" max="10" nbits="8" quantization="TruncateLeft"/>
-		<ZParams min="-10" max="10" nbits="8" quantization="TruncateLeft"/>
+		<XParams nbits="8" quantization="TruncateLeft"/>
+		<YParams nbits="8" quantization="TruncateLeft"/>
+		<ZParams nbits="8" quantization="TruncateLeft"/>
 	</Policy>
 	<Policy name="team" impl="RangedInt">
-		<Range min="0" max="7"/>
+		<Range min="0" max="16"/>
 	</Policy>
 	<!-- int: spectator mode -->
 	<Policy name="spec" impl="RangedInt">
@@ -234,9 +234,9 @@
 		<Params min="0" max="2048" nbits="12"/>
 	</Policy>
 	<Policy name="kImp" impl="QuantizedVec3">
-		<XParams min="-1" max="1" nbits="10"/>
-		<YParams min="-1" max="1" nbits="10"/>
-		<ZParams min="-1" max="1" nbits="10"/>
+		<XParams nbits="10"/>
+		<YParams nbits="10"/>
+		<ZParams nbits="10"/>
 	</Policy>
 	<Policy name="dmg" impl="FloatAsInt">
 		<Params min="0" max="8191" nbits="13"/>
@@ -265,7 +265,7 @@
 		<ZParams min="-3.14593" max="3.14593" nbits="12"/>
 	</Policy>
 	<Policy name="vel0" impl="Velocity">
-		<Params min="-80" max="80" nbits="10"/>
+		<Params nbits="10"/>
 	</Policy>
 	<Policy name="hTyp" impl="RangedInt">
 		<Range min="0" max="63"/>
@@ -289,7 +289,7 @@
 		<Params min="0" max="10" nbits="8"/>
 	</Policy>
 	<Policy name="vPed" impl="AdaptiveFloat">
-		<Params min="-1" max="1" nbits="5" height="4048" minRange="4" quantization="RoundLeftWithMidpoint"/>
+		<Params nbits="5" height="4048" minRange="4" quantization="RoundLeftWithMidpoint"/>
 	</Policy>
 	<Alias name="vStr" is="vPed"/>
 	<Alias name="vPow" is="vPed"/>
@@ -395,7 +395,7 @@
 	</Policy>
 	<!-- float: player speed -->
 	<Policy name="plSp" impl="FloatAsInt"> 
-		<Params min="0" max="10" nbits="7"/>
+		<Params nbits="7"/>
 	</Policy>
 	<!-- float: player yaw and elev, note that quantisation exactly replicates zero and range end points  -->
 	<Policy name="pYaw" impl="FloatAsInt"> 

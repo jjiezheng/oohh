@@ -36,27 +36,6 @@ inline void my_remove(lua_State *L, int idx, int times = 1)
 	}
 }
 
-// dangerous?
-inline void my_makenil(lua_State *L, int idx)
-{ 
-
-}
-
-inline const char *my_call(lua_State *L, int arguments, int results)
-{
-	if (!lua_isfunction(L, -(arguments+1)))
-	{
-		auto err = lua_tostring(L, -1);
-		lua_remove(L, -1);
-		return err;
-	}
-
-	if (lua_pcall(L, arguments, results, 0) != 0)
-	{	
-		auto err = lua_tostring(L, -1);
-		lua_remove(L, -1);
-		return err;
-	}
-
-	return 0;
-}
+const char *my_call(lua_State *L, int arguments, int results);
+void my_suppress_lock();
+void my_allow_lock();

@@ -30,7 +30,7 @@ local function copy(a, b)
 end
 
 
-local function include_external(libname)
+local function include_external(libname, libs)
 	if _ACTION == "link" then
 		copy(libname .. "/bin32/*", "bin32")
 	else
@@ -38,7 +38,13 @@ local function include_external(libname)
 		includedirs("../" .. libname .. "/include")
 		
 		libdirs("../" .. libname .. "/lib/")
-		links("" .. libname .. "")
+		if libs then
+			for k,v in pairs(libs) do
+				links(v)
+			end
+		else
+			links(libname)
+		end
 		
 		files("../" .. libname .. "/src/**.h")
 		files("../" .. libname .. "/src/**.hpp")
@@ -193,6 +199,7 @@ solution("oohh")
 		include_external("awesomium")
 		include_external("cairo")
 		include_external("bass")
+		include_external("directx", {"d3dx9", "d3dx11"})
 		
 		includedirs(FOLDER .. "/Code/CryEngine/CryAction/")
 		includedirs(FOLDER .. "/Code/CryEngine/CryCommon/")		

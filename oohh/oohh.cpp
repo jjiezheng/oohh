@@ -124,7 +124,7 @@ namespace oohh
 
 		listener->Stop();
 
-		//my->RunString("awesomium.Close()");
+		my->RunString("awesomium.Close()");
 		my->RunString("bass.Close()"); 
 
 		delete my;

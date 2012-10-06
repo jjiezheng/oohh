@@ -23,6 +23,7 @@ local sayings = {
 	"eek",
 	"did that take forever to calculate",
 	"oohh im cryeng u dno tn knw whatt m to do wht my lief",
+	"this is not a drill",
 }
 local thissaying = sayings[ math.random( 1, #sayings ) ]
 
@@ -93,6 +94,10 @@ do -- Resume
 			graphics.DrawOutlinedRect( Rect( 1, 1, size - 2 ), 1, Color( 1, 1, 1, 0.1 ) )
 		end
 	end
+	pan.RequestLayout = function( me, size )
+		pan:SetPos( Vec2( 50, 180 ) )
+		pan:SetVisible( MULTIPLAYER )
+	end
 	pan.OnPress = function()
 		console.RunString( "o toggle_menu", true, true )
 	end
@@ -112,6 +117,9 @@ do -- Connect (and co.)
 			graphics.DrawOutlinedRect( Rect( size.w - 41, 1, 40, 38 ), 1, Color( 1, 1, 1, 0.1 ) )
 			graphics.DrawFilledRect( Rect( size.w - 42, 1, 1, 38 ), Color( 0, 0, 0, 0.3 ) )
 		end
+	end
+	pan.RequestLayout = function( me, size )
+		pan:SetPos( Vec2( 50, 180 + ( MULTIPLAYER and 60 or 0 ) ) )
 	end
 	pan.OnPress = function( me, size )
 		if ( mouse.GetPos() - me:GetPos() ).w > 160 then
@@ -147,6 +155,9 @@ do -- Connect (and co.)
 		graphics.DrawFilledRect( Rect( 0, 0, size ), Color( 0, 0, 0, 0.2 ) )
 		graphics.DrawOutlinedRect( Rect( 0, 0, size ), 1, Color( 0, 0, 0, 0.3 ) )
 		graphics.DrawOutlinedRect( Rect( 1, 1, size - 2 ), 1, Color( 1, 1, 1, 0.1 ) )
+	end
+	menu.RequestLayout = function( me, size )
+		menu:SetPos( Vec2( 250, 180 + ( MULTIPLAYER and 60 or 0 ) ) )
 	end
 	
 	local pan = aahh.Create( "button", menu )
@@ -186,6 +197,9 @@ do -- Host
 			graphics.DrawOutlinedRect( Rect( 1, 1, size - 2 ), 1, Color( 1, 1, 1, 0.1 ) )
 		end
 	end
+	pan.RequestLayout = function( me, size )
+		pan:SetPos( Vec2( 50, 220 + ( MULTIPLAYER and 60 or 0 ) ) )
+	end
 	pan.OnPress = function()
 		print( "host" )
 	end
@@ -204,6 +218,9 @@ do -- Extras
 			graphics.DrawFilledRect( Rect( size.w - 42, 1, 1, 38 ), Color( 0, 0, 0, 0.3 ) )
 		end
 	end
+	pan.RequestLayout = function( me, size )
+		pan:SetPos( Vec2( 50, 280 + ( MULTIPLAYER and 60 or 0 ) ) )
+	end
 	pan.OnPress = function()
 		print( "extras" )
 	end
@@ -219,6 +236,9 @@ do -- Settings
 			graphics.DrawOutlinedRect( Rect( 0, 0, size ), 1, Color( 0, 0, 0, 0.3 ) )
 			graphics.DrawOutlinedRect( Rect( 1, 1, size - 2 ), 1, Color( 1, 1, 1, 0.1 ) )
 		end
+	end
+	pan.RequestLayout = function( me, size )
+		pan:SetPos( Vec2( 50, 320 + ( MULTIPLAYER and 60 or 0 ) ) )
 	end
 	pan.OnPress = function()
 		print( "settings" )
@@ -237,6 +257,10 @@ do -- Disconnect
 			graphics.DrawOutlinedRect( Rect( 1, 1, size - 2 ), 1, Color( 1, 1, 1, 0.1 ) )
 		end
 	end
+	pan.RequestLayout = function( me, size )
+		pan:SetPos( Vec2( 50, 380 + ( MULTIPLAYER and 60 or 0 ) ) )
+		pan:SetVisible( MULTIPLAYER )
+	end
 	pan.OnPress = function()
 		console.RunString( "disconnect", true, true )
 	end
@@ -253,6 +277,9 @@ do -- Quit
 			graphics.DrawOutlinedRect( Rect( 1, 1, size - 2 ), 1, Color( 1, 1, 1, 0.1 ) )
 		end
 	end
+	pan.RequestLayout = function( me, size )
+		pan:SetPos( Vec2( 50, 380 + ( MULTIPLAYER and 100 or 0 ) ) )
+	end
 	pan.OnPress = function()
 		console.RunString( "quit", true, true )
 	end
@@ -268,6 +295,9 @@ end )
 function menu.Show()
 	menu.backplate:SetVisible( true )
 	mouse.ShowCursor( true )
+	for k, v in pairs( menu.backplate:GetChildren() ) do
+		v:RequestLayout()
+	end
 end
 
 function menu.Hide()

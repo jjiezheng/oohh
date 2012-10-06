@@ -10,7 +10,7 @@ LUALIB_FUNCTION(_G, Matrix33)
 	return 1;
 }
 
-LUAMTA_FUNCTION(Matrix33, Invert)
+LUAMTA_FUNCTION(matrix33, Invert)
 {
 	auto self = my->ToMatrix33Ptr(1);
 
@@ -19,7 +19,7 @@ LUAMTA_FUNCTION(Matrix33, Invert)
 	return 1;
 }
 
-LUAMTA_FUNCTION(Matrix33, GetInverted)
+LUAMTA_FUNCTION(matrix33, GetInverted)
 {
 	auto self = my->ToMatrix33Ptr(1);
 
@@ -28,7 +28,7 @@ LUAMTA_FUNCTION(Matrix33, GetInverted)
 	return 1;
 }
 
-LUAMTA_FUNCTION(Matrix33, CreateOrthogonalBase)
+LUAMTA_FUNCTION(matrix33, CreateOrthogonalBase)
 {
 	auto self = my->ToMatrix33Ptr(1);
 
@@ -37,7 +37,7 @@ LUAMTA_FUNCTION(Matrix33, CreateOrthogonalBase)
 	return 1;
 }
 
-LUAMTA_FUNCTION(Matrix33, CreateRotationVDir)
+LUAMTA_FUNCTION(matrix33, CreateRotationVDir)
 {
 	auto self = my->ToMatrix33Ptr(1);
 
@@ -46,7 +46,7 @@ LUAMTA_FUNCTION(Matrix33, CreateRotationVDir)
 	return 1;
 }
 
-LUAMTA_FUNCTION(Matrix33, CreateRotationXYZ)
+LUAMTA_FUNCTION(matrix33, CreateRotationXYZ)
 {
 	auto self = my->ToMatrix33Ptr(1);
 
@@ -54,7 +54,7 @@ LUAMTA_FUNCTION(Matrix33, CreateRotationXYZ)
 
 	return 1;
 }
-LUAMTA_FUNCTION(Matrix33, Adjoint)
+LUAMTA_FUNCTION(matrix33, Adjoint)
 {
 	auto self = my->ToMatrix33Ptr(1);
 
@@ -63,7 +63,7 @@ LUAMTA_FUNCTION(Matrix33, Adjoint)
 	return 1;
 }
 
-LUAMTA_FUNCTION(Matrix33, SetRotationX)
+LUAMTA_FUNCTION(matrix33, SetRotationX)
 {
 	auto self = my->ToMatrix33Ptr(1);
 
@@ -72,7 +72,7 @@ LUAMTA_FUNCTION(Matrix33, SetRotationX)
 	return 1;
 }
 
-LUAMTA_FUNCTION(Matrix33, SetRotationY)
+LUAMTA_FUNCTION(matrix33, SetRotationY)
 {
 	auto self = my->ToMatrix33Ptr(1);
 
@@ -81,7 +81,7 @@ LUAMTA_FUNCTION(Matrix33, SetRotationY)
 	return 1;
 }
 
-LUAMTA_FUNCTION(Matrix33, SetRotationZ)
+LUAMTA_FUNCTION(matrix33, SetRotationZ)
 {
 	auto self = my->ToMatrix33Ptr(1);
 
@@ -90,7 +90,7 @@ LUAMTA_FUNCTION(Matrix33, SetRotationZ)
 	return 1;
 }
 
-LUAMTA_FUNCTION(Matrix33, SetRotation)
+LUAMTA_FUNCTION(matrix33, SetRotation)
 {
 	auto self = my->ToMatrix33Ptr(1);
 

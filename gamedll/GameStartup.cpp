@@ -39,8 +39,8 @@ History:
 static CAutoTester s_autoTesterSingleton;
 
 #include  "oohh.hpp"
-
-
+#include "ID3DSystem.h"
+#include "ID3DSystem_impl.h"
 
 #if defined(ENABLE_STATS_AGENT)
 #include "StatsAgent.h"
@@ -252,6 +252,8 @@ IGameRef CGameStartup::Init(SSystemInitParams &startupParams)
 		CryLogAlways("failed to find ISystem to register error observer");
 		assert(0);
 	}
+
+	InitD3DSystem(startupParams);
 
 	return pOut;
 }

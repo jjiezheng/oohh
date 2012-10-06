@@ -300,7 +300,9 @@ public:
 		base_folder = base_folder + "/";
         auto new_path = base_folder + path;
 
+		my_suppress_lock();
         CallHook("PathCheck", new_path, 1);
+		my_allow_lock();
 
         if (IsType(-1, LUA_TSTRING))
         {

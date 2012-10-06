@@ -140,7 +140,7 @@ LUAMTA_FUNCTION(entity, IsValid)
 	return 1;
 }
 
-LUAMTA_FUNCTION(entity, SetModelNoNetwork)
+LUAMTA_FUNCTION(entity, SetModel)
 {
 	auto self = my->ToEntity(1);
 	
@@ -859,6 +859,9 @@ LUAMTA_FUNCTION(entity, SetNetParent)
 LUAMTA_FUNCTION(entity, BindToNetwork)
 {
 	auto self = my->ToEntity(1);
+
+	if (strcmp(self->GetClass()->GetName(), "ScriptedEntity") == 0) return 0;
+
 	auto obj = gEnv->pGame->GetIGameFramework()->GetIGameObjectSystem()->CreateGameObjectForEntity(self->GetId());
 
 	obj->EnablePrePhysicsUpdate(ePPU_Always);
@@ -920,4 +923,22 @@ LUAMTA_FUNCTION(entity, RemoveAllEntityLinks)
 	my->ToEntity(1)->RemoveAllEntityLinks();
 
 	return 0;
+}
+
+LUAMTA_FUNCTION(entity, SetOpacity)
+{
+	auto self = (IEntityRenderProxy *)my->ToEntity(1)->GetProxy(ENTITY_PROXY_RENDER);
+
+	self->SetOpacity(my->ToNumber(2));
+
+	return 0;
+}
+
+LUAMTA_FUNCTION(entity, GetOpacity)
+{
+	auto self = (IEntityRenderProxy *)my->ToEntity(1)->GetProxy(ENTITY_PROXY_RENDER);
+
+	my->Push(self->GetOpacity());
+
+	return 1;
 }

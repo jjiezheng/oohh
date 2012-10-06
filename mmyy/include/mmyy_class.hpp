@@ -206,11 +206,6 @@ inline void Print(const char *str)
 		return luaL_optnumber(L, idx, def);
 	}
 
-	inline void MakeNil(int idx)
-	{
-		my_makenil(L, idx);
-	}
-
 #define WRAP_NUM(typ) inline void Push(typ num) { lua_pushnumber(L, (lua_Number)num); }
 	WRAP_NUM(char)
 	WRAP_NUM(short)

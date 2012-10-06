@@ -10,7 +10,7 @@ LUALIB_FUNCTION(_G, Matrix44)
 	return 1;
 }
 
-LUAMTA_FUNCTION(Matrix44, Invert)
+LUAMTA_FUNCTION(matrix44, Invert)
 {
 	auto self = my->ToMatrix44Ptr(1);
 
@@ -19,7 +19,7 @@ LUAMTA_FUNCTION(Matrix44, Invert)
 	return 1;
 }
 
-LUAMTA_FUNCTION(Matrix44, GetTranslation)
+LUAMTA_FUNCTION(matrix44, GetTranslation)
 {
 	auto self = my->ToMatrix44Ptr(1);
 
@@ -28,7 +28,7 @@ LUAMTA_FUNCTION(Matrix44, GetTranslation)
 	return 1;
 }
 
-LUAMTA_FUNCTION(Matrix44, Multiply)
+LUAMTA_FUNCTION(matrix44, Multiply)
 {
 	auto self = my->ToMatrix44(1);
 
@@ -39,7 +39,7 @@ LUAMTA_FUNCTION(Matrix44, Multiply)
 	return 1;
 }
 
-LUAMTA_FUNCTION(Matrix44, SetTranslation)
+LUAMTA_FUNCTION(matrix44, SetTranslation)
 {
 	auto self = my->ToMatrix44Ptr(1);
 
@@ -48,7 +48,7 @@ LUAMTA_FUNCTION(Matrix44, SetTranslation)
 	return 1;
 }
 
-LUAMTA_FUNCTION(Matrix44, Transpose)
+LUAMTA_FUNCTION(matrix44, Transpose)
 {
 	auto self = my->ToMatrix44Ptr(1);
 
@@ -57,7 +57,7 @@ LUAMTA_FUNCTION(Matrix44, Transpose)
 	return 1;
 }
 
-LUAMTA_FUNCTION(Matrix44, TransformPoint)
+LUAMTA_FUNCTION(matrix44, TransformPoint)
 {
 	auto self = my->ToMatrix44Ptr(1);
 
@@ -66,7 +66,7 @@ LUAMTA_FUNCTION(Matrix44, TransformPoint)
 	return 1;
 }
 
-LUAMTA_FUNCTION(Matrix44, TransformVector)
+LUAMTA_FUNCTION(matrix44, TransformVector)
 {
 	auto self = my->ToMatrix44Ptr(1);
 

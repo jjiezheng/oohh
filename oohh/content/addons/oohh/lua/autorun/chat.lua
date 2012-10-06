@@ -34,8 +34,8 @@ if CLIENT then
 						panel:SetText(history[i])
 						panel:SetCaretPos(#history[i])
 					end
-					
-					if key == "esc" then
+									
+					if key == "escape" then
 						panel:OnEnter("")
 					end
 				end

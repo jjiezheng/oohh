@@ -6,8 +6,8 @@ function META:GetPixelTable(new)
 	return new and ffi.new("rgba_pixel[?]", self:GetLength()) or ffi.cast("rgba_pixel *", self:GetData())
 end
 
-function META:SetPixelTable(data)
-	self:SetData(data)
+function META:SetPixelTable(data, ...)
+	self:SetData(data, ...)
 end
 
 function META:GetLength()

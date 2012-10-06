@@ -61,7 +61,7 @@ function aahh.MouseInput(key, press, pos)
 	local tbl = {}
 	
 	for _, pnl in pairs(aahh.GetPanels()) do
-		if not pnl.IgnoreMouse and pnl:IsWorldPosInside(pos) and pnl:IsVisible() then
+		if not pnl.IgnoreMouse and pnl:IsWorldPosInside(pos) and pnl:IsVisibleEx() then
 			table.insert(tbl, pnl)
 		end
 	end

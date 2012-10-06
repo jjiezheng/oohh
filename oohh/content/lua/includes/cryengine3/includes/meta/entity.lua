@@ -53,74 +53,157 @@ hook.Add("PostGameUpdate", "entity_update", function()
 			end
 		end
 		
-		if ent.OnUpdate then
+		if ent.OnUpdate and ent:GetClass() ~= "ScriptedEntity" then
 			ent:OnUpdate()
 		end
 	end
 end)
 
 if CLIENT then
-	local buffer = {}
+	local ent_buffer = {}
+	local phys_buffer = {}
 	
 	message.Hook("e", function(id, func, ...)
 		local ent = entities.GetById(id)
 		if ent:IsValid() then
 			if ent[func] then
+				print(func, ...)
 				ent[func](ent, ...)
+				if ent_buffer[id] then
+					ent_buffer[id][func] = nil
+				end
 			end	
 		else
-			buffer[id] = buffer[id] or {}
-			buffer[id][func] = {...}
+			ent_buffer[id] = ent_buffer[id] or {}
+			ent_buffer[id][func] = {...}
+		end
+	end)
+	
+	message.Hook("ep", function(id, func, ...)
+		local ent = entities.GetById(id)
+		if ent:IsValid() and ent:GetPhysics():IsValid() then
+			local ent = ent:GetPhysics()
+			if ent[func] then
+				print(func, ...)
+				ent[func](ent, ...)
+				if phys_buffer[id] then
+					phys_buffer[id][func] = nil
+				end
+			end	
+		else
+			phys_buffer[id] = phys_buffer[id] or {}
+			phys_buffer[id][func] = {...}
 		end
 	end)
 	
 	hook.Add("EntitySpawned", "call_on_client", function(ent)
 		local id = ent:GetId()
-		local data = buffer[id]
+		local data = ent_buffer[id]
 		
 		if data then
-			local data = buffer[id]
+			local data = ent_buffer[id]
 			for func, args in pairs(data) do
 				print(func, unpack(args))
 				ent[func](ent, unpack(args))
 				data[func] = nil
 			end
-			
+		end
+		
+		local data = phys_buffer[id]
+		
+		if data then
+			local data = phys_buffer[id]
+			local ent = ent:GetPhysics()
+			if ent:IsValid() then
+				for func, args in pairs(data) do
+					print(func, unpack(args))
+					ent[func](ent, unpack(args))
+					data[func] = nil
+				end
+			else
+				phys_buffer[id] = nil
+			end
 		end
 	end)
 	
 	hook.Add("EntityRemoved", "call_on_client", function(ent)
-		buffer[ent:GetId()] = nil
+		ent_buffer[ent:GetId()] = nil
+		phys_buffer[ent:GetId()] = nil
 		entities.CachedEntities[ent:GetId()] = nil
 	end)
-	
-	function META:PhysicalizeEx(...)
-		local phys = self:Physicalize(...)
-		phys:SetNetworkAuthority(true)
-		return phys
-	end
 end
 
 if SERVER then
-	function META:CallOnClient(func, ...)
+	function META:CallOnClients(func, ...)
 		message.SendToClient("e", nil, self:GetId(), func, ...)
-	end
-
-	function META:SetModel(mdl)
-		if SERVER then 
-			self:CallOnClient("SetModelNoNetwork", mdl) 
-		end
-		self:SetModelNoNetwork(mdl)
+	end	
+	
+	function META:CallOnClient(func, filter, ...)
+		message.SendToClient("e", filter, self:GetId(), func, ...)
 	end
 	
-	function META:PhysicalizeEx(...)
-		if SERVER then
-			self:CallOnClient("PhysicalizeEx", ...)
+	hook.Add("EntitySpawned", "call_on_client", function(ply)
+		if typex(ply) == "player" then
+			for key, ent in pairs(entities.GetAll()) do
+				if ent.call_on_client then
+					for func_name, args in pairs(ent.call_on_client) do
+						ent:CallOnClient(func_name, ply, unpack(args))
+					end
+					ply.call_on_client = ply.call_on_client or {}   
+				end
+			end
 		end
-		local phys = self:Physicalize(...)
-		phys:SetNetworkAuthority(true)
-		return phys
+	end)
+	
+	local NETWORK = function(func_name) 
+		local META = util.FindMetaTable("entity")
+		local old = META[func_name .. "NoNetwork"] or META[func_name]
+		
+		META[func_name] = function(self, ...) 
+			self:CallOnClients(func_name, ...)
+			
+			self.call_on_client = self.call_on_client or {}
+			self.call_on_client[func_name] = {...}
+			
+			return old(self, ...)
+		end
+		
+		META[func_name .. "NoNetwork"] = old
 	end
+
+	NETWORK("SetModel")
+	NETWORK("SetScale")
+	NETWORK("SetParent")	
+	
+	local META = util.FindMetaTable("physics")
+	
+	function META:CallOnClients(func, ...)
+		message.SendToClient("ep", nil, self:GetEntity():GetId(), func, ...)
+	end	
+	
+	function META:CallOnClient(func, filter, ...)
+		message.SendToClient("ep", filter, self:GetEntity():GetId(), func, ...)
+	end
+	
+	local NETWORK_PHYS = function(func_name) 
+		local META = util.FindMetaTable("physics")
+		local old = META[func_name .. "NoNetwork"] or META[func_name]
+		
+		META[func_name] = function(self, ...) 
+			self:CallOnClients(func_name, ...)
+			
+			self.call_on_client = self.call_on_client or {}
+			self.call_on_client[func_name] = {...}
+			
+			return old(self, ...)
+		end
+		
+		META[func_name .. "NoNetwork"] = old
+	end
+	
+	NETWORK_PHYS("SetMass")
+	NETWORK_PHYS("SetDensity")
+	NETWORK_PHYS("SetDamping")
 end
 
 local utils = 
